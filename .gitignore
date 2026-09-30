@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploaded files (keep the directory, not the content)
+storage/uploads/*
+!storage/uploads/.gitkeep
+
+# Test artifacts
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Alembic
+backend/alembic/versions/__pycache__/
+
+# Docker
+pgdata/

@@ -1,0 +1,31 @@
+[project]
+name = "conceptlens-backend"
+version = "0.1.0"
+description = "ConceptLens adaptive-learning platform — backend"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.30,<1",
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "asyncpg>=0.29,<1",
+    "alembic>=1.13,<2",
+    "pgvector>=0.3,<1",
+    "pydantic>=2.0,<3",
+    "pydantic-settings>=2.0,<3",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "pytest-asyncio>=0.24,<1",
+    "httpx>=0.27,<1",
+    "aiosqlite>=0.20,<1",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
