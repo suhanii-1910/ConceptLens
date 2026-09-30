@@ -76,9 +76,11 @@ docker compose up -d
 docker compose ps
 ```
 
-This starts PostgreSQL 16 with the pgvector extension pre-installed.
+This starts PostgreSQL 16 with the pgvector extension pre-installed.  The container's port 5432 is mapped to **host port 55432** (localhost only) to avoid conflicts with any existing local PostgreSQL installation.
 
-Default connection: `postgresql+asyncpg://conceptlens:conceptlens@localhost:5432/conceptlens`
+Default connection: `postgresql+asyncpg://conceptlens:conceptlens@localhost:55432/conceptlens`
+
+> **`.env` location:** The `.env` file lives at the **repository root** (`ConceptLens/.env`), not inside `backend/`.  The application resolves this path automatically regardless of your working directory.
 
 ---
 
