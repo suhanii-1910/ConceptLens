@@ -106,8 +106,15 @@ async def process_source(
         )
 
     try:
-        processing_result = await process_pdf(db, source_version=sv)
+        from app.services.source_processing import process_source as dispatch_process_source
+        from app.services.source_processing import VideoNotSupportedError
+        processing_result = await dispatch_process_source(db, source_version=sv)
     except NotAPDFError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except VideoNotSupportedError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
@@ -123,6 +130,25 @@ async def process_source(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"PDF processing failed: {exc}",
         )
+    except Exception as exc:
+        # We need to catch PPTXProcessingError without importing it directly at the top since it might cause circular imports if placed incorrectly, or we can just import it. Let's import it here.
+        from app.services.pptx_ingestion import PPTXProcessingError, AlreadyProcessedError as PPTXAlreadyProcessedError, NotAPPTXError
+        if isinstance(exc, PPTXProcessingError):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"PPTX processing failed: {exc}",
+            )
+        if isinstance(exc, NotAPPTXError):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            )
+        if isinstance(exc, PPTXAlreadyProcessedError):
+            from fastapi.responses import JSONResponse
+            data = ProcessingResultRead(**exc.result.__dict__).model_dump(mode="json")
+            return JSONResponse(content=data, status_code=status.HTTP_200_OK)
+
+        raise exc
 
     from fastapi.responses import JSONResponse
 

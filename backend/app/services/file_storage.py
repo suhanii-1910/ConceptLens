@@ -24,7 +24,6 @@ from app.models.source_version import ProcessingStatus, SourceType, SourceVersio
 ALLOWED_MIME_TYPES: dict[str, SourceType] = {
     "application/pdf": SourceType.pdf,
     "application/vnd.openxmlformats-officedocument.presentationml.presentation": SourceType.pptx,
-    "application/vnd.ms-powerpoint": SourceType.pptx,  # .ppt
     "video/mp4": SourceType.video,
 }
 

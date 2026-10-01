@@ -82,11 +82,12 @@ MIN_IMAGE_DIMENSION = 50
 
 @dataclass
 class ProcessingResult:
-    """Structured result returned after PDF processing."""
+    """Structured result returned after processing."""
 
     source_version_id: uuid.UUID
     processing_status: str
-    page_count: int = 0
+    page_count: int | None = 0
+    slide_count: int | None = None
     text_evidence_count: int = 0
     table_evidence_count: int = 0
     image_evidence_count: int = 0

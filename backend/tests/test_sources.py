@@ -54,6 +54,23 @@ async def test_upload_pptx(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_upload_legacy_ppt_rejected(client: AsyncClient):
+    resp = await client.post("/courses", json={"name": "Reject PPT Course"})
+    course_id = resp.json()["id"]
+
+    ppt_bytes = b"fake legacy ppt"
+    resp = await client.post(
+        f"/courses/{course_id}/sources",
+        files=_make_upload(
+            ppt_bytes,
+            "slides.ppt",
+            "application/vnd.ms-powerpoint",
+        ),
+    )
+    assert resp.status_code == 415
+
+
+@pytest.mark.asyncio
 async def test_upload_mp4(client: AsyncClient):
     resp = await client.post("/courses", json={"name": "Video Course"})
     course_id = resp.json()["id"]

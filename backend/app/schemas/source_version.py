@@ -27,7 +27,8 @@ class ProcessingResultRead(BaseModel):
 
     source_version_id: uuid.UUID
     processing_status: str
-    page_count: int
+    page_count: int | None = None
+    slide_count: int | None = None
     text_evidence_count: int
     table_evidence_count: int
     image_evidence_count: int
