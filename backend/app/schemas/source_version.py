@@ -20,3 +20,16 @@ class SourceVersionRead(BaseModel):
     storage_path: str
     processing_status: ProcessingStatus
     created_at: datetime
+
+
+class ProcessingResultRead(BaseModel):
+    """Response schema for PDF processing results."""
+
+    source_version_id: uuid.UUID
+    processing_status: str
+    page_count: int
+    text_evidence_count: int
+    table_evidence_count: int
+    image_evidence_count: int
+    warnings: list[str] = []
+    already_processed: bool = False

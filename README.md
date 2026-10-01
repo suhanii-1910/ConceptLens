@@ -8,9 +8,9 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 0A — backend foundation only.**
+**Phase 1A — PDF ingestion complete.**
 
-This phase implements:
+### Phase 0A — Backend foundation
 
 - FastAPI backend skeleton
 - PostgreSQL + pgvector database configuration
@@ -18,16 +18,36 @@ This phase implements:
 - Alembic migrations
 - Course CRUD API
 - Raw source file upload and storage (PDF, PPTX, PPT, MP4)
-- Automated tests (19 passing)
 
-### NOT implemented
+### Phase 1A — PDF ingestion
 
-The following are **not** implemented and will come in future phases:
+- **Text extraction**: Page-by-page, block-by-block via PyMuPDF with minimum-content threshold (≥20 non-whitespace characters)
+- **Table extraction**: pdfplumber `find_tables()` per page, serialised as Markdown pipe-delimited format
+- **Image extraction**: Embedded raster images via PyMuPDF, filtered for minimum dimensions (50×50 px), saved to derived storage
+- **Provenance**: Every EvidenceUnit carries `location_metadata` with page_index (0-based), page_number (1-based), printed_page_label, bounding_box, block_index, element_type
+- **Processing status**: Transitions `uploaded → processing → ready` (or `→ failed` on error)
+- **Idempotency**: Already-processed sources return existing results without creating duplicates; failed sources can be retried
+- **Derived storage**: Extracted images stored under `storage/derived/<source_version_id>/`, separate from originals
+- **API endpoint**: `POST /courses/{course_id}/sources/{source_version_id}/process` (201 on fresh processing, 200 if already processed)
+- **Scanned PDFs**: Process successfully with zero text evidence (no OCR, no fabrication)
+- **Automated tests**: 45 passing (19 from Phase 0A + 26 new)
 
-- AI / LLM calls
-- RAG (retrieval-augmented generation)
-- Multimodal parsing (PDF extraction, PPTX extraction, video transcription)
+### Current limitations
+
+- **No PPTX or video ingestion** — only PDF is supported
+- **No OCR** — scanned PDFs produce zero text evidence
+- **No LLM/AI calls** — `topic`, `subtopic`, and `extracted_description` are left NULL
+- **No embeddings or vector search**
+- **No authentication** — all endpoints are open
+- **No frontend**
+
+### NOT implemented (future phases)
+
+- PPTX extraction, video transcription
+- OCR for scanned documents
+- AI / LLM calls (topic classification, description generation)
 - Embeddings / pgvector similarity search
+- RAG (retrieval-augmented generation)
 - Tutoring / chatbot
 - Assessment generation
 - Learner modelling / mastery tracking
@@ -139,9 +159,10 @@ ConceptLens/
 │   │   ├── db/             # Database engine, session, base model
 │   │   ├── models/         # SQLAlchemy ORM models
 │   │   ├── schemas/        # Pydantic request/response schemas
-│   │   ├── services/       # Business logic (course service, file storage)
+│   │   ├── services/       # Business logic (course service, file storage, PDF ingestion)
 │   │   └── main.py         # FastAPI app entry point
 │   ├── tests/              # Pytest test suite
+│   │   └── fixtures/       # Programmatic PDF fixture factory
 │   ├── alembic/            # Database migrations
 │   ├── alembic.ini         # Alembic configuration
 │   └── pyproject.toml      # Python project & dependencies
@@ -149,7 +170,8 @@ ConceptLens/
 ├── worker/                 # (future) Ingestion/background worker
 ├── evaluation/             # (future) Evaluation runner
 ├── storage/
-│   └── uploads/            # Uploaded source files
+│   ├── uploads/            # Uploaded source files
+│   └── derived/            # Extracted artifacts (images, etc.)
 ├── demo-course/            # (future) Demo course data
 ├── docs/                   # (future) Documentation
 ├── docker-compose.yml      # PostgreSQL + pgvector
@@ -161,21 +183,23 @@ ConceptLens/
 
 ## API endpoints
 
-| Method | Path                              | Description               |
-|--------|-----------------------------------|---------------------------|
-| GET    | `/health`                         | Health check              |
-| POST   | `/courses`                        | Create a course           |
-| GET    | `/courses`                        | List all courses          |
-| GET    | `/courses/{course_id}`            | Get a single course       |
-| POST   | `/courses/{course_id}/sources`    | Upload a source file      |
-| GET    | `/courses/{course_id}/sources`    | List sources for a course |
+| Method | Path                                                          | Description               |
+|--------|---------------------------------------------------------------|---------------------------|
+| GET    | `/health`                                                     | Health check              |
+| POST   | `/courses`                                                    | Create a course           |
+| GET    | `/courses`                                                    | List all courses          |
+| GET    | `/courses/{course_id}`                                        | Get a single course       |
+| POST   | `/courses/{course_id}/sources`                                | Upload a source file      |
+| GET    | `/courses/{course_id}/sources`                                | List sources for a course |
+| POST   | `/courses/{course_id}/sources/{source_version_id}/process`    | Process a PDF source      |
 
 ---
 
 ## Known limitations
 
 - **No Docker in CI/dev environment**: Migrations require a running PostgreSQL instance started via `docker compose up -d`. Tests use in-memory SQLite and do not require PostgreSQL.
-- **No file parsing**: Uploaded files are stored but not parsed, indexed, or processed.
+- **PDF only**: Only PDF files can be processed. PPTX and video sources are accepted for upload but cannot be processed yet.
+- **No OCR**: Scanned PDFs produce zero text evidence — no text is fabricated.
 - **No authentication**: All endpoints are open.
 - **Duplicate detection is per-course**: The same file uploaded to different courses creates separate records.
 - **No file-size limits enforced at the application level**: Large uploads are accepted (rely on reverse proxy limits in production).

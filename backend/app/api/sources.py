@@ -1,14 +1,22 @@
-"""Source upload/listing API routes."""
+"""Source upload/listing/processing API routes."""
 
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
-from app.schemas.source_version import SourceVersionRead
+from app.models.source_version import SourceVersion
+from app.schemas.source_version import ProcessingResultRead, SourceVersionRead
 from app.services import course_service
 from app.services.file_storage import UnsupportedFileTypeError, store_source, list_sources
+from app.services.pdf_ingestion import (
+    AlreadyProcessedError,
+    NotAPDFError,
+    PDFProcessingError,
+    process_pdf,
+)
 
 router = APIRouter(prefix="/courses/{course_id}/sources", tags=["sources"])
 
@@ -57,3 +65,66 @@ async def list_course_sources(
 
     sources = await list_sources(db, course_id)
     return [SourceVersionRead.model_validate(s) for s in sources]
+
+
+@router.post(
+    "/{source_version_id}/process",
+    response_model=ProcessingResultRead,
+)
+async def process_source(
+    course_id: uuid.UUID,
+    source_version_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Trigger PDF processing for a source version.
+
+    Extracts text blocks, tables, and images, creating EvidenceUnit
+    records with page-level provenance.
+
+    Returns 200 if already processed, 201 on fresh processing.
+    """
+    # Verify the course exists
+    course = await course_service.get_course(db, course_id)
+    if course is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Course {course_id} not found",
+        )
+
+    # Verify the source version exists and belongs to this course
+    result = await db.execute(
+        select(SourceVersion).where(
+            SourceVersion.id == source_version_id,
+            SourceVersion.course_id == course_id,
+        )
+    )
+    sv = result.scalar_one_or_none()
+    if sv is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"SourceVersion {source_version_id} not found in course {course_id}",
+        )
+
+    try:
+        processing_result = await process_pdf(db, source_version=sv)
+    except NotAPDFError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except AlreadyProcessedError as exc:
+        # Return existing result with 200
+        from fastapi.responses import JSONResponse
+
+        data = ProcessingResultRead(**exc.result.__dict__).model_dump(mode="json")
+        return JSONResponse(content=data, status_code=status.HTTP_200_OK)
+    except PDFProcessingError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"PDF processing failed: {exc}",
+        )
+
+    from fastapi.responses import JSONResponse
+
+    data = ProcessingResultRead(**processing_result.__dict__).model_dump(mode="json")
+    return JSONResponse(content=data, status_code=status.HTTP_201_CREATED)
