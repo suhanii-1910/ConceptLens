@@ -156,6 +156,48 @@ def make_multipage_pdf(num_pages: int = 5) -> bytes:
     return data
 
 
+def make_unicode_pdf() -> bytes:
+    """Create a PDF with Unicode text for preservation testing.
+
+    Uses accented Latin characters that the default built-in font
+    (Helvetica) encodes correctly.  Characters outside the font's
+    encoding (Greek, CJK, em-dash) are dropped at PDF creation time
+    by PyMuPDF, so we restrict the test to characters the font
+    genuinely embeds.
+    """
+    doc = pymupdf.open()
+    page = doc.new_page()
+    page.insert_text(
+        (72, 72),
+        "Café résumé naïve Ångström über Zürich año señor",
+        fontsize=11,
+    )
+    data = doc.tobytes()
+    doc.close()
+    return data
+
+
+def make_image_only_pdf(width: int = 100, height: int = 100) -> bytes:
+    """Create a PDF with an embedded image but NO text at all.
+
+    Simulates a scanned-style document with only raster content.
+    """
+    doc = pymupdf.open()
+    page = doc.new_page()
+
+    # Create and embed an image — no text on the page
+    pix = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, width, height), 1)
+    pix.set_rect(pix.irect, (50, 150, 50, 255))  # green-ish (RGBA)
+    img_bytes = pix.tobytes("png")
+
+    rect = pymupdf.Rect(72, 72, 72 + width, 72 + height)
+    page.insert_image(rect, stream=img_bytes)
+
+    data = doc.tobytes()
+    doc.close()
+    return data
+
+
 def make_mixed_content_pdf() -> bytes:
     """Create a PDF with text, an image, and table lines on the same page."""
     doc = pymupdf.open()
