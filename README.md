@@ -32,9 +32,20 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **Scanned PDFs**: Process successfully with zero text evidence (no OCR, no fabrication)
 - **Automated tests**: 45 passing (19 from Phase 0A + 26 new)
 
+### Phase 1B — PPTX ingestion
+
+- **Text extraction**: Normal text extraction preserving slide structure
+- **Table extraction**: Native tables correctly rendered as deterministic Markdown pipe-delimited tables
+- **Image extraction**: Embedded raster image extraction to derived storage
+- **Provenance**: Slide index, slide number, shape index, exact bounding box
+- **Resilience**: Idempotent processing and failure/partial evidence safety
+
 ### Current limitations
 
-- **No PPTX or video ingestion** — only PDF is supported
+- **No video ingestion yet**
+- No legacy .ppt support
+- No SmartArt, chart, or vector-diagram interpretation
+- No WordArt semantics, OLE, or macros — only PDF is supported
 - **No OCR** — scanned PDFs produce zero text evidence
 - **No LLM/AI calls** — `topic`, `subtopic`, and `extracted_description` are left NULL
 - **No embeddings or vector search**
@@ -43,8 +54,9 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ### NOT implemented (future phases)
 
-- PPTX extraction, video transcription
+- Video transcription
 - OCR for scanned documents
+- AI descriptions / captions for images
 - AI / LLM calls (topic classification, description generation)
 - Embeddings / pgvector similarity search
 - RAG (retrieval-augmented generation)

@@ -13,6 +13,7 @@ from app.services.pdf_ingestion import (
     ProcessingResult,
     _count_existing_evidence,
 )
+from app.services.derived_storage import derived_dir_for, safe_derived_filename
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ async def process_pptx(
     *,
     source_version: SourceVersion,
 ) -> ProcessingResult:
-    """Process a PPTX SourceVersion: extract text shapes.
+    """Process a PPTX SourceVersion: extract text shapes, tables, and images.
 
     Raises:
         NotAPPTXError: if source_type is not PPTX
@@ -85,6 +86,7 @@ async def process_pptx(
         result = await _extract_pptx(db, source_version=source_version)
     except Exception as exc:
         # transition: processing → failed
+        await db.rollback()
         logger.error("PPTX processing failed: source_version_id=%s, error=%s", sv_id, exc)
         source_version.processing_status = ProcessingStatus.failed
         await db.commit()
@@ -107,6 +109,35 @@ async def process_pptx(
     return result
 
 
+def _table_to_markdown(table) -> str:
+    """Convert a pptx Table into a Markdown table."""
+    if not table.rows:
+        return ""
+
+    def _cell(text: str | None) -> str:
+        if text is None:
+            return ""
+        # Preserve multi-line by replacing newline with <br>
+        # Escape pipe characters to preserve markdown table
+        return str(text).replace("|", "\\|").replace("\n", "<br>").strip()
+
+    lines: list[str] = []
+
+    # Process header
+    header = [_cell(cell.text_frame.text if getattr(cell, "text_frame", None) else "") for cell in table.rows[0].cells]
+    lines.append("| " + " | ".join(header) + " |")
+    lines.append("| " + " | ".join("---" for _ in header) + " |")
+
+    # Process body
+    for row in list(table.rows)[1:]:
+        cells = [_cell(cell.text_frame.text if getattr(cell, "text_frame", None) else "") for cell in row.cells]
+        while len(cells) < len(header):
+            cells.append("")
+        lines.append("| " + " | ".join(cells) + " |")
+
+    return "\n".join(lines)
+
+
 async def _extract_pptx(
     db: AsyncSession,
     *,
@@ -120,10 +151,15 @@ async def _extract_pptx(
     if not pptx_path.exists():
         raise FileNotFoundError(f"PPTX file not found: {pptx_path}")
 
+    derived_dir = derived_dir_for(sv_id)
+
     result = ProcessingResult(
         source_version_id=sv_id,
         processing_status="ready",
     )
+    result.text_evidence_count = 0
+    result.table_evidence_count = 0
+    result.image_evidence_count = 0
 
     evidence_units: list[EvidenceUnit] = []
 
@@ -140,14 +176,10 @@ async def _extract_pptx(
     for slide_index, slide in enumerate(prs.slides):
         slide_number = slide_index + 1
 
+        # Track image count per slide for deterministic artifacts
+        slide_image_index = 0
+
         for shape_index, shape in enumerate(slide.shapes):
-            if not shape.has_text_frame:
-                continue
-
-            raw_text = shape.text
-            if not raw_text.strip():
-                continue
-
             left = shape.left
             top = shape.top
             width = shape.width
@@ -168,26 +200,87 @@ async def _extract_pptx(
                 "coordinate_unit": "emu",
                 "slide_width": slide_width,
                 "slide_height": slide_height,
-                "element_type": "text",
             }
 
-            eu = EvidenceUnit(
-                course_id=course_id,
-                source_version_id=sv_id,
-                modality=Modality.text,
-                original_text=raw_text,
-                extracted_description=None,
-                topic=None,
-                subtopic=None,
-                extraction_status=ExtractionStatus.extracted,
-                location_metadata=location_metadata,
-            )
-            evidence_units.append(eu)
-            result.text_evidence_count += 1
+            # Table checking
+            if getattr(shape, "has_table", False):
+                md_text = _table_to_markdown(shape.table)
+                if md_text.strip():
+                    loc_meta = location_metadata.copy()
+                    loc_meta["element_type"] = "table"
+                    eu = EvidenceUnit(
+                        course_id=course_id,
+                        source_version_id=sv_id,
+                        modality=Modality.table,
+                        original_text=md_text,
+                        extracted_description=None,
+                        topic=None,
+                        subtopic=None,
+                        extraction_status=ExtractionStatus.extracted,
+                        location_metadata=loc_meta,
+                    )
+                    evidence_units.append(eu)
+                    result.table_evidence_count += 1
+                continue
 
-    # For phase 1B-A task, table_evidence_count = 0 and image_evidence_count = 0
-    result.table_evidence_count = 0
-    result.image_evidence_count = 0
+            # Picture checking
+            shape_type = getattr(shape, "shape_type", None)
+            if shape_type == MSO_SHAPE_TYPE.PICTURE and hasattr(shape, "image"):
+                image_bytes = shape.image.blob
+                ext = getattr(shape.image, "ext", "png")
+
+                filename = safe_derived_filename(
+                    prefix="pptx_img", page_index=slide_index, img_index=slide_image_index, ext=ext,
+                )
+                image_path = derived_dir / filename
+                image_path.write_bytes(image_bytes)
+
+                slide_image_index += 1
+
+                img_size = getattr(shape.image, "size", None)
+
+                loc_meta = location_metadata.copy()
+                loc_meta["element_type"] = "image"
+                loc_meta["derived_path"] = str(image_path)
+                loc_meta["image_extension"] = ext
+                if img_size and len(img_size) == 2:
+                    loc_meta["image_width"] = img_size[0]
+                    loc_meta["image_height"] = img_size[1]
+
+                eu = EvidenceUnit(
+                    course_id=course_id,
+                    source_version_id=sv_id,
+                    modality=Modality.image,
+                    original_text=None,
+                    extracted_description=None,
+                    topic=None,
+                    subtopic=None,
+                    extraction_status=ExtractionStatus.extracted,
+                    location_metadata=loc_meta,
+                )
+                evidence_units.append(eu)
+                result.image_evidence_count += 1
+                continue
+
+            # Text checking
+            if getattr(shape, "has_text_frame", False):
+                raw_text = shape.text
+                if raw_text.strip():
+                    loc_meta = location_metadata.copy()
+                    loc_meta["element_type"] = "text"
+                    eu = EvidenceUnit(
+                        course_id=course_id,
+                        source_version_id=sv_id,
+                        modality=Modality.text,
+                        original_text=raw_text,
+                        extracted_description=None,
+                        topic=None,
+                        subtopic=None,
+                        extraction_status=ExtractionStatus.extracted,
+                        location_metadata=loc_meta,
+                    )
+                    evidence_units.append(eu)
+                    result.text_evidence_count += 1
 
     if evidence_units:
         db.add_all(evidence_units)
