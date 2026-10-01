@@ -40,3 +40,6 @@ backend/alembic/versions/__pycache__/
 
 # Docker
 pgdata/
+
+# Generated derived artifacts
+storage/derived/
