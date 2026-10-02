@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 1A — PDF ingestion complete.**
+**Phase 1C — PDF, PPTX, and video ingestion complete.**
 
 ### Phase 0A — Backend foundation
 
@@ -30,7 +30,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **Derived storage**: Extracted images stored under `storage/derived/<source_version_id>/`, separate from originals
 - **API endpoint**: `POST /courses/{course_id}/sources/{source_version_id}/process` (201 on fresh processing, 200 if already processed)
 - **Scanned PDFs**: Process successfully with zero text evidence (no OCR, no fabrication)
-- **Automated tests**: 45 passing (19 from Phase 0A + 26 new)
+- **Automated regression suite**: 72 passing tests across backend ingestion and API behavior
 
 ### Phase 1B — PPTX ingestion
 
@@ -40,12 +40,26 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **Provenance**: Slide index, slide number, shape index, exact bounding box
 - **Resilience**: Idempotent processing and failure/partial evidence safety
 
+### Phase 1C — Video ingestion
+
+- **Media inspection**: FFprobe detects source duration and available audio/video streams
+- **Local transcription**: Timestamped speech transcription through a provider interface, with MLX Whisper (`mlx-community/whisper-base-mlx`) as the default Apple Silicon provider
+- **Grounded transcript provenance**: Transcript EvidenceUnits preserve real provider timestamps and source duration
+- **Terminal timestamp hardening**: Small ASR end-boundary overshoots are bounded to the real source duration while preserving the provider's original timestamp and adjustment metadata
+- **Decoded-frame provenance**: Representative visual evidence is selected only from actual FFprobe-decoded frames — citation timestamps are never mathematically fabricated
+- **Frame extraction**: Selected frames are extracted by decoded frame index with source frame index, real timestamp, width, height, keyframe flag, selection method, and source duration recorded in provenance
+- **Source immutability**: Original video SHA-256 is verified before and after processing
+- **Derived storage**: Extracted frames are stored separately under `storage/derived/<source_version_id>/`
+- **Stream resilience**: Video-only and audio-only media are handled with explicit warnings; media with no usable streams fails
+- **Idempotency**: Reprocessing an already-ready source creates no duplicate EvidenceUnits or derived frames
+- **Failure cleanup**: Partially created derived frame artifacts are removed when processing fails
+- **No visual semantic interpretation yet**: Frames are preserved as grounded visual evidence but are not captioned or interpreted by an AI model in Phase 1C
+
 ### Current limitations
 
-- **No video ingestion yet**
 - No legacy .ppt support
 - No SmartArt, chart, or vector-diagram interpretation
-- No WordArt semantics, OLE, or macros — only PDF is supported
+- No WordArt semantics, OLE, or macro interpretation
 - **No OCR** — scanned PDFs produce zero text evidence
 - **No LLM/AI calls** — `topic`, `subtopic`, and `extracted_description` are left NULL
 - **No embeddings or vector search**
@@ -54,7 +68,6 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ### NOT implemented (future phases)
 
-- Video transcription
 - OCR for scanned documents
 - AI descriptions / captions for images
 - AI / LLM calls (topic classification, description generation)
@@ -75,6 +88,8 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 - Python 3.12+
 - Docker & Docker Compose (for PostgreSQL)
+- FFmpeg / FFprobe (required for video ingestion)
+- Apple Silicon macOS for the default local MLX Whisper transcription provider
 - [uv](https://docs.astral.sh/uv/) (recommended) or pip
 
 ---
@@ -171,7 +186,7 @@ ConceptLens/
 │   │   ├── db/             # Database engine, session, base model
 │   │   ├── models/         # SQLAlchemy ORM models
 │   │   ├── schemas/        # Pydantic request/response schemas
-│   │   ├── services/       # Business logic (course service, file storage, PDF ingestion)
+│   │   ├── services/       # Business logic, storage, PDF/PPTX/video ingestion
 │   │   └── main.py         # FastAPI app entry point
 │   ├── tests/              # Pytest test suite
 │   │   └── fixtures/       # Programmatic PDF fixture factory
@@ -203,15 +218,16 @@ ConceptLens/
 | GET    | `/courses/{course_id}`                                        | Get a single course       |
 | POST   | `/courses/{course_id}/sources`                                | Upload a source file      |
 | GET    | `/courses/{course_id}/sources`                                | List sources for a course |
-| POST   | `/courses/{course_id}/sources/{source_version_id}/process`    | Process a PDF source      |
+| POST   | `/courses/{course_id}/sources/{source_version_id}/process`    | Process a supported source |
 
 ---
 
 ## Known limitations
 
 - **No Docker in CI/dev environment**: Migrations require a running PostgreSQL instance started via `docker compose up -d`. Tests use in-memory SQLite and do not require PostgreSQL.
-- **PDF only**: Only PDF files can be processed. PPTX and video sources are accepted for upload but cannot be processed yet.
+- **Supported processing formats**: PDF, PPTX, and MP4 video. Legacy `.ppt` is not supported.
 - **No OCR**: Scanned PDFs produce zero text evidence — no text is fabricated.
+- **Video visual semantics**: Video frames are grounded to real decoded-frame timestamps, but Phase 1C does not yet perform OCR, captioning, diagram interpretation, or other visual semantic analysis.
 - **No authentication**: All endpoints are open.
 - **Duplicate detection is per-course**: The same file uploaded to different courses creates separate records.
 - **No file-size limits enforced at the application level**: Large uploads are accepted (rely on reverse proxy limits in production).

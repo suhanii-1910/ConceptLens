@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     # File storage
     upload_dir: str = "storage/uploads"
 
+    # Video Processing
+    video_transcription_model: str = "mlx-community/whisper-base-mlx"
+    video_max_frames: int = 15
+    video_min_frame_gap_seconds: float = 2.0
+    video_subprocess_timeout_seconds: int = 300
+
     # Application
     debug: bool = False
 

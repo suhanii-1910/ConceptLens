@@ -224,23 +224,3 @@ async def test_process_corrupt_pptx(client: AsyncClient, corrupt_pptx: Path, db_
         .where(EvidenceUnit.source_version_id == uuid.UUID(source_version_id))
     )
     assert len(result.scalars().all()) == 0
-
-
-@pytest.mark.asyncio
-async def test_process_video_not_supported(client: AsyncClient):
-    resp = await client.post("/courses", json={"name": "Video Processing"})
-    assert resp.status_code == 201
-    course_id = resp.json()["id"]
-
-    mp4_bytes = b"\x00\x00\x00\x18ftypmp42"
-    resp = await client.post(
-        f"/courses/{course_id}/sources",
-        files={"file": ("vid.mp4", mp4_bytes, "video/mp4")},
-    )
-    assert resp.status_code == 201
-    source_version_id = resp.json()["id"]
-
-    # Trigger processing
-    resp = await client.post(f"/courses/{course_id}/sources/{source_version_id}/process")
-    assert resp.status_code == 400
-    assert "Video processing is not yet implemented" in resp.json()["detail"]

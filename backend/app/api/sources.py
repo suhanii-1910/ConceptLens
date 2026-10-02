@@ -148,6 +148,22 @@ async def process_source(
             data = ProcessingResultRead(**exc.result.__dict__).model_dump(mode="json")
             return JSONResponse(content=data, status_code=status.HTTP_200_OK)
 
+        from app.services.video_ingestion import VideoProcessingError, AlreadyProcessedError as VideoAlreadyProcessedError, NotAVideoError
+        if isinstance(exc, VideoProcessingError):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Video processing failed: {exc}",
+            )
+        if isinstance(exc, NotAVideoError):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            )
+        if isinstance(exc, VideoAlreadyProcessedError):
+            from fastapi.responses import JSONResponse
+            data = ProcessingResultRead(**exc.result.__dict__).model_dump(mode="json")
+            return JSONResponse(content=data, status_code=status.HTTP_200_OK)
+
         raise exc
 
     from fastapi.responses import JSONResponse

@@ -22,6 +22,8 @@ async def process_source(db: AsyncSession, source_version: SourceVersion):
 
         return await process_pptx(db, source_version=source_version)
     elif source_version.source_type == SourceType.video:
-        raise VideoNotSupportedError("Video processing is not yet implemented.")
+        from app.services.video_ingestion import process_video
+
+        return await process_video(db, source_version=source_version)
     else:
         raise ValueError(f"Unknown source type: {source_version.source_type}")

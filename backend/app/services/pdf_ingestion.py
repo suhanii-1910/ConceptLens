@@ -88,9 +88,11 @@ class ProcessingResult:
     processing_status: str
     page_count: int | None = 0
     slide_count: int | None = None
+    duration_seconds: float | None = None
     text_evidence_count: int = 0
     table_evidence_count: int = 0
     image_evidence_count: int = 0
+    video_evidence_count: int = 0
     warnings: list[str] = field(default_factory=list)
     already_processed: bool = False
 
@@ -583,6 +585,7 @@ async def _count_existing_evidence(
         "text_evidence_count": 0,
         "table_evidence_count": 0,
         "image_evidence_count": 0,
+        "video_evidence_count": 0,
     }
     for u in units:
         if u.modality == Modality.text:
@@ -591,5 +594,7 @@ async def _count_existing_evidence(
             counts["table_evidence_count"] += 1
         elif u.modality == Modality.image:
             counts["image_evidence_count"] += 1
+        elif u.modality == Modality.video:
+            counts["video_evidence_count"] += 1
 
     return counts
