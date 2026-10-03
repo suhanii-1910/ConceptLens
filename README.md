@@ -73,6 +73,26 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
   - `POST /courses/{course_id}/retrieval/index`
   - `POST /courses/{course_id}/retrieval/search`
 
+### Phase 2B — Citation + Grounding Validation
+
+- **Deterministic provenance validation**: Every retrieval result is validated against stored evidence before any citation is issued — no citations are fabricated
+- **PDF page grounding**: Page index, page number, and optional printed page label are validated for internal consistency; bounding boxes are checked for geometric validity
+- **PPTX slide grounding**: Slide index, slide number, and optional shape index are validated; bounding boxes are checked
+- **Video transcript timestamp grounding**: Start/end seconds are validated for ordering, finiteness, and bounds against recorded source duration
+- **Decoded video-frame grounding**: Frame timestamps and source frame indices are validated; timestamps are never mathematically derived — only real decoded-frame provenance is accepted
+- **Structured citation objects**: Valid results carry a `Citation` with `locator`, `locator_label`, `location_metadata`, source identity, and modality
+- **Invalid provenance rejection**: Any inconsistency (wrong course, source mismatch, bad locator, unready source) produces `grounding_status=invalid` with structured `grounding_errors`; the HTTP response is still 200
+- **Course/source/status consistency checks**: Evidence unit course, source version course, and expected course are compared directly; source version must be `ready` and evidence unit must be `extracted`
+- **Safe public provenance metadata**: Citation and retrieval result `location_metadata` are filtered through a per-source-type allowlist — only known safe keys are exposed
+- **Local derived/storage paths excluded**: Fields such as `derived_path` carrying filesystem paths are excluded from all public surfaces by the allowlist; raw DB metadata is never mutated
+- **`only_grounded` downstream boundary**: A utility filter exposes only fully-validated results to downstream consumers, enforcing the grounding boundary
+
+**Not yet implemented:**
+- No answer generation
+- No RAG (retrieval-augmented generation)
+- No tutoring or chatbot
+- No assessment generation
+
 ### Current limitations
 
 - No legacy .ppt support

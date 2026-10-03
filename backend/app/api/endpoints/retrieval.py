@@ -1,8 +1,11 @@
 import uuid
+import logging
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
+
+logger = logging.getLogger(__name__)
 
 from app.db.session import get_db
 from app.schemas.retrieval import SearchRequest, SearchResponse, IndexingResponse
@@ -53,12 +56,11 @@ async def index_course_evidence(
             skipped_no_text_count=result.get("skipped_no_text_count", 0)
         )
         
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Indexing failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Indexing failed: {str(e)}"
+            detail="Indexing failed due to an internal error.",
         )
 
 @router.post("/search", response_model=SearchResponse)
@@ -93,11 +95,12 @@ async def search_evidence(
             modalities=request.modalities,
             source_version_ids=request.source_version_ids
         )
-        return {"results": results}
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
+        from app.services.citation_grounding import ground_retrieval_results
+        grounded = await ground_retrieval_results(db, course_id, results)
+        return {"results": grounded}
+    except Exception:
+        logger.exception("Search failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Search failed: {str(e)}"
+            detail="Search failed due to an internal error.",
         )

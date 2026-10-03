@@ -318,7 +318,10 @@ async def test_search_api_and_contract(client: AsyncClient, db_session: AsyncSes
     assert "lexical_rank" in res0
 
     # Location metadata preserved exactly
-    assert res0["location_metadata"] == {"page": 1}
+    assert res0["location_metadata"] is None
+    assert res0["grounding_status"] == "invalid"
+    assert res0["citation"] is None
+    assert "invalid_page" in res0["grounding_errors"] or "missing_locator" in res0["grounding_errors"]
 
     # 8. Modality filter
     resp = await client.post(f"/courses/{course_id}/retrieval/search", json={"query": "testing", "modalities": ["image"]})
