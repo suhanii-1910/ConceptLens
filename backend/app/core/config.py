@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     # Application
     debug: bool = False
 
+    # Embedding config
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_dimensions: int = 384
+    embedding_batch_size: int = 32
+
     model_config = {"env_prefix": "CONCEPTLENS_", "env_file": str(_ENV_FILE)}
 
 

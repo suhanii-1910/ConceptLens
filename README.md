@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 1C — PDF, PPTX, and video ingestion complete.**
+**Phase 2A — Hybrid evidence retrieval complete.**
 
 ### Phase 0A — Backend foundation
 
@@ -55,6 +55,24 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **Failure cleanup**: Partially created derived frame artifacts are removed when processing fails
 - **No visual semantic interpretation yet**: Frames are preserved as grounded visual evidence but are not captioned or interpreted by an AI model in Phase 1C
 
+
+### Phase 2A — Hybrid evidence retrieval
+
+- **Explicit evidence indexing**: Course-scoped indexing prepares existing extracted EvidenceUnits for retrieval without creating new evidence
+- **Local semantic embeddings**: `sentence-transformers/all-MiniLM-L6-v2` generates normalized 384-dimensional embeddings
+- **Embedding change detection**: SHA-256 content hashes and model identifiers prevent unnecessary re-embedding of unchanged evidence
+- **Dense retrieval**: PostgreSQL `pgvector` cosine-distance search over indexed EvidenceUnits
+- **Lexical retrieval**: PostgreSQL full-text search using `to_tsvector`, `websearch_to_tsquery`, and ranked lexical candidates
+- **Hybrid ranking**: Reciprocal Rank Fusion (RRF) combines dense and lexical rankings without mixing incomparable raw score scales
+- **Course isolation**: Dense and lexical retrieval are both restricted to the requested course
+- **Evidence safety**: Retrieval includes only extracted EvidenceUnits from ready SourceVersions
+- **Optional filters**: Retrieval supports modality and source-version filtering
+- **Grounded results**: Retrieval returns stored EvidenceUnit provenance and source metadata without fabricating page, slide, timestamp, or bounding-box information
+- **Image limitation**: Raw image EvidenceUnits without real semantic descriptions remain unembedded and are not semantically searchable
+- **API endpoints**:
+  - `POST /courses/{course_id}/retrieval/index`
+  - `POST /courses/{course_id}/retrieval/search`
+
 ### Current limitations
 
 - No legacy .ppt support
@@ -62,7 +80,6 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - No WordArt semantics, OLE, or macro interpretation
 - **No OCR** — scanned PDFs produce zero text evidence
 - **No LLM/AI calls** — `topic`, `subtopic`, and `extracted_description` are left NULL
-- **No embeddings or vector search**
 - **No authentication** — all endpoints are open
 - **No frontend**
 
@@ -71,7 +88,6 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - OCR for scanned documents
 - AI descriptions / captions for images
 - AI / LLM calls (topic classification, description generation)
-- Embeddings / pgvector similarity search
 - RAG (retrieval-augmented generation)
 - Tutoring / chatbot
 - Assessment generation
@@ -186,7 +202,7 @@ ConceptLens/
 │   │   ├── db/             # Database engine, session, base model
 │   │   ├── models/         # SQLAlchemy ORM models
 │   │   ├── schemas/        # Pydantic request/response schemas
-│   │   ├── services/       # Business logic, storage, PDF/PPTX/video ingestion
+│   │   ├── services/       # Ingestion, embeddings, indexing, and hybrid retrieval
 │   │   └── main.py         # FastAPI app entry point
 │   ├── tests/              # Pytest test suite
 │   │   └── fixtures/       # Programmatic PDF fixture factory
@@ -219,6 +235,8 @@ ConceptLens/
 | POST   | `/courses/{course_id}/sources`                                | Upload a source file      |
 | GET    | `/courses/{course_id}/sources`                                | List sources for a course |
 | POST   | `/courses/{course_id}/sources/{source_version_id}/process`    | Process a supported source |
+| POST   | `/courses/{course_id}/retrieval/index`                       | Index searchable evidence |
+| POST   | `/courses/{course_id}/retrieval/search`                      | Hybrid evidence search    |
 
 ---
 
@@ -228,6 +246,7 @@ ConceptLens/
 - **Supported processing formats**: PDF, PPTX, and MP4 video. Legacy `.ppt` is not supported.
 - **No OCR**: Scanned PDFs produce zero text evidence — no text is fabricated.
 - **Video visual semantics**: Video frames are grounded to real decoded-frame timestamps, but Phase 1C does not yet perform OCR, captioning, diagram interpretation, or other visual semantic analysis.
+- **Image semantic retrieval**: Raster image EvidenceUnits without a real `extracted_description` are intentionally not embedded or semantically searchable yet.
 - **No authentication**: All endpoints are open.
 - **Duplicate detection is per-course**: The same file uploaded to different courses creates separate records.
 - **No file-size limits enforced at the application level**: Large uploads are accepted (rely on reverse proxy limits in production).
