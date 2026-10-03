@@ -96,8 +96,22 @@ async def search_evidence(
             source_version_ids=request.source_version_ids
         )
         from app.services.citation_grounding import ground_retrieval_results
+        from app.services.evidence_boundary import evaluate_evidence_boundary
         grounded = await ground_retrieval_results(db, course_id, results)
-        return {"results": grounded}
+        boundary = evaluate_evidence_boundary(grounded)
+        return {
+            "results": grounded,
+            "evidence_boundary": {
+                "status": boundary.status.value,
+                "reason": boundary.reason.value,
+                "should_decline": boundary.should_decline,
+                "message": boundary.message,
+                "candidate_count": boundary.candidate_count,
+                "relevant_candidate_count": boundary.relevant_candidate_count,
+                "usable_candidate_count": boundary.usable_candidate_count,
+                "usable_evidence_unit_ids": [str(uid) for uid in boundary.usable_evidence_unit_ids],
+            },
+        }
     except Exception:
         logger.exception("Search failed")
         raise HTTPException(

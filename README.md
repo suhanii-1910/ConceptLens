@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 2A — Hybrid evidence retrieval complete.**
+**Phase 2C — Unsupported / Insufficient-Evidence Boundary complete.**
 
 ### Phase 0A — Backend foundation
 
@@ -86,6 +86,26 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **Safe public provenance metadata**: Citation and retrieval result `location_metadata` are filtered through a per-source-type allowlist — only known safe keys are exposed
 - **Local derived/storage paths excluded**: Fields such as `derived_path` carrying filesystem paths are excluded from all public surfaces by the allowlist; raw DB metadata is never mutated
 - **`only_grounded` downstream boundary**: A utility filter exposes only fully-validated results to downstream consumers, enforcing the grounding boundary
+
+### Phase 2C — Unsupported / Insufficient-Evidence Boundary
+
+- **Deterministic evidence support classification**: Every search response includes an `evidence_boundary` decision object with one of three stable statuses: `supported`, `insufficient_evidence`, or `unsupported`
+- **Distinct relevance and grounding requirements**: Relevance qualification (is this evidence semantically or lexically related?) and grounding validation (is this evidence citable?) are evaluated separately — a result can be relevant but ungradeable, or graded but irrelevant
+- **Dense relevance signal**: An evidence unit is relevance-qualified by dense retrieval when its cosine distance is finite, non-negative, and at or below the 0.55 threshold (conservatively calibrated for the `all-MiniLM-L6-v2` embedding space, range approximately [0, 2])
+- **Lexical relevance signal**: An evidence unit is also relevance-qualified when its PostgreSQL `ts_rank` score is a positive finite number (any FTS match)
+- **RRF rank and fused score are NOT support signals**: `dense_rank`, `lexical_rank`, and `fused_score` are relative ranking signals; they are never treated as calibrated evidence quality probabilities; rank #1 alone cannot make evidence supported
+- **Grounded citation required**: A relevance-qualified evidence unit is usable only when Phase 2B grounding is `valid` AND a `Citation` object is present — both conditions must hold
+- **Three decision states**:
+  - `supported`: at least one retrieved result is relevance-qualified, grounding valid, and has a citation — future answer generation may use only those usable results
+  - `insufficient_evidence`: at least one result is relevance-qualified but no relevance-qualified result is safely grounded — related material was found but source-backed answers cannot be issued
+  - `unsupported`: no results at all, or no result met the relevance threshold — the current uploaded course materials do not provide sufficiently relevant support for the query
+- **"Unsupported" is not real-world falsity**: The absence of support in uploaded course materials does not mean the claim is false in the world; decline messages say exactly that
+- **Stable, safe decline messages**: Human-readable decline messages are deterministic string constants (not generated text); `supported` carries no message
+- **`only_supported_evidence` downstream gate**: A pure helper function returns only usable evidence units for future answer generation; it preserves retrieval order, all ranking scores, all citation data, and all provenance without rescoring or mutation
+- **Future answer generation must use only supported evidence**: The boundary decision is the enforceable gate between retrieval and any future RAG or Ask phase; downstream consumers must check `should_decline` before generating a source-backed answer
+- **No database mutation**: Phase 2C performs no DB writes, no extra DB reads, and does not alter any stored provenance
+- **No LLM required**: The boundary classification is entirely deterministic — no language model is called at any point in the boundary decision
+- **`evidence_boundary` field is additive**: The search API still returns all retrieved results in `results` for inspection; the boundary object is added alongside, not in place of, existing results
 
 **Not yet implemented:**
 - No answer generation

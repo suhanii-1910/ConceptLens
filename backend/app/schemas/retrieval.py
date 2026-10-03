@@ -81,8 +81,33 @@ class RetrievalResultItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class EvidenceSupportStatusSchema(str, enum.Enum):
+    supported = "supported"
+    insufficient_evidence = "insufficient_evidence"
+    unsupported = "unsupported"
+
+
+class EvidenceBoundaryReasonSchema(str, enum.Enum):
+    grounded_relevant_evidence = "grounded_relevant_evidence"
+    no_candidates = "no_candidates"
+    no_relevant_evidence = "no_relevant_evidence"
+    relevant_evidence_not_grounded = "relevant_evidence_not_grounded"
+
+
+class EvidenceBoundaryDecisionSchema(BaseModel):
+    status: EvidenceSupportStatusSchema
+    reason: EvidenceBoundaryReasonSchema
+    should_decline: bool
+    message: Optional[str] = None
+    candidate_count: int
+    relevant_candidate_count: int
+    usable_candidate_count: int
+    usable_evidence_unit_ids: List[uuid.UUID]
+
+
 class SearchResponse(BaseModel):
     results: List[RetrievalResultItem]
+    evidence_boundary: EvidenceBoundaryDecisionSchema
 
 class IndexingResponse(BaseModel):
     total_evidence: int
