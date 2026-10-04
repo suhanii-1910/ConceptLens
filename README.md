@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 2C — Unsupported / Insufficient-Evidence Boundary complete.**
+**Phase 3 — Grounded Ask Experience complete.**
 
 ### Phase 0A — Backend foundation
 
@@ -107,11 +107,47 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **No LLM required**: The boundary classification is entirely deterministic — no language model is called at any point in the boundary decision
 - **`evidence_boundary` field is additive**: The search API still returns all retrieved results in `results` for inspection; the boundary object is added alongside, not in place of, existing results
 
+### Phase 3 — Grounded Ask Experience
+
+- **Stateless grounded question answering**: `POST /courses/{course_id}/ask` accepts a learner question and an ask mode, answering strictly from grounded course evidence without maintaining server-side conversational state.
+- **Three ask modes**:
+  - `just_answer`: Direct, concise answer grounded in course material.
+  - `explain`: Structured step-by-step conceptual explanation with grounded answer blocks.
+  - `guide`: Socratic guiding hints and scaffolding, concluding with a targeted follow-up question (`next_question`).
+- **End-to-end grounded pipeline**:
+  `retrieval → grounding → evidence boundary → supported-only evidence → provider → evidence-ID validation → server citation mapping`
+- **Pre-generation deterministic boundary gate**:
+  Retrieval and Phase 2C evidence boundary qualification run before any provider call. If the evidence boundary evaluates to `unsupported` or `insufficient_evidence`, the endpoint immediately returns HTTP 200 with status `declined` and a deterministic decline message. The external LLM provider is **never called**, preventing hallucination and unnecessary provider spend.
+- **Model sees only supported evidence**:
+  Only evidence units that pass both Phase 2A relevance qualification and Phase 2B grounding validation are supplied to the model. Ungrounded or irrelevant material is excluded.
+- **Model never authors Citation objects**:
+  The language model returns only draft answer blocks referencing `evidence_unit_ids`. The model never generates citations, locator labels, page/slide numbers, or file paths.
+- **Server-driven citation mapping**:
+  The server validates referenced `evidence_unit_ids` against the verified supported evidence set and maps them directly to immutable, exact Phase 2B `Citation` objects.
+- **Fail-closed on hallucinated evidence IDs**:
+  If the model cites unknown, unprovided, or hallucinated `evidence_unit_ids`, or returns malformed output, the system fails closed with HTTP 502 Bad Gateway without returning partial or ungrounded answers.
+- **Answer construction**:
+  The final top-level `answer` is constructed server-side by joining validated block texts; the provider returns block drafts only.
+- **Untrusted data & prompt injection defense**:
+  All source evidence content is strictly demarcated as untrusted data in prompts. Prompt injection instructions appearing inside course evidence are systematically ignored. Learner requests to bypass grounding or answer from outside knowledge are declined.
+- **Private path and prompt safety**:
+  Responses expose zero private filesystem paths (`storage_path`, `derived_path`), system prompts, internal prompts, or provider credentials.
+- **OpenAI-compatible provider adapter**:
+  Configurable LLM provider integration via standard HTTP client (`httpx`) targeting any OpenAI-compatible API endpoint with zero temperature and structured JSON response handling.
+- **Server-only provider credentials**:
+  API keys and endpoint configurations remain strictly server-side and are never exposed across API boundaries or logged.
+- **Exact citation provenance preserved**:
+  Downstream citations preserve exact source provenance from Phase 1 and Phase 2 (PDF page numbers, PPTX slide numbers, transcript start/end timestamps, decoded video frame timestamps, and public locator labels).
+
 **Not yet implemented:**
-- No answer generation
-- No RAG (retrieval-augmented generation)
-- No tutoring or chatbot
-- No assessment generation
+- persistent conversations
+- learner mastery
+- assessments
+- misconception diagnosis
+- adaptive teaching
+- Transfer Check
+- Learning Trace
+- frontend
 
 ### Current limitations
 
@@ -119,24 +155,23 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - No SmartArt, chart, or vector-diagram interpretation
 - No WordArt semantics, OLE, or macro interpretation
 - **No OCR** — scanned PDFs produce zero text evidence
-- **No LLM/AI calls** — `topic`, `subtopic`, and `extracted_description` are left NULL
 - **No authentication** — all endpoints are open
 - **No frontend**
+- **Stateless questions only** — no conversational follow-up memory or learner profiling
 
 ### NOT implemented (future phases)
 
 - OCR for scanned documents
 - AI descriptions / captions for images
-- AI / LLM calls (topic classification, description generation)
-- RAG (retrieval-augmented generation)
-- Tutoring / chatbot
-- Assessment generation
-- Learner modelling / mastery tracking
-- Reasoning diagnosis
-- Teaching policy
-- Evaluation
+- persistent conversations
+- learner mastery
+- assessments
+- misconception diagnosis
+- adaptive teaching
+- Transfer Check
+- Learning Trace
 - Authentication / authorization
-- Frontend
+- frontend
 
 ---
 
