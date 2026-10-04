@@ -5,6 +5,7 @@ from app.models.source_version import SourceVersion, SourceType, ProcessingStatu
 from app.models.evidence_unit import EvidenceUnit, Modality, ExtractionStatus, evidence_concept_link
 from app.models.concept import Concept
 from app.models.prerequisite_edge import PrerequisiteEdge
+from app.models.assessment import AssessmentQuestion, AssessmentAttempt
 
 __all__ = [
     "Course",
@@ -17,4 +18,6 @@ __all__ = [
     "evidence_concept_link",
     "Concept",
     "PrerequisiteEdge",
+    "AssessmentQuestion",
+    "AssessmentAttempt",
 ]

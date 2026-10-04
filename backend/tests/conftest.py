@@ -17,6 +17,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 # Force test settings before any app import
 os.environ.setdefault("CONCEPTLENS_DATABASE_URL", "sqlite+aiosqlite:///")
 os.environ.setdefault("CONCEPTLENS_UPLOAD_DIR", "/tmp/conceptlens_test_uploads")
+os.environ.setdefault("TESTING", "1")
+os.environ.setdefault("USE_FAKE_EMBEDDING", "1")
 
 from app.db.base import Base  # noqa: E402
 from app.db.session import get_db  # noqa: E402

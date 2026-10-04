@@ -11,7 +11,6 @@ class LLMConfigurationError(Exception):
 class LLMProviderError(Exception):
     """Raised when LLM provider communication fails (network, timeout, non-2xx)."""
 
-
 class InvalidLLMResponseError(Exception):
     """Raised when LLM response is malformed, invalid JSON, or violates schema."""
 
@@ -107,22 +106,26 @@ class OpenAILLMProvider:
         try:
             data = response.json()
         except Exception:
-            raise LLMProviderError("LLM provider returned malformed JSON response.") from None
+            raise InvalidLLMResponseError("LLM provider returned malformed JSON response.") from None
 
         if not isinstance(data, dict):
-            raise LLMProviderError("LLM provider response must be a JSON object.")
+            raise InvalidLLMResponseError("LLM provider response must be a JSON object.")
 
         choices = data.get("choices")
         if not isinstance(choices, list) or len(choices) == 0:
-            raise LLMProviderError("LLM provider response missing choices.")
+            raise InvalidLLMResponseError("LLM provider response missing choices.")
 
-        message = choices[0].get("message")
+        choice = choices[0]
+        if not isinstance(choice, dict):
+            raise InvalidLLMResponseError("LLM provider response choice is not a dict.")
+
+        message = choice.get("message")
         if not isinstance(message, dict):
-            raise LLMProviderError("LLM provider response missing message in choice.")
+            raise InvalidLLMResponseError("LLM provider response missing message in choice.")
 
         content = message.get("content")
         if not isinstance(content, str):
-            raise LLMProviderError("LLM provider response content is not a string.")
+            raise InvalidLLMResponseError("LLM provider response content is not a string.")
 
         return content
 

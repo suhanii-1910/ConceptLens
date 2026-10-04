@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 3 — Grounded Ask Experience complete.**
+**Phase 4 — Grounded Assessment System complete.**
 
 ### Phase 0A — Backend foundation
 
@@ -139,15 +139,52 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **Exact citation provenance preserved**:
   Downstream citations preserve exact source provenance from Phase 1 and Phase 2 (PDF page numbers, PPTX slide numbers, transcript start/end timestamps, decoded video frame timestamps, and public locator labels).
 
-**Not yet implemented:**
-- persistent conversations
-- learner mastery
-- assessments
+### Phase 4 — Grounded Assessment System
+
+- **MCQ assessment v1**: Generates 4-option single-select multiple choice questions anchored strictly to verified course evidence.
+- **API Endpoints**:
+  - `POST /courses/{course_id}/assessments/generate`: Request generation of questions for a topic focus and requested difficulty (`easy`, `medium`, `hard`).
+  - `GET /courses/{course_id}/assessments/questions/{question_id}`: Fetch public representation of a verified question.
+  - `POST /courses/{course_id}/assessments/questions/{question_id}/attempts`: Submit learner attempt and receive deterministic grading.
+- **Pipeline flow**:
+  - `hybrid retrieval → Phase 2B grounding → Phase 2C evidence boundary`.
+  - Only supported evidence reaches generator and verifier.
+  - Unsupported or insufficient evidence calls provider 0 times (early decline with HTTP 200).
+- **Dual-model generation & independent verification**:
+  - Generator and verifier are separate, decoupled provider calls.
+  - Only independently verified questions are persisted transactionally to the database.
+  - Server validates all generator and verifier claimed evidence unit IDs against the supported allowlist (tampered or unallowed IDs fail closed).
+- **Exact Phase 2B citation snapshots**:
+  - Stored questions record immutable, exact Phase 2B `Citation` snapshots, preserving full source provenance while guaranteeing public safety (no internal `storage_path` or `derived_path` leaks).
+- **Public question answer-key safety**:
+  - Public generated/fetched questions hide answer key (`correct_option_index`, `correct_option_text`).
+  - Public generated/fetched questions hide `explanation`.
+- **Deterministic grading**:
+  - Deterministic grading after learner submission via direct index comparison on server.
+  - Grading uses NO LLM (0 provider calls).
+- **Attempt immutability**:
+  - Attempts are immutable append-only rows (`AssessmentAttempt`).
+  - Second submission creates a new attempt; previous attempt rows remain unchanged.
+- **Post-submission reveal**:
+  - Attempt response reveals answer, explanation, and citations only after submission.
+- **Difficulty and focus**:
+  - Requested difficulty `easy` / `medium` / `hard`.
+- **Learner identity & state**:
+  - `learner_id` is an opaque client-provided UUID, not authenticated identity.
+  - Phase 4 performs NO mastery updates and does not mutate learner state.
+
+### Explicitly NOT yet implemented
+
+- learner mastery model
+- BKT
+- adaptive difficulty selection from mastery
 - misconception diagnosis
-- adaptive teaching
+- adaptive teaching policy
 - Transfer Check
 - Learning Trace
+- persistent chat history
 - frontend
+- authentication
 
 ### Current limitations
 
@@ -164,10 +201,11 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - OCR for scanned documents
 - AI descriptions / captions for images
 - persistent conversations
-- learner mastery
-- assessments
+- learner mastery model
+- BKT
+- adaptive difficulty selection from mastery
 - misconception diagnosis
-- adaptive teaching
+- adaptive teaching policy
 - Transfer Check
 - Learning Trace
 - Authentication / authorization

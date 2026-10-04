@@ -7,6 +7,7 @@ from app.api.courses import router as courses_router
 from app.api.sources import router as sources_router
 from app.api.endpoints.retrieval import router as retrieval_router
 from app.api.endpoints.ask import router as ask_router
+from app.api.endpoints.assessment import router as assessment_router
 
 app = FastAPI(
     title="ConceptLens",
@@ -19,3 +20,4 @@ app.include_router(courses_router)
 app.include_router(sources_router)
 app.include_router(retrieval_router)
 app.include_router(ask_router)
+app.include_router(assessment_router)

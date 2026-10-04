@@ -41,3 +41,9 @@ class Course(Base):
     prerequisite_edges: Mapped[list["PrerequisiteEdge"]] = relationship(  # noqa: F821
         back_populates="course", cascade="all, delete-orphan"
     )
+    assessment_questions: Mapped[list["AssessmentQuestion"]] = relationship(  # noqa: F821
+        back_populates="course", cascade="all, delete-orphan"
+    )
+    assessment_attempts: Mapped[list["AssessmentAttempt"]] = relationship(  # noqa: F821
+        back_populates="course", cascade="all, delete-orphan"
+    )

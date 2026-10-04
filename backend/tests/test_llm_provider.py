@@ -5,6 +5,7 @@ import httpx
 from app.services.llm_provider import (
     LLMConfigurationError,
     LLMProviderError,
+    InvalidLLMResponseError,
     OpenAILLMProvider,
     get_llm_provider,
 )
@@ -145,7 +146,7 @@ async def test_provider_network_error_raises_provider_error():
 
 
 async def test_provider_malformed_response_json():
-    """Malformed non-JSON provider response raises LLMProviderError."""
+    """Malformed non-JSON provider response raises InvalidLLMResponseError."""
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, text="NOT_VALID_JSON")
 
@@ -158,12 +159,12 @@ async def test_provider_malformed_response_json():
             client=client,
         )
 
-        with pytest.raises(LLMProviderError):
+        with pytest.raises(InvalidLLMResponseError):
             await provider.generate(system_prompt="system", user_prompt="user")
 
 
 async def test_provider_missing_choices_or_content():
-    """Missing choices, missing message, or non-string content raises LLMProviderError."""
+    """Missing choices, missing message, or non-string content raises InvalidLLMResponseError."""
     # 1. missing choices
     def handler_no_choices(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json={"choices": []})
@@ -176,7 +177,7 @@ async def test_provider_missing_choices_or_content():
             model="test-model",
             client=client,
         )
-        with pytest.raises(LLMProviderError):
+        with pytest.raises(InvalidLLMResponseError):
             await provider.generate(system_prompt="s", user_prompt="u")
 
     # 2. non-string content
@@ -191,9 +192,99 @@ async def test_provider_missing_choices_or_content():
             model="test-model",
             client=client,
         )
-        with pytest.raises(LLMProviderError):
+        with pytest.raises(InvalidLLMResponseError):
             await provider.generate(system_prompt="s", user_prompt="u")
 
+
+    # 3. choice is null
+    def handler_null_choice(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"choices": [None]})
+
+    transport = httpx.MockTransport(handler_null_choice)
+    async with httpx.AsyncClient(transport=transport) as client:
+        provider = OpenAILLMProvider(
+            base_url="https://api.openai.com",
+            api_key="secret-key",
+            model="test-model",
+            client=client,
+        )
+        with pytest.raises(InvalidLLMResponseError):
+            await provider.generate(system_prompt="s", user_prompt="u")
+
+    # 4. choice is bad (string)
+    def handler_bad_choice(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"choices": ["bad"]})
+
+    transport = httpx.MockTransport(handler_bad_choice)
+    async with httpx.AsyncClient(transport=transport) as client:
+        provider = OpenAILLMProvider(
+            base_url="https://api.openai.com",
+            api_key="secret-key",
+            model="test-model",
+            client=client,
+        )
+        with pytest.raises(InvalidLLMResponseError):
+            await provider.generate(system_prompt="s", user_prompt="u")
+
+    # 5. choice is empty dict
+    def handler_empty_choice(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"choices": [{}]})
+
+    transport = httpx.MockTransport(handler_empty_choice)
+    async with httpx.AsyncClient(transport=transport) as client:
+        provider = OpenAILLMProvider(
+            base_url="https://api.openai.com",
+            api_key="secret-key",
+            model="test-model",
+            client=client,
+        )
+        with pytest.raises(InvalidLLMResponseError):
+            await provider.generate(system_prompt="s", user_prompt="u")
+
+    # 6. missing message content
+    def handler_message_null(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"choices": [{"message": None}]})
+
+    transport = httpx.MockTransport(handler_message_null)
+    async with httpx.AsyncClient(transport=transport) as client:
+        provider = OpenAILLMProvider(
+            base_url="https://api.openai.com",
+            api_key="secret-key",
+            model="test-model",
+            client=client,
+        )
+        with pytest.raises(InvalidLLMResponseError):
+            await provider.generate(system_prompt="s", user_prompt="u")
+
+    # 7. message is bad (string)
+    def handler_message_bad(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"choices": [{"message": "bad"}]})
+
+    transport = httpx.MockTransport(handler_message_bad)
+    async with httpx.AsyncClient(transport=transport) as client:
+        provider = OpenAILLMProvider(
+            base_url="https://api.openai.com",
+            api_key="secret-key",
+            model="test-model",
+            client=client,
+        )
+        with pytest.raises(InvalidLLMResponseError):
+            await provider.generate(system_prompt="s", user_prompt="u")
+
+    # 8. message is empty dict
+    def handler_empty_message(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"choices": [{"message": {}}]})
+
+    transport = httpx.MockTransport(handler_empty_message)
+    async with httpx.AsyncClient(transport=transport) as client:
+        provider = OpenAILLMProvider(
+            base_url="https://api.openai.com",
+            api_key="secret-key",
+            model="test-model",
+            client=client,
+        )
+        with pytest.raises(InvalidLLMResponseError):
+            await provider.generate(system_prompt="s", user_prompt="u")
 
 def test_get_llm_provider_factory(monkeypatch):
     """get_llm_provider reads settings/env or raises LLMConfigurationError."""
