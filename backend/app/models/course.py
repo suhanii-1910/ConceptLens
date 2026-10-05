@@ -50,3 +50,7 @@ class Course(Base):
     learner_concept_masteries: Mapped[list["LearnerConceptMastery"]] = relationship(  # noqa: F821
         back_populates="course", cascade="all, delete-orphan"
     )
+    reasoning_diagnoses: Mapped[list["ReasoningDiagnosis"]] = relationship(  # noqa: F821
+        back_populates="course", cascade="all, delete-orphan",
+        foreign_keys="ReasoningDiagnosis.course_id",
+    )

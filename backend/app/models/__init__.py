@@ -11,6 +11,7 @@ from app.models.learner_mastery import (
     MasteryObservation,
     assessment_question_concept_link,
 )
+from app.models.reasoning_diagnosis import ReasoningDiagnosis, DiagnosticProbe, DiagnosticProbeAttempt
 
 __all__ = [
     "Course",
@@ -28,4 +29,7 @@ __all__ = [
     "LearnerConceptMastery",
     "MasteryObservation",
     "assessment_question_concept_link",
+    "ReasoningDiagnosis",
+    "DiagnosticProbe",
+    "DiagnosticProbeAttempt",
 ]

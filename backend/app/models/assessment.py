@@ -107,6 +107,7 @@ class AssessmentAttempt(Base):
     )
 
     __table_args__ = (
+        sa.UniqueConstraint("id", "question_id", "course_id", "learner_id", name="uq_assessment_attempt_diagnosis_scope"),
         CheckConstraint(
             "selected_option_index >= 0 AND selected_option_index <= 3",
             name="ck_assessment_attempts_selected_option_index",

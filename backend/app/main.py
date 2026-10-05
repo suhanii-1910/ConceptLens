@@ -9,6 +9,7 @@ from app.api.endpoints.retrieval import router as retrieval_router
 from app.api.endpoints.ask import router as ask_router
 from app.api.endpoints.assessment import router as assessment_router
 from app.api.endpoints.mastery import router as mastery_router
+from app.api.endpoints.reasoning_diagnosis import router as reasoning_diagnosis_router
 
 app = FastAPI(
     title="ConceptLens",
@@ -23,3 +24,4 @@ app.include_router(retrieval_router)
 app.include_router(ask_router)
 app.include_router(assessment_router)
 app.include_router(mastery_router)
+app.include_router(reasoning_diagnosis_router)

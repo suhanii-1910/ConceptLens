@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 5 — Persistent Learner Mastery complete.**
+**Phase 6 — Reasoning Debugger and Diagnostic Probes implemented.**
 
 ### Phase 0A — Backend foundation
 
@@ -183,16 +183,36 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **Isolation and boundaries:** grading and mastery call no LLM/provider. Course and learner UUID scope every estimate; an opaque learner UUID provides no authentication. Question answers remain hidden until submission.
 - **Verification:** Phase 5 unit/API tests cover mapping, BKT, reads, and rollback. Run `CONCEPTLENS_TEST_POSTGRES=1 .venv/bin/python -m pytest tests/test_mastery_postgres.py` from `backend` for real PostgreSQL concurrency acceptance. It uses disposable schemas on the local development database (or `CONCEPTLENS_TEST_POSTGRES_URL`), without rerunning migrations or changing application rows.
 
+### Phase 6 — Reasoning Debugger
+
+- **Event-scoped hypotheses:** a diagnosis belongs to an existing learner assessment attempt and its still-verified, same-course question. A wrong answer alone never diagnoses a misconception. The observation and tentative hypothesis remain separate, inspectable fields; neither becomes a permanent learner label.
+- **Typed reasoning:** accepts `reasoning_text` (up to 8,000 characters), `reasoning_steps` (up to 20 nonblank steps of 1,000 characters), or both, with a combined 12,000-character limit. Original input is preserved. First-break excerpts must occur verbatim in that input; structured-step indices are zero-based and validated against the submitted steps.
+- **Fail closed:** `no_clear_break`, `insufficient_reasoning`, and `insufficient_evidence` produce no hypothesis or probe. Very short explanations (under 12 trimmed characters) decline without a provider call. Unmapped questions and missing/unusable frozen evidence also decline. Unsupported or tampered model IDs and malformed responses return 502; provider configuration/network failures return 503.
+- **Independent verification:** generation proposes one diagnosis/probe pair; a separate verifier checks the earliest break, tentative interpretation, allowed concept, supporting rule, fresh probe, unique correct answer, and absence of answer leakage. Only approved content persists; verifier-selected evidence replaces generator-selected evidence. Rejected candidates become `no_clear_break` without storing their proposed interpretation.
+- **Server-owned citations:** context starts from the question's verifier-approved evidence IDs, exact frozen citation snapshots, and frozen concept mapping. Existing evidence/source rows are checked for course and provenance consistency. Context is bounded to 10 evidence items, 6,000 characters per item, 24,000 evidence characters, and 64,000 characters per user prompt. This implementation conservatively uses frozen evidence only; it does not retrieve additional evidence when that context is insufficient. Models cannot supply citation objects or source locators.
+- **Existing prerequisite graph only:** public context lists up to 20 actual incoming same-course prerequisite edges for the verified target, in stable UUID order. Missing graph data yields an empty list. No graph or prerequisite lesson is generated.
+- **Diagnostic probe:** one independently verified four-option MCQ tests the suspected reasoning distinction using fresh context. Public creation/GET responses hide its answer key and explanation. Submission grades deterministically, reveals the verified answer/explanation and exact citations, and requires no provider call.
+- **Resolution means evidence, not certainty:** the first valid correct response rejects the hypothesis; an incorrect response confirms it **by this diagnostic probe**. These are not psychological certainties. Unsafe stored probe data resolves `inconclusive` and reveals no unsafe answer. Repeated attempts append audit rows but cannot flip the outcome. PostgreSQL `SELECT FOR UPDATE` serializes submissions; a partial unique index permits only one applied resolution per diagnosis.
+- **Mastery remains separate:** diagnosis and probe processing never modify BKT state or observations. The read-only `cold_start` field is true when the learner has no positive mastery observation count in the course. Cold start remains untested; no new mastery estimate is created.
+- **Atomic, auditable persistence:** diagnosis/probe creation and first resolution each commit as one transaction. Composite foreign keys enforce attempt/diagnosis/probe scope; original assessments and mappings remain untouched. ORM writes protect diagnosis content, probes, and append-only attempts. Whole-course ORM deletion cleans up the aggregate. Direct administrative SQL is outside the ORM immutability boundary.
+- **Routes:** `POST /courses/{course_id}/learners/{learner_id}/reasoning-diagnoses` accepts `attempt_id` and reasoning; `GET .../{diagnosis_id}` returns the public event; `POST .../{diagnosis_id}/probe-attempts` accepts only `selected_option_index`.
+- **Migration:** `0005` adds three Phase 6 tables and a composite unique key on assessment attempts, with no historical diagnosis backfill. Prior migrations remain unchanged. The normal development database is not migrated by acceptance tests.
+- **Acceptance commands** (from `backend`):
+  - `.venv/bin/pytest tests/test_reasoning_diagnosis.py tests/test_api_reasoning_diagnosis.py`
+  - `CONCEPTLENS_TEST_POSTGRES=1 .venv/bin/pytest tests/test_reasoning_diagnosis_postgres.py -k 'not migration_lifecycle'`
+  - `CONCEPTLENS_TEST_MIGRATION_LIFECYCLE=1 .venv/bin/pytest tests/test_reasoning_diagnosis_postgres.py -k migration_lifecycle -s`
+  - PostgreSQL acceptance creates unique disposable databases on the configured test server (optional `CONCEPTLENS_TEST_POSTGRES_URL`), runs actual Alembic migrations, and drops only those databases. The role needs database-creation permission. The lifecycle check preserves representative Phase 5 rows through `0004 → 0005 → 0004 → 0005`.
+
 ### Explicitly NOT yet implemented
 
-- reasoning diagnosis
 - adaptive difficulty selection from mastery
-- misconception diagnosis
 - adaptive teaching policy
+- prerequisite repair lessons
 - Transfer Check
 - Learning Trace UI
 - persistent chat history
 - frontend
+- image/handwritten/screenshot learner-reasoning interpretation (a later multimodal/UI requirement)
 - authentication
 
 ### Current limitations
@@ -203,17 +223,17 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **No OCR** — scanned PDFs produce zero text evidence
 - **No authentication** — all endpoints are open
 - **No frontend**
-- **Stateless Ask** — no conversational follow-up memory; learner state is limited to concept mastery estimates
+- **Stateless Ask** — no conversational follow-up memory; learner state includes concept mastery estimates and event-scoped diagnosis evidence
 
 ### NOT implemented (future phases)
 
 - OCR for scanned documents
 - AI descriptions / captions for images
 - persistent conversations
-- reasoning diagnosis
 - adaptive difficulty selection from mastery
-- misconception diagnosis
 - adaptive teaching policy
+- prerequisite repair lessons
+- image/handwritten learner-reasoning interpretation
 - Transfer Check
 - Learning Trace UI
 - Authentication / authorization
