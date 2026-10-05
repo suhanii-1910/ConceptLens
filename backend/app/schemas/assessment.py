@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from app.models.evidence_unit import Modality
 from app.schemas.retrieval import Citation, EvidenceBoundaryDecisionSchema
+from app.schemas.learner_mastery import MasteryUpdateStatus, LearnerMasteryUpdatePublic
 
 
 # ---------------------------------------------------------------------------
@@ -161,6 +162,8 @@ class AssessmentAttemptResponse(BaseModel):
     explanation: str
     citations: List[Citation]
     created_at: datetime
+    mastery_update_status: Optional[MasteryUpdateStatus] = None
+    mastery_update: Optional[LearnerMasteryUpdatePublic] = None
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.evidence_unit import evidence_concept_link
+from app.models.learner_mastery import assessment_question_concept_link
 
 
 class Concept(Base):
@@ -30,4 +31,9 @@ class Concept(Base):
     course: Mapped["Course"] = relationship(back_populates="concepts")  # noqa: F821
     evidence_units: Mapped[list["EvidenceUnit"]] = relationship(  # noqa: F821
         secondary=evidence_concept_link, back_populates="concepts"
+    )
+    assessment_questions: Mapped[list["AssessmentQuestion"]] = relationship(  # noqa: F821
+        secondary=assessment_question_concept_link,
+        back_populates="concepts",
+        passive_deletes=True,
     )

@@ -1,4 +1,4 @@
-"""Phase 4 Grounded Assessment API endpoints."""
+"""Phase 4 & 5 Grounded Assessment API endpoints."""
 
 import logging
 import uuid
@@ -6,6 +6,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -24,6 +25,7 @@ from app.schemas.assessment import (
 )
 from app.schemas.retrieval import Citation
 from app.services.assessment_generation import generate_assessments
+from app.services.mastery_update import process_mastery_update
 from app.services.llm_provider import (
     InvalidLLMResponseError,
     LLMConfigurationError,
@@ -138,54 +140,55 @@ async def submit_assessment_attempt(
 
     - Graded deterministically without LLM calls.
     - Persisted as an immutable append-only record.
+    - Updates BKT Learner Mastery (Phase 5).
     - Answer key, explanation, and citations revealed only AFTER submission.
-    - NEVER updates learner mastery in Phase 4.
     """
-    await _verify_course(db, course_id)
-
-    stmt = select(AssessmentQuestion).where(
-        AssessmentQuestion.id == question_id,
-        AssessmentQuestion.course_id == course_id,
-        AssessmentQuestion.verification_status == AssessmentQuestionVerificationStatus.verified,
-    )
-    question = await db.scalar(stmt)
-    if not question:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Question {question_id} not found",
+    # Own the transaction before the first read (SQLAlchemy otherwise autobegins).
+    async with db.begin():
+        await _verify_course(db, course_id)
+        stmt = select(AssessmentQuestion).options(
+            selectinload(AssessmentQuestion.concepts)
+        ).where(
+            AssessmentQuestion.id == question_id,
+            AssessmentQuestion.course_id == course_id,
+            AssessmentQuestion.verification_status == AssessmentQuestionVerificationStatus.verified,
         )
+        question = await db.scalar(stmt)
+        if not question:
+            raise HTTPException(status_code=404, detail=f"Question {question_id} not found")
 
-    # Deterministic grading
-    is_correct = (attempt_in.selected_option_index == question.correct_option_index)
+        # Validate stored response data before accepting an attempt.
+        parsed_citations = [Citation.model_validate(c) for c in question.citation_snapshots]
+        correct_text = question.options[question.correct_option_index]
+        attempt = AssessmentAttempt(
+            id=uuid.uuid4(),
+            question_id=question.id,
+            course_id=course_id,
+            learner_id=attempt_in.learner_id,
+            selected_option_index=attempt_in.selected_option_index,
+            is_correct=attempt_in.selected_option_index == question.correct_option_index,
+        )
+        db.add(attempt)
+        await db.flush()
 
-    # Immutable attempt persistence
-    attempt = AssessmentAttempt(
-        id=uuid.uuid4(),
-        question_id=question.id,
-        course_id=course_id,
-        learner_id=attempt_in.learner_id,
-        selected_option_index=attempt_in.selected_option_index,
-        is_correct=is_correct,
-    )
-    db.add(attempt)
-    await db.commit()
-    await db.refresh(attempt)
-
-    parsed_citations = [
-        Citation.model_validate(c) for c in question.citation_snapshots
-    ]
-    correct_text = question.options[question.correct_option_index]
-
-    return AssessmentAttemptResponse(
-        attempt_id=attempt.id,
-        question_id=question.id,
-        course_id=course_id,
-        learner_id=attempt.learner_id,
-        selected_option_index=attempt.selected_option_index,
-        is_correct=attempt.is_correct,
-        correct_option_index=question.correct_option_index,
-        correct_option_text=correct_text,
-        explanation=question.explanation,
-        citations=parsed_citations,
-        created_at=attempt.created_at,
-    )
+        status_enum, update_public = await process_mastery_update(
+            db=db, attempt=attempt, course_id=course_id, concepts=question.concepts,
+        )
+        attempt.mastery_update_status = status_enum
+        response = AssessmentAttemptResponse(
+            attempt_id=attempt.id,
+            question_id=question.id,
+            course_id=course_id,
+            learner_id=attempt.learner_id,
+            selected_option_index=attempt.selected_option_index,
+            is_correct=attempt.is_correct,
+            correct_option_index=question.correct_option_index,
+            correct_option_text=correct_text,
+            explanation=question.explanation,
+            citations=parsed_citations,
+            created_at=attempt.created_at,
+            mastery_update_status=status_enum,
+            mastery_update=update_public,
+        )
+    # Exiting the transaction commits all three records or rolls them all back.
+    return response

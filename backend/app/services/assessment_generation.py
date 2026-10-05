@@ -6,12 +6,14 @@ import uuid
 from typing import Any, Dict, List, Optional, Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.models.assessment import (
     AssessmentAttempt,
     AssessmentQuestion,
 )
-from app.models.evidence_unit import Modality
+from app.models.concept import Concept
+from app.models.evidence_unit import EvidenceUnit, Modality, evidence_concept_link
 from app.schemas.assessment import (
     AssessmentDifficulty,
     AssessmentGenerationRequest,
@@ -472,8 +474,6 @@ async def generate_assessments(
         v_item = verifier_map[idx]
         if v_item.verdict == QuestionVerificationVerdict.verified:
             # Build safe citation snapshots from verified evidence unit IDs
-            # (or from draft.evidence_unit_ids + v_item.evidence_unit_ids)
-            # Use draft.evidence_unit_ids preserving order, mapping to allowed_by_id citations
             citations: List[Citation] = []
             seen_c_ids = set()
             for eid in v_item.evidence_unit_ids:
@@ -485,6 +485,21 @@ async def generate_assessments(
 
             citation_snapshots = [c.model_dump(mode="json") for c in citations]
             evidence_unit_ids_str = [str(eid) for eid in v_item.evidence_unit_ids]
+
+            # Fetch relevant concepts bounded to course using the current evidence_concept_link
+            concept_stmt = select(Concept).join(
+                evidence_concept_link,
+                evidence_concept_link.c.concept_id == Concept.id
+            ).join(
+                EvidenceUnit, EvidenceUnit.id == evidence_concept_link.c.evidence_unit_id
+            ).where(
+                evidence_concept_link.c.evidence_unit_id.in_(v_item.evidence_unit_ids),
+                EvidenceUnit.course_id == course_id,
+                Concept.course_id == course_id
+            ).distinct()
+
+            result = await db.scalars(concept_stmt)
+            question_concepts = result.all()
 
             question_entity = AssessmentQuestion(
                 id=uuid.uuid4(),
@@ -499,6 +514,7 @@ async def generate_assessments(
                 citation_snapshots=citation_snapshots,
                 verification_status=AssessmentQuestionVerificationStatus.verified,
                 generation_focus=request.focus,
+                concepts=list(question_concepts),
             )
             verified_questions_to_persist.append(question_entity)
         else:

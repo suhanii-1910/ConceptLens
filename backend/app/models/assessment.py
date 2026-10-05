@@ -9,11 +9,13 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.models.learner_mastery import assessment_question_concept_link
 from app.schemas.assessment import (
     AssessmentDifficulty,
     AssessmentQuestionType,
     AssessmentQuestionVerificationStatus,
 )
+from app.schemas.learner_mastery import MasteryUpdateStatus
 
 
 class AssessmentQuestion(Base):
@@ -65,6 +67,10 @@ class AssessmentQuestion(Base):
 
     # Relationships
     course: Mapped["Course"] = relationship(back_populates="assessment_questions")  # noqa: F821
+    concepts: Mapped[list["Concept"]] = relationship(  # noqa: F821
+        secondary=assessment_question_concept_link,
+        back_populates="assessment_questions",
+    )
     attempts: Mapped[list["AssessmentAttempt"]] = relationship(
         back_populates="question", cascade="all, delete-orphan"
     )
@@ -92,6 +98,10 @@ class AssessmentAttempt(Base):
     )
     selected_option_index: Mapped[int] = mapped_column(Integer, nullable=False)
     is_correct: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    mastery_update_status: Mapped[MasteryUpdateStatus | None] = mapped_column(
+        Enum(MasteryUpdateStatus, name="mastery_update_status_enum"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

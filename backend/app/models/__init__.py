@@ -6,6 +6,11 @@ from app.models.evidence_unit import EvidenceUnit, Modality, ExtractionStatus, e
 from app.models.concept import Concept
 from app.models.prerequisite_edge import PrerequisiteEdge
 from app.models.assessment import AssessmentQuestion, AssessmentAttempt
+from app.models.learner_mastery import (
+    LearnerConceptMastery,
+    MasteryObservation,
+    assessment_question_concept_link,
+)
 
 __all__ = [
     "Course",
@@ -20,4 +25,7 @@ __all__ = [
     "PrerequisiteEdge",
     "AssessmentQuestion",
     "AssessmentAttempt",
+    "LearnerConceptMastery",
+    "MasteryObservation",
+    "assessment_question_concept_link",
 ]

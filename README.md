@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 4 — Grounded Assessment System complete.**
+**Phase 5 — Persistent Learner Mastery complete.**
 
 ### Phase 0A — Backend foundation
 
@@ -171,17 +171,26 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
   - Requested difficulty `easy` / `medium` / `hard`.
 - **Learner identity & state**:
   - `learner_id` is an opaque client-provided UUID, not authenticated identity.
-  - Phase 4 performs NO mastery updates and does not mutate learner state.
+  - Phase 4 alone performs no mastery updates; Phase 5 adds the policy below.
+
+### Phase 5 — Persistent Learner Mastery
+
+- **Trusted mapping prerequisite:** course Concepts and `evidence_concept_link` annotations must already be curated. Ingestion does not infer concepts. New verified questions freeze their deduplicated same-course mapping from verifier-approved evidence only; existing questions remain unmapped.
+- **Deterministic BKT v1:** initial mastery `0.20`, learn `0.10`, guess `0.20`, slip `0.10`, model version `bkt-v1`. These defaults are **uncalibrated estimates**. Stored mastery is capped at `1 - 1e-12` to avoid absorbing certainty; mastery bands are presentation labels, not diagnoses.
+- **Singleton and first-exposure policy:** exactly one mapped concept and no previous learner/question attempt produces `updated`. Otherwise the attempt persists with `skipped_unmapped`, `skipped_ambiguous`, or `skipped_repeated_question`. Historical Phase 4 attempts count as prior exposure.
+- **Atomic persistence:** attempt, mastery counters/probability, and immutable ordered observations commit together. PostgreSQL insert-on-conflict plus a row lock serializes mastery updates; exposure is rechecked under that lock. Repeats never increment observations or change `last_attempt_id`.
+- **Read-only API:** `GET /courses/{course_id}/learners/{learner_id}/mastery` lists every course concept by name then UUID; appending `/{concept_id}` reads one. Unseen concepts return virtual `0.20` mastery, zero counts, `unseen`, and null timestamps/last attempt. Reads create no state.
+- **Isolation and boundaries:** grading and mastery call no LLM/provider. Course and learner UUID scope every estimate; an opaque learner UUID provides no authentication. Question answers remain hidden until submission.
+- **Verification:** Phase 5 unit/API tests cover mapping, BKT, reads, and rollback. Run `CONCEPTLENS_TEST_POSTGRES=1 .venv/bin/python -m pytest tests/test_mastery_postgres.py` from `backend` for real PostgreSQL concurrency acceptance. It uses disposable schemas on the local development database (or `CONCEPTLENS_TEST_POSTGRES_URL`), without rerunning migrations or changing application rows.
 
 ### Explicitly NOT yet implemented
 
-- learner mastery model
-- BKT
+- reasoning diagnosis
 - adaptive difficulty selection from mastery
 - misconception diagnosis
 - adaptive teaching policy
 - Transfer Check
-- Learning Trace
+- Learning Trace UI
 - persistent chat history
 - frontend
 - authentication
@@ -194,20 +203,19 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - **No OCR** — scanned PDFs produce zero text evidence
 - **No authentication** — all endpoints are open
 - **No frontend**
-- **Stateless questions only** — no conversational follow-up memory or learner profiling
+- **Stateless Ask** — no conversational follow-up memory; learner state is limited to concept mastery estimates
 
 ### NOT implemented (future phases)
 
 - OCR for scanned documents
 - AI descriptions / captions for images
 - persistent conversations
-- learner mastery model
-- BKT
+- reasoning diagnosis
 - adaptive difficulty selection from mastery
 - misconception diagnosis
 - adaptive teaching policy
 - Transfer Check
-- Learning Trace
+- Learning Trace UI
 - Authentication / authorization
 - frontend
 
