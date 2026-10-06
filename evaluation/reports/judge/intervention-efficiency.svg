@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="231" viewBox="0 0 960 231" role="img" aria-label="Actions per successful held-out transfer">
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:Arial,sans-serif;font-size:13px;fill:#18263a}.title{font-size:19px;font-weight:bold}</style>
+<text x="20" y="27" class="title">Actions per successful held-out transfer</text>
+<text x="20" y="51">SIMULATED PERSONALIZATION RESULT</text>
+<text x="20" y="96">FIXED</text>
+<rect x="300" y="80" width="331.68" height="24" fill="#3168a0"/>
+<text x="760" y="96">5.1799</text>
+<text x="20" y="138">SIMPLE ADAPTIVE</text>
+<rect x="300" y="122" width="440.00" height="24" fill="#3168a0"/>
+<text x="760" y="138">6.8715</text>
+<text x="20" y="180">CONCEPTLENS</text>
+<rect x="300" y="164" width="164.86" height="24" fill="#3168a0"/>
+<text x="760" y="180">2.5747</text>
+<text x="300" y="221">Bars start at 0; scale maximum 6.872. Null values have no bar.</text></svg>

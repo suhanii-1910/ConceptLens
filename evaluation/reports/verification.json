@@ -1,0 +1,80 @@
+{
+  "backend_regression": {
+    "command": ".venv/bin/pytest -q",
+    "cwd": "backend",
+    "duration_seconds": 10.89,
+    "failed": 0,
+    "passed": 471,
+    "skip_reason": "Existing opt-in PostgreSQL integration suites were not enabled; Phase 9 disposable PostgreSQL tests ran separately.",
+    "skipped": 20,
+    "warnings": 4290
+  },
+  "base_head": "2ecbfc318f7decf9554e4776e0f9de4289afc601",
+  "branch": "feature/evaluation",
+  "committed": false,
+  "database_isolation": {
+    "assessment_and_mastery_remained_empty": true,
+    "failure_cleanup_verified": true,
+    "migration_target": "0006",
+    "normal_development_db_touched": false,
+    "real_ingestion_retrieval_ask_with_model_fixtures_passed": true,
+    "success_cleanup_verified": true
+  },
+  "final_repository_checks": {
+    "artifact_code_hashes_current": true,
+    "branch": "feature/evaluation",
+    "files_added": 46,
+    "files_modified": [
+      "README.md"
+    ],
+    "git_diff_check": "passed",
+    "head": "2ecbfc318f7decf9554e4776e0f9de4289afc601",
+    "unexpected_files": [],
+    "untracked_text_whitespace_check": "passed"
+  },
+  "framework_fixture_integration": {
+    "metrics": 4,
+    "positive_and_negative_judgments_passed": true,
+    "ragas_version": "0.4.3",
+    "submission_scores_generated": false
+  },
+  "frontend_build": {
+    "command": "npm run build",
+    "exit_code": 0
+  },
+  "frontend_tests": {
+    "command": "npm test -- --run",
+    "cwd": "frontend",
+    "failed": 0,
+    "passed": 45,
+    "test_files": 3
+  },
+  "frontend_typecheck": {
+    "command": "npm run typecheck",
+    "exit_code": 0
+  },
+  "label": "IMPLEMENTATION VERIFICATION \u2014 NOT A BENCHMARK SCORE",
+  "limitations": [
+    "Real generator/evaluator grounding scores pending provider configuration.",
+    "Simulation assumes synthetic learning/noise and frozen content; not measured student learning.",
+    "Real ASR/generator/verifier quality not established by fixture integration.",
+    "Backend optional PostgreSQL suites skipped in the full regression; evaluation-specific disposable PostgreSQL paths passed."
+  ],
+  "merged": false,
+  "new_migrations": false,
+  "phase9_focused": {
+    "admin_url_configured": true,
+    "command": "PYTHONPATH=evaluation:backend backend/.venv/bin/pytest -q --disable-warnings --tb=short evaluation/tests",
+    "duration_seconds": 6.08,
+    "failed": 0,
+    "passed": 80,
+    "skipped": 0,
+    "warnings": 141
+  },
+  "production_files_modified": false,
+  "pushed": false,
+  "real_framework_run_performed": false,
+  "real_provider_available": false,
+  "simulation_twice_identical": "See reproducibility.json for canonical payload SHA-256 and timestamp envelopes.",
+  "warnings": "Existing Python 3.14 pytest-asyncio/SWIG deprecation warnings; no failing tests."
+}

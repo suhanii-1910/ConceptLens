@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="231" viewBox="0 0 960 231" role="img" aria-label="Exact question ID / normalized text repetition">
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:Arial,sans-serif;font-size:13px;fill:#18263a}.title{font-size:19px;font-weight:bold}</style>
+<text x="20" y="27" class="title">Exact question ID / normalized text repetition</text>
+<text x="20" y="51">SIMULATED PERSONALIZATION RESULT</text>
+<text x="20" y="96">FIXED</text>
+<rect x="300" y="80" width="146.67" height="24" fill="#3168a0"/>
+<text x="760" y="96">0.3333</text>
+<text x="20" y="138">SIMPLE ADAPTIVE</text>
+<rect x="300" y="122" width="148.82" height="24" fill="#3168a0"/>
+<text x="760" y="138">0.3382</text>
+<text x="20" y="180">CONCEPTLENS</text>
+<rect x="300" y="164" width="131.83" height="24" fill="#3168a0"/>
+<text x="760" y="180">0.2996</text>
+<text x="300" y="221">Bars start at 0; scale maximum 1. Null values have no bar.</text></svg>

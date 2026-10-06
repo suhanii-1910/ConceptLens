@@ -1,0 +1,1320 @@
+{
+  "metadata": {
+    "code_sha256": {
+      "evaluation/conceptlens_eval/__init__.py": "4f4d031d27479c1ad8adb024193059712755778ab8ff9c759a115445780649df",
+      "evaluation/conceptlens_eval/__main__.py": "dd05b4137429d10ef9094f2ee8f95f196ffd60da4d140f28f52c0264485da88c",
+      "evaluation/conceptlens_eval/common.py": "e82373dc645f0ca9b581af2df8068fb688233cc81220171e646aaf22fbbedf76",
+      "evaluation/conceptlens_eval/database.py": "cb1c401cd6a86690f9033921d3c2c89aff7068e1fa954679f0e45cec14991ba4",
+      "evaluation/conceptlens_eval/dataset.py": "1eac7323454d9bd6056e7273be0742da7dcb682a9fc3cdb9f044d17c8d2c4e8e",
+      "evaluation/conceptlens_eval/framework.py": "75ddc5f7a9ccd668c8f210b7556a86232ea2d189e922fa0dca6d57364bf08190",
+      "evaluation/conceptlens_eval/framework_worker.py": "ada965e9ec2aacdcb6ccb75f7c12e77b8e45929ed576a3e3c6eecaa48f2d90aa",
+      "evaluation/conceptlens_eval/grounding.py": "006fe776abee3921fd1e55924af7056afb79862db3cc62b2302c30856b169ff1",
+      "evaluation/conceptlens_eval/metrics.py": "648525c79d10c6c9c6484dfcaf4e60fbab9c25027e2655ce5d2bcd9d1a732a15",
+      "evaluation/conceptlens_eval/policy.py": "3134435e7dc072be223f401fc664006d637b68eba3dda9ba007880e3717191bf",
+      "evaluation/conceptlens_eval/reporting.py": "241225e06ff3a495a536b3b99d85bfc2eca38d211a03982437eed85a829153d2",
+      "evaluation/conceptlens_eval/simulation.py": "b147f95b85e6e9beb8776f1aa91e00258d72ccd582a64e65e9bf7bfdf6659c8d"
+    },
+    "configuration": {
+      "manifest_sha256": "35012a52fbb31646d27eec20ae87cc9707cedc7a6b0f9698f71d200c19e71f87",
+      "split": "test",
+      "top_k": 10
+    },
+    "dataset_version": "aster-memory-1.0.0",
+    "evaluation_version": "1.0.0",
+    "framework": "ragas",
+    "framework_lock_sha256": "53015f0e8755580218aa91c176fb0b931ee33ead3b34e2a329645d332c4562cd",
+    "framework_version": "0.4.3",
+    "git_commit": "2ecbfc318f7decf9554e4776e0f9de4289afc601",
+    "production_service_sha256": {
+      "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "adaptive_learning.py": "2a22b0f0aeed2b169292b05296a864ec9652a2b986e27971620b61b45da2de90",
+      "assessment_generation.py": "fafa122e80450666cf8d4f0102c11ab23c808bd9085554f7a10987bee012835c",
+      "assessment_grading.py": "f46eaee12f86d4fde42cbf0c086b78b651e36f4e7549c5f5847c443e32479cc2",
+      "citation_grounding.py": "27c4284ba0d509aca4ccd92ac7a6f965310acb96345f588fdf0ad1ae04eef9b1",
+      "course_service.py": "9a10f3ca233be8f62dfc39c274e56a847d775b4160f44b3b706ecffdb2315d20",
+      "derived_storage.py": "b3338b6eb5e4ca6ff556efebb152f183475e64fd17d82fb84284068ee61b5faf",
+      "embedding_provider.py": "e1887ead2b4e48ab3c4ae1ae23e4618f38a44d20e3af4a078888569f8cc9ed76",
+      "evidence_boundary.py": "77b940d8535bc282d97886700785169efeda07289557b0ed53d86e1e69ffa138",
+      "file_storage.py": "549a39523323fbd8a5c9913c0e797881153fda9152f1b0c8ae8b45973af1e019",
+      "grounded_ask.py": "8f7d83f268b7a52e651e2ec89b9c1ccec5cdc69858ecee1bb82fa95dd9a35465",
+      "indexing.py": "58704c9a9f4f6e63913681725a916ece868d9ccdcf89e609c38dab4531d38839",
+      "learner_mastery.py": "d8a78160094a5d3aa5f63cb14e75ef37502a778bd5fbe3ab577ef373c94687d9",
+      "llm_provider.py": "0eadf0be5508407dde77cae2de102ac03268010fee6e88bf720160bdc8ba300a",
+      "mastery_update.py": "c891d4222c90eb9591cb85144ac6e85ee8c821ccebbcb65057abcc6d571fd725",
+      "media_tools.py": "22d3977d3f1641930300c6133039fba79c68ad3e48096f2bd4458f270fe16bff",
+      "pdf_ingestion.py": "6eedd0cd9f7ad9425337808203c1fcd87677daf5385de3963ade60997a6a46c5",
+      "pptx_ingestion.py": "9192bbbdd3be27dd98a007fad40fb9ca760a3f5cf7cfa6a6f5afde6ccd611b4f",
+      "reasoning_diagnosis.py": "48fdaa6ee5bc017403a745ad4ceeac4c09ea989504e0c79f359c9ee989b4cde6",
+      "retriever.py": "25ed6f4dcfa8a895bd4ae28d3c3aecb599a1335e081e970b23a28ad5e204a8ab",
+      "searchable_text.py": "2cf699aeaed4db75191e75b42668f25eec3fbf74ec235ab54f97cd1965ea6972",
+      "source_processing.py": "31e52e26bdc54d246196a57ffe06ecf516697bd1ce0b9162e4b5e6c93d6a871c",
+      "transcription.py": "39cded1a13322a5f42dd89c7cab8ad838298613f8ab29dd0a1e919cb3a75f62c",
+      "video_ingestion.py": "045244e1830fb1ee1e2505995ac09d44f8abc3b73cf9082237d4f83dc8c28e9c"
+    },
+    "python_version": "3.14.2",
+    "timestamp_utc": "2026-10-06T17:29:26.936312+00:00"
+  },
+  "payload": {
+    "by_case_type": {
+      "cross_source": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "figure_diagram": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "table_numerical": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "text": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "unsupported": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "video": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      }
+    },
+    "by_modality": {
+      "figure": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "mixed": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "none": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "table": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "text": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      },
+      "video": {
+        "answers_missing_citations": 0,
+        "cases_scored": 0,
+        "cases_total": 2,
+        "citation_count": 0,
+        "citation_locator_accuracy": null,
+        "citation_source_accuracy": null,
+        "confusion": {
+          "FN": 0,
+          "FP": 0,
+          "TN": 0,
+          "TP": 0
+        },
+        "evidence_coverage": null,
+        "framework_metrics": {
+          "answer_relevancy": {
+            "mean": null,
+            "n": 0
+          },
+          "context_precision": {
+            "mean": null,
+            "n": 0
+          },
+          "context_recall": {
+            "mean": null,
+            "n": 0
+          },
+          "faithfulness": {
+            "mean": null,
+            "n": 0
+          }
+        },
+        "refusal_accuracy": null,
+        "refusal_f1": null,
+        "refusal_precision": null,
+        "refusal_recall": null,
+        "retrieval_source_recall": null
+      }
+    },
+    "cases": [
+      {
+        "answer": null,
+        "case_id": "test-text-1",
+        "case_type": "text",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "text",
+        "query": "Does an Aster TLB miss necessarily mean a page fault? Explain using the residency rule.",
+        "reference_answer": "No. A TLB miss requires consulting the page table. A fault occurs only when the page is not resident.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-text-2",
+        "case_type": "text",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "text",
+        "query": "Which page-table flag sends an Aster access to the page-fault handler, and at what value?",
+        "reference_answer": "The present bit set to zero triggers the handler.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-table-1",
+        "case_type": "table_numerical",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 3,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "table",
+        "query": "Compute Cedar's TLB hit fraction from the measured trace.",
+        "reference_answer": "150 divided by 200 equals 0.75, or 75%.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-table-2",
+        "case_type": "table_numerical",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 3,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "table",
+        "query": "How many TLB misses occurred in Elm's trace?",
+        "reference_answer": "120 lookups minus 90 hits equals 30 misses.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-video-1",
+        "case_type": "video",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": 40.0,
+              "kind": "time",
+              "number": null,
+              "start": 19.8
+            },
+            "source_id": "demonstration"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "video",
+        "query": "In the narrated absent-page procedure, what happens after the page is read and before instruction restart?",
+        "reference_answer": "The handler updates the page table.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-video-2",
+        "case_type": "video",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": 58.4,
+              "kind": "time",
+              "number": null,
+              "start": 40.0
+            },
+            "source_id": "demonstration"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "video",
+        "query": "What extra work does the demonstration require when evicting a dirty page?",
+        "reference_answer": "Write modified contents back to storage.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-cross-1",
+        "case_type": "cross_source",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "memory"
+          },
+          {
+            "locator": {
+              "end": null,
+              "kind": "slide",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "operations"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "mixed",
+        "query": "What does Aster's TLB cache, and why do the slides require flushing it on an address-space switch?",
+        "reference_answer": "It caches page-to-frame translations. Flushing prevents reuse of translations from the old address space.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-cross-2",
+        "case_type": "cross_source",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 1,
+              "start": null
+            },
+            "source_id": "memory"
+          },
+          {
+            "locator": {
+              "end": null,
+              "kind": "slide",
+              "number": 1,
+              "start": null
+            },
+            "source_id": "operations"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "mixed",
+        "query": "Combine the notes and slides: during translation, what replaces the virtual page number and what happens to the offset?",
+        "reference_answer": "The physical frame number replaces the virtual page number; the offset is preserved.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-off-1",
+        "case_type": "unsupported",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [],
+        "expected_supported": false,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "none",
+        "query": "What is the Aster laboratory's monthly cloud hosting bill?",
+        "reference_answer": "",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-off-2",
+        "case_type": "unsupported",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [],
+        "expected_supported": false,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "none",
+        "query": "According to these materials, what dose of aspirin treats a headache?",
+        "reference_answer": "",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-figure-1",
+        "case_type": "figure_diagram",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 4,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "figure",
+        "query": "Where does the dashed route from Amber gate terminate in the routing figure?",
+        "reference_answer": "Violet queue.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-figure-2",
+        "case_type": "figure_diagram",
+        "citations": [],
+        "custom": {
+          "reason": "execution error or pending provider",
+          "scored": false
+        },
+        "error": "Generator provider unconfigured; no pipeline run",
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 4,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "expected_supported": true,
+        "framework": {
+          "label": "PENDING REAL PROVIDER RUN",
+          "raw": {},
+          "reason": "REAL FRAMEWORK RESULTS: PENDING PROVIDER CONFIGURATION",
+          "scores": {
+            "answer_relevancy": null,
+            "context_precision": null,
+            "context_recall": null,
+            "faithfulness": null
+          },
+          "status": "pending"
+        },
+        "latency_seconds": null,
+        "modality": "figure",
+        "query": "Which node sits to the right of Amber gate in the routing figure?",
+        "reference_answer": "Frame lookup.",
+        "retrieved": [],
+        "split": "test",
+        "status": "pending"
+      }
+    ],
+    "custom_metrics": {
+      "answers_missing_citations": 0,
+      "cases_scored": 0,
+      "cases_total": 12,
+      "citation_count": 0,
+      "citation_locator_accuracy": null,
+      "citation_source_accuracy": null,
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "TP": 0
+      },
+      "evidence_coverage": null,
+      "refusal_accuracy": null,
+      "refusal_f1": null,
+      "refusal_precision": null,
+      "refusal_recall": null,
+      "retrieval_source_recall": null
+    },
+    "database_events": [],
+    "dataset_version": "aster-memory-1.0.0",
+    "failures": [
+      {
+        "answer": null,
+        "case_id": "test-text-1",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "Does an Aster TLB miss necessarily mean a page fault? Explain using the residency rule.",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-text-2",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "Which page-table flag sends an Aster access to the page-fault handler, and at what value?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-table-1",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 3,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "Compute Cedar's TLB hit fraction from the measured trace.",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-table-2",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 3,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "How many TLB misses occurred in Elm's trace?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-video-1",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": 40.0,
+              "kind": "time",
+              "number": null,
+              "start": 19.8
+            },
+            "source_id": "demonstration"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "In the narrated absent-page procedure, what happens after the page is read and before instruction restart?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-video-2",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": 58.4,
+              "kind": "time",
+              "number": null,
+              "start": 40.0
+            },
+            "source_id": "demonstration"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "What extra work does the demonstration require when evicting a dirty page?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-cross-1",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "memory"
+          },
+          {
+            "locator": {
+              "end": null,
+              "kind": "slide",
+              "number": 2,
+              "start": null
+            },
+            "source_id": "operations"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "What does Aster's TLB cache, and why do the slides require flushing it on an address-space switch?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-cross-2",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 1,
+              "start": null
+            },
+            "source_id": "memory"
+          },
+          {
+            "locator": {
+              "end": null,
+              "kind": "slide",
+              "number": 1,
+              "start": null
+            },
+            "source_id": "operations"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "Combine the notes and slides: during translation, what replaces the virtual page number and what happens to the offset?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-off-1",
+        "citations": [],
+        "expected": [],
+        "failed_metric": "execution",
+        "question": "What is the Aster laboratory's monthly cloud hosting bill?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-off-2",
+        "citations": [],
+        "expected": [],
+        "failed_metric": "execution",
+        "question": "According to these materials, what dose of aspirin treats a headache?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-figure-1",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 4,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "Where does the dashed route from Amber gate terminate in the routing figure?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      },
+      {
+        "answer": null,
+        "case_id": "test-figure-2",
+        "citations": [],
+        "expected": [
+          {
+            "locator": {
+              "end": null,
+              "kind": "page",
+              "number": 4,
+              "start": null
+            },
+            "source_id": "memory"
+          }
+        ],
+        "failed_metric": "execution",
+        "question": "Which node sits to the right of Amber gate in the routing figure?",
+        "reason": "Generator provider unconfigured; no pipeline run",
+        "retrieved": [],
+        "status": "pending"
+      }
+    ],
+    "framework_metrics": {
+      "answer_relevancy": {
+        "mean": null,
+        "n": 0
+      },
+      "context_precision": {
+        "mean": null,
+        "n": 0
+      },
+      "context_recall": {
+        "mean": null,
+        "n": 0
+      },
+      "faithfulness": {
+        "mean": null,
+        "n": 0
+      }
+    },
+    "generator_configured": false,
+    "label": "PENDING REAL PROVIDER RUN",
+    "normal_development_db_touched": false,
+    "real_pipeline_run": false,
+    "split": "test"
+  }
+}

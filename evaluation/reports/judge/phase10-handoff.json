@@ -1,0 +1,95 @@
+{
+  "grounding_status": "PENDING REAL PROVIDER RUN",
+  "phase": "10 (not implemented)",
+  "priorities": [
+    {
+      "evidence": {
+        "framework_scored_cases": 0
+      },
+      "rank": 1,
+      "reserved_work": "Complete provider-backed Track-D closure on frozen test split; preserve failures.",
+      "weakness": "Real grounding quality remains unmeasured without generator/evaluator configuration."
+    },
+    {
+      "evidence": {
+        "figure_cases": {
+          "answers_missing_citations": 0,
+          "cases_scored": 0,
+          "cases_total": 2,
+          "citation_count": 0,
+          "citation_locator_accuracy": null,
+          "citation_source_accuracy": null,
+          "confusion": {
+            "FN": 0,
+            "FP": 0,
+            "TN": 0,
+            "TP": 0
+          },
+          "evidence_coverage": null,
+          "framework_metrics": {
+            "answer_relevancy": {
+              "mean": null,
+              "n": 0
+            },
+            "context_precision": {
+              "mean": null,
+              "n": 0
+            },
+            "context_recall": {
+              "mean": null,
+              "n": 0
+            },
+            "faithfulness": {
+              "mean": null,
+              "n": 0
+            }
+          },
+          "refusal_accuracy": null,
+          "refusal_f1": null,
+          "refusal_precision": null,
+          "refusal_recall": null,
+          "retrieval_source_recall": null
+        },
+        "measured_failure_rate": null
+      },
+      "rank": 2,
+      "reserved_work": "True visual/diagram evidence and exact source opening; citations alone are not semantic proof.",
+      "weakness": "Diagram labels are raster-only; current retrieval lacks true visual semantics."
+    },
+    {
+      "evidence": {
+        "scope": "synthetic profiles and frozen diagnostic fixtures only",
+        "simulated_transfer_success": {
+          "CONCEPTLENS": 0.54375,
+          "FIXED": 0.5791666666666667,
+          "SIMPLE ADAPTIVE": 0.6
+        }
+      },
+      "rank": 3,
+      "reserved_work": "Stronger cold-start diagnostic, justified by a real follow-up study before educational claims.",
+      "weakness": "Unconfirmed diagnoses expose a limited cold-start/general-practice path."
+    },
+    {
+      "evidence": {
+        "assessment_format": "multiple_choice",
+        "live_verifier_evaluated": false
+      },
+      "rank": 4,
+      "reserved_work": "Short-answer and numerical assessment; deterministic CPU-scheduling verifier.",
+      "weakness": "MCQ-only simulated assessments cannot validate generated reasoning or numerical solutions."
+    },
+    {
+      "evidence": {
+        "simulated_bkt_mae": {
+          "CONCEPTLENS": 0.26022418593469965,
+          "FIXED": 0.24393040667622598,
+          "SIMPLE ADAPTIVE": 0.26094256437203356
+        }
+      },
+      "rank": 5,
+      "reserved_work": "Post-assessment weak-topic reporting; expose evidence and uncertainty; real learner validation.",
+      "weakness": "BKT estimates are distinct from latent ability; current evidence does not establish real learner calibration."
+    }
+  ],
+  "simulation_status": "SIMULATED PERSONALIZATION RESULT"
+}

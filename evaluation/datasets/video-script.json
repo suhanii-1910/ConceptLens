@@ -1,0 +1,17 @@
+[
+  {
+    "start": 0.0,
+    "end": 19.8,
+    "transcript": "Aster laboratory demonstration. On a translation cache miss, first consult the page table. If its present bit is one, load the translation into the T L B and resume the access. No disk read is required in this case."
+  },
+  {
+    "start": 19.8,
+    "end": 40.0,
+    "transcript": "Now consider an absent page. The page fault handler first obtains a free frame. It then reads the requested page into that frame. Next it updates the page table, and finally restarts the interrupted instruction."
+  },
+  {
+    "start": 40.0,
+    "end": 58.4,
+    "transcript": "The lab records a dirty bit when a resident page has been modified. Evicting a dirty page requires writing its modified contents back to storage. A clean page does not require this write back."
+  }
+]

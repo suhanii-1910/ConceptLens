@@ -1,0 +1,51 @@
+{
+  "failure_path": {
+    "events": [
+      {
+        "action": "created",
+        "database": "conceptlens_eval_5c918af238014aa8a2e2f4535bbc0e61"
+      },
+      {
+        "action": "migrated",
+        "revision": "0006"
+      },
+      {
+        "action": "seeded_and_checked",
+        "revision": "0006"
+      },
+      {
+        "absence_verified": true,
+        "action": "dropped",
+        "database": "conceptlens_eval_5c918af238014aa8a2e2f4535bbc0e61"
+      },
+      {
+        "action": "intentional_failure_cleanup_verified"
+      }
+    ],
+    "label": "TEST FIXTURE \u2014 NOT A SUBMISSION RESULT",
+    "normal_development_db_touched": false
+  },
+  "success_path": {
+    "events": [
+      {
+        "action": "created",
+        "database": "conceptlens_eval_1684dae1490348119e851e13bef1d65f"
+      },
+      {
+        "action": "migrated",
+        "revision": "0006"
+      },
+      {
+        "action": "seeded_and_checked",
+        "revision": "0006"
+      },
+      {
+        "absence_verified": true,
+        "action": "dropped",
+        "database": "conceptlens_eval_1684dae1490348119e851e13bef1d65f"
+      }
+    ],
+    "label": "TEST FIXTURE \u2014 NOT A SUBMISSION RESULT",
+    "normal_development_db_touched": false
+  }
+}

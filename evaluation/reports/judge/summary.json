@@ -1,0 +1,374 @@
+{
+  "custom": {
+    "answers_missing_citations": 0,
+    "cases_scored": 0,
+    "cases_total": 12,
+    "citation_count": 0,
+    "citation_locator_accuracy": null,
+    "citation_source_accuracy": null,
+    "confusion": {
+      "FN": 0,
+      "FP": 0,
+      "TN": 0,
+      "TP": 0
+    },
+    "evidence_coverage": null,
+    "refusal_accuracy": null,
+    "refusal_f1": null,
+    "refusal_precision": null,
+    "refusal_recall": null,
+    "retrieval_source_recall": null
+  },
+  "framework": {
+    "answer_relevancy": {
+      "mean": null,
+      "n": 0
+    },
+    "context_precision": {
+      "mean": null,
+      "n": 0
+    },
+    "context_recall": {
+      "mean": null,
+      "n": 0
+    },
+    "faithfulness": {
+      "mean": null,
+      "n": 0
+    }
+  },
+  "grounding_label": "PENDING REAL PROVIDER RUN",
+  "simulation": {
+    "CONCEPTLENS": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.24259857840768737,
+          0.27789168758110583
+        ],
+        "mean": 0.26022418593469965,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.11328901511124621,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2.3345864661654137,
+          2.836909871244635
+        ],
+        "mean": 2.574712643678161,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 2.396883301138791,
+        "sd_n_defined": 113
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.08191992341573563,
+          0.09082734319730794
+        ],
+        "mean": 0.0863110375364321,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.04851173186822856,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0017208333333333316,
+          0.005541666666666663
+        ],
+        "mean": 0.003529166666666664,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.011275260311763942,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.29212752114508783,
+          0.3069371727748691
+        ],
+        "mean": 0.29960835509138384,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.04611042165402216,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.020833333333333332,
+          0.052083333333333336
+        ],
+        "mean": 0.035416666666666666,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.09334940087787229,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.30625,
+          0.5041666666666667
+        ],
+        "mean": 0.4,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.6984376321837334,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.7473958333333334,
+          0.7527868852459016
+        ],
+        "mean": 0.75,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.01458214783039886,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5020833333333333,
+          0.5875
+        ],
+        "mean": 0.54375,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.28561907552283866,
+        "sd_n_defined": 120
+      }
+    },
+    "FIXED": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.22715627179291695,
+          0.2613830396084817
+        ],
+        "mean": 0.24393040667622598,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.11544745932397107,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          4.832214765100671,
+          5.55984555984556
+        ],
+        "mean": 5.179856115107913,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 3.17556704414429,
+        "sd_n_defined": 114
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.1957944387425942,
+          0.1957944387425942
+        ],
+        "mean": 0.1957944387425942,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.07882451427057871,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        "mean": 0.3333333333333333,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5375,
+          0.6270833333333333
+        ],
+        "mean": 0.58125,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.29198412095652787,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2,
+          2
+        ],
+        "mean": 2,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.75,
+          0.75
+        ],
+        "mean": 0.75,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5395833333333333,
+          0.6208333333333333
+        ],
+        "mean": 0.5791666666666667,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.2806492572629418,
+        "sd_n_defined": 120
+      }
+    },
+    "SIMPLE ADAPTIVE": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.2462227695463324,
+          0.2754772685396665
+        ],
+        "mean": 0.26094256437203356,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.12375445428384917,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          6.30718954248366,
+          7.4840989399293285
+        ],
+        "mean": 6.871527777777778,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 5.860647481767456,
+        "sd_n_defined": 116
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.21740994511123546,
+          0.23435095372842218
+        ],
+        "mean": 0.2259839691618271,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.1145602023881535,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.3220338983050847,
+          0.35397039030955585
+        ],
+        "mean": 0.3382352941176471,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.13223082729729943,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.8354166666666667,
+          0.8895833333333333
+        ],
+        "mean": 0.8625,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.17103859704953228,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2.9604166666666667,
+          3.2916666666666665
+        ],
+        "mean": 3.122916666666667,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 1.2213076033107966,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.8305084745762712,
+          0.8384925975773889
+        ],
+        "mean": 0.8345588235294118,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.033057706824324844,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.55625,
+          0.64375
+        ],
+        "mean": 0.6,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.27577240646603357,
+        "sd_n_defined": 120
+      }
+    }
+  },
+  "simulation_label": "SIMULATED PERSONALIZATION RESULT"
+}

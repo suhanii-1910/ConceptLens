@@ -1,0 +1,33 @@
+{
+  "version": "sim-1.0.0",
+  "seeds": [7, 19, 31, 43, 59, 71, 83, 97],
+  "learners_per_profile_seed": 3,
+  "sessions": 4,
+  "horizon": 8,
+  "bootstrap_samples": 1000,
+  "bootstrap_seed": 20261006,
+  "guess": 0.25,
+  "slip": 0.08,
+  "misconception_penalty": 0.20,
+  "misconception_repair_probability": 0.18,
+  "reasoning_sensitivity": 0.75,
+  "reasoning_false_positive": 0.12,
+  "gains": {
+    "source_explanation": 0.07,
+    "visual_explanation": 0.07,
+    "worked_example": 0.09,
+    "prerequisite_recap": 0.07,
+    "prerequisite_practice": 0.05,
+    "general_practice": 0.05,
+    "prerequisite_probe": 0.0,
+    "diagnostic_probe": 0.0,
+    "transfer_check": 0.0
+  },
+  "profiles": [
+    {"name": "novice_prerequisite_gaps", "target": 0.15, "prerequisite": 0.15, "procedural": 0.2, "misconception": false, "noise": 0.08},
+    {"name": "misconception", "target": 0.4, "prerequisite": 0.65, "procedural": 0.5, "misconception": true, "noise": 0.08},
+    {"name": "procedural_conceptually_weak", "target": 0.25, "prerequisite": 0.65, "procedural": 0.85, "misconception": false, "noise": 0.08},
+    {"name": "strong", "target": 0.85, "prerequisite": 0.9, "procedural": 0.9, "misconception": false, "noise": 0.04},
+    {"name": "noisy_inconsistent", "target": 0.6, "prerequisite": 0.6, "procedural": 0.65, "misconception": false, "noise": 0.35}
+  ]
+}

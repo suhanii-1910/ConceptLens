@@ -1,0 +1,332 @@
+{
+  "version": "items-1.0.0",
+  "provenance": "Original deterministic, source-reviewed MCQ fixtures; not LLM-verified production questions. Held-out contexts are never used by a teaching policy.",
+  "prerequisite_edges": [
+    [
+      "prerequisite",
+      "target"
+    ]
+  ],
+  "items": [
+    {
+      "item_id": "training-target-1",
+      "role": "training",
+      "concept": "target",
+      "template_id": "resident-miss",
+      "question": "A requested page is resident but its translation is absent from the TLB. What happens next?",
+      "options": [
+        "Consult the page table; a resident page needs no disk read.",
+        "Always fetch the page from disk.",
+        "Delete the page table.",
+        "Every resident access is a page fault."
+      ],
+      "correct_option_index": 0,
+      "explanation": "A TLB miss concerns a cached translation; page residency is determined separately.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "training-target-2",
+      "role": "training",
+      "concept": "target",
+      "template_id": "resident-miss",
+      "question": "A TLB lookup fails; the page table says present=1. Which action is required?",
+      "options": [
+        "Consult the page table; a resident page needs no disk read.",
+        "Always fetch the page from disk.",
+        "Delete the page table.",
+        "Every resident access is a page fault."
+      ],
+      "correct_option_index": 0,
+      "explanation": "A TLB miss concerns a cached translation; page residency is determined separately.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "training-target-3",
+      "role": "training",
+      "concept": "target",
+      "template_id": "resident-miss",
+      "question": "A process accesses a resident page after an untagged TLB flush. Must it read the page from disk?",
+      "options": [
+        "Consult the page table; a resident page needs no disk read.",
+        "Always fetch the page from disk.",
+        "Delete the page table.",
+        "Every resident access is a page fault."
+      ],
+      "correct_option_index": 0,
+      "explanation": "A TLB miss concerns a cached translation; page residency is determined separately.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "training-target-4",
+      "role": "training",
+      "concept": "target",
+      "template_id": "resident-miss",
+      "question": "A student says every TLB miss proves a page fault. Which observation refutes that claim?",
+      "options": [
+        "Consult the page table; a resident page needs no disk read.",
+        "Always fetch the page from disk.",
+        "Delete the page table.",
+        "Every resident access is a page fault."
+      ],
+      "correct_option_index": 0,
+      "explanation": "A TLB miss concerns a cached translation; page residency is determined separately.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "training-target-5",
+      "role": "training",
+      "concept": "target",
+      "template_id": "residency-rule",
+      "question": "The page table reports present=0 after a TLB miss. What follows?",
+      "options": [
+        "Invoke the page-fault handler for a nonresident page.",
+        "Every TLB hit invokes it.",
+        "A present bit of zero means resident.",
+        "Ignore page residency."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Present=0 denotes a nonresident page.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "training-target-6",
+      "role": "training",
+      "concept": "target",
+      "template_id": "residency-rule",
+      "question": "An address references a nonresident page. Which event handles this?",
+      "options": [
+        "Invoke the page-fault handler for a nonresident page.",
+        "Every TLB hit invokes it.",
+        "A present bit of zero means resident.",
+        "Ignore page residency."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Present=0 denotes a nonresident page.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "training-target-7",
+      "role": "training",
+      "concept": "target",
+      "template_id": "residency-rule",
+      "question": "A TLB miss and a page fault differ in what way?",
+      "options": [
+        "Invoke the page-fault handler for a nonresident page.",
+        "Every TLB hit invokes it.",
+        "A present bit of zero means resident.",
+        "Ignore page residency."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Present=0 denotes a nonresident page.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "training-target-8",
+      "role": "training",
+      "concept": "target",
+      "template_id": "residency-rule",
+      "question": "Trace table: TLB=miss; page-table present=0. Select the handler.",
+      "options": [
+        "Invoke the page-fault handler for a nonresident page.",
+        "Every TLB hit invokes it.",
+        "A present bit of zero means resident.",
+        "Ignore page residency."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Present=0 denotes a nonresident page.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-1",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For process A, a page-table entry has present=0. What does this indicate?",
+      "options": [
+        "The page is not resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-2",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For process B, a page-table entry has present=0. What does this indicate?",
+      "options": [
+        "The page is not resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-3",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For a restarted instruction, a page-table entry has present=0. What does this indicate?",
+      "options": [
+        "The page is not resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-4",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For a new access, a page-table entry has present=0. What does this indicate?",
+      "options": [
+        "The page is not resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-5",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For process A, a page-table entry has present=1. What does this indicate?",
+      "options": [
+        "The page is resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is not resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-6",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For process B, a page-table entry has present=1. What does this indicate?",
+      "options": [
+        "The page is resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is not resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-7",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For a restarted instruction, a page-table entry has present=1. What does this indicate?",
+      "options": [
+        "The page is resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is not resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "training-prerequisite-8",
+      "role": "training",
+      "concept": "prerequisite",
+      "template_id": "present-bit",
+      "question": "For a new access, a page-table entry has present=1. What does this indicate?",
+      "options": [
+        "The page is resident.",
+        "The page size doubles.",
+        "The offset changes.",
+        "The page is not resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "The present bit indicates whether a page is resident.",
+      "style": "procedural"
+    },
+    {
+      "item_id": "heldout-target-1",
+      "role": "heldout",
+      "concept": "target",
+      "template_id": "resident-miss",
+      "question": "After switching address spaces, the lab flushes its TLB. The first requested page remains in RAM. Explain the needed access path.",
+      "options": [
+        "Page-table lookup restores the translation without paging in.",
+        "TLB flushing removes every RAM page.",
+        "Any cache miss forces a disk read.",
+        "The offset must be discarded."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Separate translation-cache presence from physical-page residency.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "heldout-target-2",
+      "role": "heldout",
+      "concept": "target",
+      "template_id": "residency-rule",
+      "question": "Two references both miss the TLB. Only one page is resident. Which requires loading a page from storage?",
+      "options": [
+        "Only the nonresident reference.",
+        "Both references necessarily do.",
+        "Neither can require storage.",
+        "Only the resident reference."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Separate translation-cache presence from physical-page residency.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "heldout-target-3",
+      "role": "heldout",
+      "concept": "target",
+      "template_id": "aggregate-trace",
+      "question": "A workload reports 30 translation-cache misses and 2 absent pages. Is this internally possible?",
+      "options": [
+        "Yes, translation misses and residency faults are different events.",
+        "No, both counts must be identical.",
+        "No, cache misses can never occur.",
+        "No, every page is always resident."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Separate translation-cache presence from physical-page residency.",
+      "style": "conceptual"
+    },
+    {
+      "item_id": "heldout-target-4",
+      "role": "heldout",
+      "concept": "target",
+      "template_id": "residency-rule",
+      "question": "A trace resumes an instruction after updating a page table following a disk read. What distinguished this event from a resident TLB miss?",
+      "options": [
+        "The referenced page was not resident.",
+        "The page was resident throughout.",
+        "Only the offset was missing.",
+        "Every TLB miss loads data from disk."
+      ],
+      "correct_option_index": 0,
+      "explanation": "Separate translation-cache presence from physical-page residency.",
+      "style": "conceptual"
+    }
+  ]
+}

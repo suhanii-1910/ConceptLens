@@ -1,0 +1,438 @@
+{
+  "version": "aster-memory-1.0.0",
+  "frozen_at": "2026-10-06",
+  "description": "Original small diagnostic corpus, not the CPU scheduling demo. Six development and twelve test cases. No test-outcome tuning.",
+  "sources": [
+    {
+      "source_id": "memory",
+      "filename": "aster-memory.pdf",
+      "path": "sources/aster-memory.pdf",
+      "sha256": "04898b31926e349a592b04ffb2574b589e591e58c8bd2ba174066638aa933704",
+      "kind": "pdf"
+    },
+    {
+      "source_id": "operations",
+      "filename": "aster-operations.pptx",
+      "path": "sources/aster-operations.pptx",
+      "sha256": "2bbbea6824da2a679c1fe1cd7cb8f7f1ab697f8aa40ca0f9e995bc04b74f9d78",
+      "kind": "pptx"
+    },
+    {
+      "source_id": "demonstration",
+      "filename": "aster-demonstration.mp4",
+      "path": "sources/aster-demonstration.mp4",
+      "sha256": "e91ef271d72e7b4e0b0ba3033a699ada16621dc7c3c60e6258b2692275941b0b",
+      "kind": "video"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "dev-text",
+      "split": "development",
+      "question": "What distinguishes a virtual page from a physical frame in Aster?",
+      "case_type": "text",
+      "modality": "text",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 1
+          }
+        }
+      ],
+      "reference_answer": "A virtual page holds virtual addresses; a frame is a block of physical memory.",
+      "required_facts": [
+        "A virtual page holds virtual addresses; a frame is a block of physical memory."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "dev-table",
+      "split": "development",
+      "question": "How many page faults did the Birch trace record?",
+      "case_type": "table_numerical",
+      "modality": "table",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 3
+          }
+        }
+      ],
+      "reference_answer": "Birch recorded 3 page faults.",
+      "required_facts": [
+        "Birch recorded 3 page faults."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "dev-video",
+      "split": "development",
+      "question": "In the demonstration, what is consulted first after a translation cache miss?",
+      "case_type": "video",
+      "modality": "video",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "demonstration",
+          "locator": {
+            "kind": "time",
+            "start": 0.0,
+            "end": 19.8
+          }
+        }
+      ],
+      "reference_answer": "Consult the page table.",
+      "required_facts": [
+        "Consult the page table."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Expected interval is the measured narrated clip span. Location coverage requires at least 50% overlap; short transcript chunks may lose location credit even when semantically useful."
+    },
+    {
+      "case_id": "dev-cross",
+      "split": "development",
+      "question": "Combine the lab page size and the slide's offset bit count.",
+      "case_type": "cross_source",
+      "modality": "mixed",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 1
+          }
+        },
+        {
+          "source_id": "operations",
+          "locator": {
+            "kind": "slide",
+            "number": 1
+          }
+        }
+      ],
+      "reference_answer": "Pages are 4096 bytes and the offset has 12 bits.",
+      "required_facts": [
+        "Pages are 4096 bytes and the offset has 12 bits."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "dev-off",
+      "split": "development",
+      "question": "Which network congestion protocol does the Aster lab deploy?",
+      "case_type": "unsupported",
+      "modality": "none",
+      "supported": false,
+      "expected": [],
+      "reference_answer": "",
+      "required_facts": [],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "dev-figure",
+      "split": "development",
+      "question": "Which named gate is shown in the Aster routing figure?",
+      "case_type": "figure_diagram",
+      "modality": "figure",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 4
+          }
+        }
+      ],
+      "reference_answer": "Amber gate.",
+      "required_facts": [
+        "Amber gate."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Raster labels only; current lack of visual semantics is an intended limitation."
+    },
+    {
+      "case_id": "test-text-1",
+      "split": "test",
+      "question": "Does an Aster TLB miss necessarily mean a page fault? Explain using the residency rule.",
+      "case_type": "text",
+      "modality": "text",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 2
+          }
+        }
+      ],
+      "reference_answer": "No. A TLB miss requires consulting the page table. A fault occurs only when the page is not resident.",
+      "required_facts": [
+        "No. A TLB miss requires consulting the page table. A fault occurs only when the page is not resident."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-text-2",
+      "split": "test",
+      "question": "Which page-table flag sends an Aster access to the page-fault handler, and at what value?",
+      "case_type": "text",
+      "modality": "text",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 2
+          }
+        }
+      ],
+      "reference_answer": "The present bit set to zero triggers the handler.",
+      "required_facts": [
+        "The present bit set to zero triggers the handler."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-table-1",
+      "split": "test",
+      "question": "Compute Cedar's TLB hit fraction from the measured trace.",
+      "case_type": "table_numerical",
+      "modality": "table",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 3
+          }
+        }
+      ],
+      "reference_answer": "150 divided by 200 equals 0.75, or 75%.",
+      "required_facts": [
+        "150 divided by 200 equals 0.75, or 75%."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-table-2",
+      "split": "test",
+      "question": "How many TLB misses occurred in Elm's trace?",
+      "case_type": "table_numerical",
+      "modality": "table",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 3
+          }
+        }
+      ],
+      "reference_answer": "120 lookups minus 90 hits equals 30 misses.",
+      "required_facts": [
+        "120 lookups minus 90 hits equals 30 misses."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-video-1",
+      "split": "test",
+      "question": "In the narrated absent-page procedure, what happens after the page is read and before instruction restart?",
+      "case_type": "video",
+      "modality": "video",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "demonstration",
+          "locator": {
+            "kind": "time",
+            "start": 19.8,
+            "end": 40.0
+          }
+        }
+      ],
+      "reference_answer": "The handler updates the page table.",
+      "required_facts": [
+        "The handler updates the page table."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Expected interval is the measured narrated clip span. Location coverage requires at least 50% overlap; short transcript chunks may lose location credit even when semantically useful."
+    },
+    {
+      "case_id": "test-video-2",
+      "split": "test",
+      "question": "What extra work does the demonstration require when evicting a dirty page?",
+      "case_type": "video",
+      "modality": "video",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "demonstration",
+          "locator": {
+            "kind": "time",
+            "start": 40.0,
+            "end": 58.4
+          }
+        }
+      ],
+      "reference_answer": "Write modified contents back to storage.",
+      "required_facts": [
+        "Write modified contents back to storage."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Expected interval is the measured narrated clip span. Location coverage requires at least 50% overlap; short transcript chunks may lose location credit even when semantically useful."
+    },
+    {
+      "case_id": "test-cross-1",
+      "split": "test",
+      "question": "What does Aster's TLB cache, and why do the slides require flushing it on an address-space switch?",
+      "case_type": "cross_source",
+      "modality": "mixed",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 2
+          }
+        },
+        {
+          "source_id": "operations",
+          "locator": {
+            "kind": "slide",
+            "number": 2
+          }
+        }
+      ],
+      "reference_answer": "It caches page-to-frame translations. Flushing prevents reuse of translations from the old address space.",
+      "required_facts": [
+        "It caches page-to-frame translations. Flushing prevents reuse of translations from the old address space."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-cross-2",
+      "split": "test",
+      "question": "Combine the notes and slides: during translation, what replaces the virtual page number and what happens to the offset?",
+      "case_type": "cross_source",
+      "modality": "mixed",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 1
+          }
+        },
+        {
+          "source_id": "operations",
+          "locator": {
+            "kind": "slide",
+            "number": 1
+          }
+        }
+      ],
+      "reference_answer": "The physical frame number replaces the virtual page number; the offset is preserved.",
+      "required_facts": [
+        "The physical frame number replaces the virtual page number; the offset is preserved."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-off-1",
+      "split": "test",
+      "question": "What is the Aster laboratory's monthly cloud hosting bill?",
+      "case_type": "unsupported",
+      "modality": "none",
+      "supported": false,
+      "expected": [],
+      "reference_answer": "",
+      "required_facts": [],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-off-2",
+      "split": "test",
+      "question": "According to these materials, what dose of aspirin treats a headache?",
+      "case_type": "unsupported",
+      "modality": "none",
+      "supported": false,
+      "expected": [],
+      "reference_answer": "",
+      "required_facts": [],
+      "topic": "Aster memory lab",
+      "notes": "Original authored benchmark; reference evidence locations are frozen before scoring."
+    },
+    {
+      "case_id": "test-figure-1",
+      "split": "test",
+      "question": "Where does the dashed route from Amber gate terminate in the routing figure?",
+      "case_type": "figure_diagram",
+      "modality": "figure",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 4
+          }
+        }
+      ],
+      "reference_answer": "Violet queue.",
+      "required_facts": [
+        "Violet queue."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Raster labels only; current lack of visual semantics is an intended limitation."
+    },
+    {
+      "case_id": "test-figure-2",
+      "split": "test",
+      "question": "Which node sits to the right of Amber gate in the routing figure?",
+      "case_type": "figure_diagram",
+      "modality": "figure",
+      "supported": true,
+      "expected": [
+        {
+          "source_id": "memory",
+          "locator": {
+            "kind": "page",
+            "number": 4
+          }
+        }
+      ],
+      "reference_answer": "Frame lookup.",
+      "required_facts": [
+        "Frame lookup."
+      ],
+      "topic": "Aster memory lab",
+      "notes": "Raster labels only; current lack of visual semantics is an intended limitation."
+    }
+  ]
+}

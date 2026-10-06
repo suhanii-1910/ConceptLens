@@ -1,0 +1,88 @@
+{
+  "configuration": {
+    "bank_sha256": "ba4c0d9745a3f5eb97fd799b054e8ae4980a73b7a9f2367641c7850d67bdbf77",
+    "bootstrap_samples": 1000,
+    "bootstrap_seed": 20261006,
+    "gains": {
+      "diagnostic_probe": 0.0,
+      "general_practice": 0.05,
+      "prerequisite_practice": 0.05,
+      "prerequisite_probe": 0.0,
+      "prerequisite_recap": 0.07,
+      "source_explanation": 0.07,
+      "transfer_check": 0.0,
+      "visual_explanation": 0.07,
+      "worked_example": 0.09
+    },
+    "guess": 0.25,
+    "horizon": 8,
+    "learners_per_profile_seed": 3,
+    "misconception_penalty": 0.2,
+    "misconception_repair_probability": 0.18,
+    "profiles": [
+      {
+        "misconception": false,
+        "name": "novice_prerequisite_gaps",
+        "noise": 0.08,
+        "prerequisite": 0.15,
+        "procedural": 0.2,
+        "target": 0.15
+      },
+      {
+        "misconception": true,
+        "name": "misconception",
+        "noise": 0.08,
+        "prerequisite": 0.65,
+        "procedural": 0.5,
+        "target": 0.4
+      },
+      {
+        "misconception": false,
+        "name": "procedural_conceptually_weak",
+        "noise": 0.08,
+        "prerequisite": 0.65,
+        "procedural": 0.85,
+        "target": 0.25
+      },
+      {
+        "misconception": false,
+        "name": "strong",
+        "noise": 0.04,
+        "prerequisite": 0.9,
+        "procedural": 0.9,
+        "target": 0.85
+      },
+      {
+        "misconception": false,
+        "name": "noisy_inconsistent",
+        "noise": 0.35,
+        "prerequisite": 0.6,
+        "procedural": 0.65,
+        "target": 0.6
+      }
+    ],
+    "reasoning_false_positive": 0.12,
+    "reasoning_sensitivity": 0.75,
+    "seeds": [
+      7,
+      19,
+      31,
+      43,
+      59,
+      71,
+      83,
+      97
+    ],
+    "sessions": 4,
+    "slip": 0.08,
+    "version": "sim-1.0.0"
+  },
+  "excluded_fields": [
+    "metadata.timestamp_utc"
+  ],
+  "first_timestamp": "2026-10-06T17:29:29.063702+00:00",
+  "identical_payload": true,
+  "label": "SIMULATED PERSONALIZATION RESULT",
+  "second_timestamp": "2026-10-06T17:29:31.156008+00:00",
+  "sha256": "5e7f1140f9b67f37e43f7dd35c44f353c54b01afd7742c66a96c5f83c946776b"
+}

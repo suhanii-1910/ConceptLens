@@ -407,3 +407,16 @@ ConceptLens/
 - **No authentication**: All endpoints are open.
 - **Duplicate detection is per-course**: The same file uploaded to different courses creates separate records.
 - **No file-size limits enforced at the application level**: Large uploads are accepted (rely on reverse proxy limits in production).
+
+## Phase 9 — evaluation
+
+The isolated [evaluation harness](evaluation/README.md) adds a versioned PDF/PPTX/video grounding benchmark, genuine RAGAS 0.4.3 metrics, deterministic citation/refusal checks, and reproducible multi-session simulations comparing **FIXED**, **SIMPLE ADAPTIVE**, and **CONCEPTLENS** using production policy decisions. It changes no product behavior and uses only disposable PostgreSQL databases or memory.
+
+See the [judge report](evaluation/reports/judge/report.md) and [Phase 10 handoff](evaluation/reports/judge/phase10-handoff.json). Current real grounding scores are **pending provider configuration**; personalization results are explicitly **simulation**, not real student learning gains.
+
+```sh
+PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval validate-dataset
+PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval simulate
+PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval grounding
+PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval report
+```
