@@ -8,7 +8,9 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 7 — Backend adaptive learning, prerequisite repair, Transfer Check, and Learning Trace implemented.**
+**Phase 8 — React frontend for the existing evidence and adaptive-learning backend implemented.**
+
+The five principal views are Workspace, Ask, Learn, Practice, and Dashboard. Learn connects a verified assessment response to typed reasoning, a diagnostic probe, server-selected teaching, prerequisite repair, a Transfer Check, and the persisted Learning Trace. See [frontend setup and acceptance checks](frontend/README.md).
 
 ### Phase 0A — Backend foundation
 
@@ -227,11 +229,9 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 ### Explicitly NOT yet implemented
 
 - adaptive difficulty selection from mastery
-- Learning Trace UI
 - formal evaluation/baselines
 - full short-answer/numerical assessment expansion
 - persistent chat history
-- frontend
 - image/handwritten/screenshot learner-reasoning interpretation (a later multimodal/UI requirement)
 - authentication
 
@@ -242,7 +242,6 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - No WordArt semantics, OLE, or macro interpretation
 - **No OCR** — scanned PDFs produce zero text evidence
 - **No authentication** — all endpoints are open
-- **No frontend**
 - **Stateless Ask** — no conversational follow-up memory; learner state includes concept mastery estimates and event-scoped diagnosis evidence
 
 ### NOT implemented (future phases)
@@ -252,11 +251,9 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - persistent conversations
 - adaptive difficulty selection from mastery
 - image/handwritten learner-reasoning interpretation
-- Learning Trace UI
 - formal evaluation/baselines
 - full short-answer/numerical assessment expansion
 - Authentication / authorization
-- frontend
 
 ---
 
@@ -369,7 +366,7 @@ ConceptLens/
 │   ├── alembic/            # Database migrations
 │   ├── alembic.ini         # Alembic configuration
 │   └── pyproject.toml      # Python project & dependencies
-├── frontend/               # (future) React/TypeScript frontend
+├── frontend/               # React/TypeScript evidence and learning workspace
 ├── worker/                 # (future) Ingestion/background worker
 ├── evaluation/             # (future) Evaluation runner
 ├── storage/
