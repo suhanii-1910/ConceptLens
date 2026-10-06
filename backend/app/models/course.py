@@ -54,3 +54,6 @@ class Course(Base):
         back_populates="course", cascade="all, delete-orphan",
         foreign_keys="ReasoningDiagnosis.course_id",
     )
+    learning_sessions: Mapped[list["LearningSession"]] = relationship(  # noqa: F821
+        back_populates="course", cascade="all, delete-orphan", foreign_keys="LearningSession.course_id",
+    )

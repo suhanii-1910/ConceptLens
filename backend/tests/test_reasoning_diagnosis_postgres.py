@@ -20,6 +20,7 @@ import pytest_asyncio
 from sqlalchemy import insert, select, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.attributes import set_committed_value
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import Settings
@@ -53,7 +54,7 @@ async def migrate(engine, database, command, revision=None):
 
 
 @asynccontextmanager
-async def disposable_database(revision='0005'):
+async def disposable_database(revision='head'):
     original = make_url(os.getenv('CONCEPTLENS_TEST_POSTGRES_URL') or Settings.model_fields['database_url'].default)
     name = 'conceptlens_phase6_check_' + uuid.uuid4().hex[:16]
     assert name != original.database and name != 'conceptlens'
@@ -210,11 +211,15 @@ async def test_migration_lifecycle(monkeypatch):
         async with factory() as db:
             await submit_probe_attempt(other.id, other_attempt.learner_id, other_diag.id, ProbeAttemptCreate(selected_option_index=0), db)
         async with factory() as db:
-            await db.delete(await db.get(Course, other.id))
+            course_to_delete = await db.get(Course, other.id)
+            # This historical lifecycle intentionally stops at 0005, before the
+            # Phase 7 relationship/table exists; its collection is known empty.
+            set_committed_value(course_to_delete, 'learning_sessions', [])
+            await db.delete(course_to_delete)
             await db.commit()
         assert await snapshot() == before
-        assert '0005 (head)' in await migrate(engine, name, 'current')
-        assert '0005 (head)' in await migrate(engine, name, 'heads')
+        assert '0005' in await migrate(engine, name, 'current')
+        assert '0006 (head)' in await migrate(engine, name, 'heads')
         await migrate(engine, name, 'downgrade', '0004')
         assert await snapshot() == before
         async with engine.connect() as conn:
@@ -225,7 +230,7 @@ async def test_migration_lifecycle(monkeypatch):
             assert await conn.scalar(text("SELECT count(*) FROM pg_constraint WHERE conname='uq_assessment_attempt_diagnosis_scope'")) == 0
         await migrate(engine, name, 'upgrade', '0005')
         assert await snapshot() == before
-        assert '0005 (head)' in await migrate(engine, name, 'current')
+        assert '0005' in await migrate(engine, name, 'current')
         async with engine.connect() as conn:
             for table in PHASE6:
                 assert await conn.scalar(text(f'SELECT count(*) FROM "{table}"')) == 0

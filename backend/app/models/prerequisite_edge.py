@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, Float, ForeignKey, String, DateTime, func
+from sqlalchemy import Boolean, CheckConstraint, Float, ForeignKey, String, DateTime, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -13,6 +13,7 @@ from app.db.base import Base
 class PrerequisiteEdge(Base):
     __tablename__ = "prerequisite_edges"
     __table_args__ = (
+        UniqueConstraint("id", "course_id", "prerequisite_concept_id", "target_concept_id", name="uq_edge_learning_scope"),
         CheckConstraint(
             "prerequisite_concept_id != target_concept_id",
             name="ck_no_self_prerequisite",

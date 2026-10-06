@@ -11,6 +11,8 @@ from app.api.endpoints.assessment import router as assessment_router
 from app.api.endpoints.mastery import router as mastery_router
 from app.api.endpoints.reasoning_diagnosis import router as reasoning_diagnosis_router
 
+from app.api.endpoints.adaptive_learning import router as adaptive_learning_router
+
 app = FastAPI(
     title="ConceptLens",
     description="Multimodal adaptive-learning platform — backend API",
@@ -25,3 +27,5 @@ app.include_router(ask_router)
 app.include_router(assessment_router)
 app.include_router(mastery_router)
 app.include_router(reasoning_diagnosis_router)
+
+app.include_router(adaptive_learning_router)

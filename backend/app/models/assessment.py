@@ -58,6 +58,7 @@ class AssessmentQuestion(Base):
     )
 
     __table_args__ = (
+        sa.UniqueConstraint("id", "course_id", name="uq_question_learning_scope"),
         CheckConstraint(
             "correct_option_index >= 0 AND correct_option_index <= 3",
             name="ck_assessment_questions_correct_option_index",

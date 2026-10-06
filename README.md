@@ -8,7 +8,7 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 
 ## Current implementation status
 
-**Phase 6 — Reasoning Debugger and Diagnostic Probes implemented.**
+**Phase 7 — Backend adaptive learning, prerequisite repair, Transfer Check, and Learning Trace implemented.**
 
 ### Phase 0A — Backend foundation
 
@@ -203,13 +203,33 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
   - `CONCEPTLENS_TEST_MIGRATION_LIFECYCLE=1 .venv/bin/pytest tests/test_reasoning_diagnosis_postgres.py -k migration_lifecycle -s`
   - PostgreSQL acceptance creates unique disposable databases on the configured test server (optional `CONCEPTLENS_TEST_POSTGRES_URL`), runs actual Alembic migrations, and drops only those databases. The role needs database-creation permission. The lifecycle check preserves representative Phase 5 rows through `0004 → 0005 → 0004 → 0005`.
 
+### Phase 7 — Adaptive learning and Learning Trace
+
+- **Eligibility:** targeted repair starts only from a confirmed, same-course/learner Phase 6 diagnosis with a verified original assessment, frozen target concept, actual confirming diagnostic response, and valid source evidence. Other diagnosis statuses return safe actions without teaching the suspected gap as fact. An unresolved session can start repair after its diagnostic probe confirms the event. Phase 6 history stays unchanged.
+- **Deterministic policy:** `source_explanation` → if confused, `visual_explanation` → if still confused, a real `prerequisite_probe` (or `worked_example` when no prerequisite exists). Understood feedback advances to a **Transfer Check**. Recap/practice returns to a worked example, then Transfer Check. Each strategy is used at most once per session; policy reasons are returned and persisted.
+- **Learner control:** feedback requires the current `intervention_id` and `understood` or `still_confused`. A wrong prerequisite response offers exactly `sixty_second_recap`, `practice_prerequisite`, and `continue_anyway`. The selected choice is stored and honored. A correct prerequisite response proceeds to a worked example without labeling a weakness.
+- **Real prerequisites:** actual same-course edges and concept/evidence links only. Selection ranks lowest observed mastery first, then concept UUID and edge UUID; unseen prerequisites are explicitly untested and sort after observed prerequisites. Selection and all teaching/prerequisite interactions create no mastery updates.
+- **Verified source-grounded repair:** separate generator and authoritative verifier calls must approve every action. The server selects strategy and concepts; the model returns only bounded content and allowlisted evidence UUIDs. Verifier evidence wins. Public citations are built from stored source/evidence provenance. Context is bounded to 10 evidence items, 6,000 characters per item, 24,000 source characters, and 96,000 characters per prompt. Visual payloads contain plain titles, steps, labels, and annotations; executable markup is rejected.
+- **Transfer Check:** one fresh four-option MCQ per session reuses `AssessmentQuestion`, its frozen concept mapping, shared deterministic grading, and ordinary `AssessmentAttempt` records. The verifier checks the same target rule, exactly one supported answer, changed structure, and no repetition/paraphrase of the original, diagnostic, or prior session questions. Exact duplicate stems also fail a server check. Answer keys and explanations are hidden until submission.
+- **Mastery and result:** the first eligible Transfer Check attempt calls the existing Phase 5 BKT service. Repeats append attempts with `skipped_repeated_question`, never replace the resolving attempt, and never advance policy again. Passing completes the session. Failure selects meaningful unused repair; exhaustion recommends `reconsider_diagnosis`, without rewriting the original diagnosis. There is no second Transfer Check in that session.
+- **Learning Trace / Proof:** a typed, read-only persisted chain links observed reasoning, tentative hypothesis, diagnostic responses, interpretation, interventions, Transfer Check resolution, and actual mastery observations. It makes no provider call. Proof flags require corresponding stored verification, valid current provenance, and actual learner-state updates; absent proof remains false.
+- **Atomicity and scope:** session row locks serialize learner actions; diagnosis locking serializes creation. Unique constraints enforce one session per diagnosis, one intervention per strategy/sequence, and one Transfer Check per session. Composite foreign keys constrain course/learner/target/question/edge/attempt relationships. ORM history guards protect content; a PostgreSQL trigger also prevents SQL replacement of a resolved Transfer Check's status or resolving attempt. Whole-course deletion cascades the aggregate.
+- **Failure behavior:** missing trusted evidence or verifier rejection returns 422; invalid/foreign model output returns 502; provider failures return 503. The entire transition rolls back, including attempts and BKT observations if generating the next action fails. No unverified teaching is persisted.
+- **Routes:** prefix `/courses/{course_id}/learners/{learner_id}/learning-sessions`. `POST` accepts `diagnosis_id`; `GET /{session_id}` reads state; `POST /{session_id}/feedback` accepts `intervention_id` and `feedback`; `POST /{session_id}/prerequisite-choice` accepts `intervention_id` and `choice`. Submit `selected_option_index` to `POST /{session_id}/interventions/{intervention_id}/attempts` for prerequisite probe/practice or `POST /{session_id}/transfer-check/attempts`. `GET /{session_id}/trace` returns the proof chain. Session-owned questions must use these scoped submission routes; the ordinary assessment submission route returns 409 for them. Ordinary Phase 4 questions retain their existing behavior.
+- **Migration:** `0006` follows `0005`, adds three tables, scope constraints and the resolution trigger, and performs no backfill. Downgrade removes only these Phase 7 objects/constraints; reusable assessment/attempt/mastery rows remain. Normal development data is not migrated by acceptance tests.
+- **Acceptance** (from `backend`):
+  - `.venv/bin/pytest tests/test_adaptive_learning.py tests/test_api_adaptive_learning.py`
+  - `CONCEPTLENS_TEST_POSTGRES=1 .venv/bin/pytest tests/test_adaptive_learning_postgres.py -k 'not migration_lifecycle'`
+  - `CONCEPTLENS_TEST_MIGRATION_LIFECYCLE=1 .venv/bin/pytest tests/test_adaptive_learning_postgres.py -k migration_lifecycle -s`
+  - PostgreSQL checks reuse the existing disposable-database harness and create/drop only uniquely named test databases. They cover races, scope constraints, immutable resolution, rollback, cascade, and `0005 → 0006 → 0005 → 0006` data preservation.
+- **Limits:** semantic freshness/source support still depend on the independent model verifier; deterministic checks cannot prove arbitrary paraphrase equivalence. Missing trusted prerequisite evidence fails closed. BKT defaults remain uncalibrated. Frontend, formal evaluation/baselines, full short-answer/numerical assessment, image/handwritten reasoning interpretation, and authentication remain unimplemented.
+
 ### Explicitly NOT yet implemented
 
 - adaptive difficulty selection from mastery
-- adaptive teaching policy
-- prerequisite repair lessons
-- Transfer Check
 - Learning Trace UI
+- formal evaluation/baselines
+- full short-answer/numerical assessment expansion
 - persistent chat history
 - frontend
 - image/handwritten/screenshot learner-reasoning interpretation (a later multimodal/UI requirement)
@@ -231,11 +251,10 @@ ConceptLens is a multimodal adaptive-learning platform. It builds a model of the
 - AI descriptions / captions for images
 - persistent conversations
 - adaptive difficulty selection from mastery
-- adaptive teaching policy
-- prerequisite repair lessons
 - image/handwritten learner-reasoning interpretation
-- Transfer Check
 - Learning Trace UI
+- formal evaluation/baselines
+- full short-answer/numerical assessment expansion
 - Authentication / authorization
 - frontend
 

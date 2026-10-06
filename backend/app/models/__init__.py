@@ -12,6 +12,7 @@ from app.models.learner_mastery import (
     assessment_question_concept_link,
 )
 from app.models.reasoning_diagnosis import ReasoningDiagnosis, DiagnosticProbe, DiagnosticProbeAttempt
+from app.models.adaptive_learning import LearningSession, LearningIntervention, TransferCheck
 
 __all__ = [
     "Course",
@@ -32,4 +33,7 @@ __all__ = [
     "ReasoningDiagnosis",
     "DiagnosticProbe",
     "DiagnosticProbeAttempt",
+    "LearningSession",
+    "LearningIntervention",
+    "TransferCheck",
 ]
