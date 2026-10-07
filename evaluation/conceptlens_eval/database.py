@@ -40,12 +40,12 @@ async def disposable_database(admin_url: str, events: list):
         created = True
         events.append({"action":"created","database":name})
         result = await asyncio.to_thread(subprocess.run,
-            [str(ROOT/"backend/.venv/bin/python"),"-m","alembic","upgrade","0006"],cwd=ROOT/"backend",
+            [str(ROOT/"backend/.venv/bin/python"),"-m","alembic","upgrade","0007"],cwd=ROOT/"backend",
             env={**os.environ,"CONCEPTLENS_DATABASE_URL":target.render_as_string(hide_password=False)},
             text=True,capture_output=True,timeout=120)
         if result.returncode:
             raise RuntimeError("disposable migration failed; database will be dropped (connection details redacted)")
-        events.append({"action":"migrated","revision":"0006"})
+        events.append({"action":"migrated","revision":"0007"})
         yield target.render_as_string(hide_password=False)
     finally:
         try:
@@ -69,7 +69,7 @@ async def check_lifecycle(admin_url: str, *, fail_inside: bool = False) -> dict:
             try:
                 async with engine.begin() as db:
                     revision = await db.scalar(text("SELECT version_num FROM alembic_version"))
-                    if revision != "0006": raise AssertionError("unexpected migration revision")
+                    if revision != "0007": raise AssertionError("unexpected migration revision")
                     await db.execute(text("INSERT INTO courses (id,name) VALUES (:id,'Evaluation lifecycle fixture')"),{"id":uuid.uuid4()})
                     events.append({"action":"seeded_and_checked","revision":revision})
                     if fail_inside: raise RuntimeError("intentional lifecycle failure")

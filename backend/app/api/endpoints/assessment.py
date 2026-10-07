@@ -25,6 +25,7 @@ from app.schemas.assessment import (
 from app.schemas.retrieval import Citation
 from app.services.assessment_generation import generate_assessments
 from app.services.assessment_grading import grade_attempt
+from app.services.typed_assessment import public_format
 from app.services.llm_provider import (
     InvalidLLMResponseError,
     LLMConfigurationError,
@@ -125,6 +126,7 @@ async def get_assessment_question(
         options=question.options,
         citations=parsed_citations,
         created_at=question.created_at,
+        **public_format(question),
     )
 
 
@@ -160,6 +162,6 @@ async def submit_assessment_attempt(
         if await db.scalar(select(LearningIntervention.id).where(
             LearningIntervention.assessment_question_id == question.id)):
             raise HTTPException(409, "Use the scoped learning-session submission route")
-        _, response = await grade_attempt(db, question, attempt_in.learner_id, attempt_in.selected_option_index)
+        _, response = await grade_attempt(db, question, attempt_in.learner_id, attempt_in.selected_option_index, response=attempt_in)
     # Exiting the transaction commits all three records or rolls them all back.
     return response

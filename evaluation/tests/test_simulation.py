@@ -84,12 +84,18 @@ async def test_production_repair_exhaustion_and_freshness(bank):
         assert len(texts)==len(set(texts))
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('marker,probe_correct,expected',[(False,False,'general_practice'),(True,True,'general_practice'),(True,False,'source_explanation')])
+@pytest.mark.parametrize('marker,probe_correct,expected',[(False,False,'source_explanation'),(True,True,'source_explanation'),(True,False,'source_explanation')])
 async def test_production_diagnosis_safe_path(bank,marker,probe_correct,expected):
     with MemoryPolicy(bank['items'],{'target':.2,'prerequisite':.2},{'target':0,'prerequisite':0},0,bank['prerequisite_edges']) as p:
         await p.start(marker)
         if marker: await p.respond(probe_correct,False)
         assert p.session.current_action==expected
+        assert p.diagnosis.status == ('no_clear_break' if not marker else 'rejected' if probe_correct else 'confirmed')
+        assert p.counts == {'target':0,'prerequisite':0}
+        await p.respond(False,True)
+        assert p.session.current_action=='transfer_check'
+        await p.respond(True,True)
+        assert p.session.status=='complete' and p.counts['target']==1
 
 @pytest.mark.asyncio
 async def test_production_transfer_pass_and_no_prerequisite(bank):

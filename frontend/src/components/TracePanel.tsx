@@ -58,6 +58,8 @@ export function TraceContent({ trace }: { trace: LearningTrace }) {
         <li>
           <h3>Interpretation</h3>
           <p>{diagnosisLabels[trace.interpretation]}</p>
+          {trace.interpretation !== "confirmed" && trace.teaching_actions.length > 0 && <p>Learning continued at the observed concept level. The system did not assume a confirmed misconception.</p>}
+          <p>{trace.session.reason}</p>
         </li>
         <li>
           <h3>Teaching actions</h3>

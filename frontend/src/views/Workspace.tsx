@@ -1,3 +1,4 @@
+import { SourceInventory } from "../components/SourceViewer";
 import { useCallback, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -267,6 +268,7 @@ function SourceWorkspace() {
                     </div>
                     <div className="source-info">
                       <strong>{source.original_filename}</strong>
+                      <SourceInventory course={source.course_id} source={source.id}/>
                       <small>
                         {source.source_type.toUpperCase()} · Added{" "}
                         {new Date(source.created_at).toLocaleDateString()}

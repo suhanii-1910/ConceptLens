@@ -74,7 +74,10 @@ export type Difficulty = "easy" | "medium" | "hard";
 export interface Question {
   id: string;
   course_id: string;
-  question_type: "multiple_choice";
+  question_type: "multiple_choice" | "short_answer" | "numerical";
+  answer_unit?: string | null;
+  numeric_format?: string | null;
+  scenario?: Record<string, unknown> | null;
   difficulty: Difficulty;
   question_text: string;
   options: string[];
@@ -113,10 +116,13 @@ export interface Attempt {
   question_id: string;
   course_id: string;
   learner_id: string;
-  selected_option_index: number;
-  is_correct: boolean;
-  correct_option_index: number;
-  correct_option_text: string;
+  selected_option_index: number | null;
+  is_correct: boolean | null;
+  correct_option_index: number | null;
+  correct_option_text: string | null;
+  question_type?: Question["question_type"];
+  submitted_answer?: string | null;
+  grading?: { verdict: string; explanation: string; method: string; solution_proof?: SchedulingProof } | null;
   explanation: string;
   citations: Citation[];
   created_at: string;
@@ -313,3 +319,12 @@ export interface LearningTrace {
   }[];
   proof: Proof;
 }
+
+export type AnswerInput = { selected_option_index: number } | { answer_text: string } | { answer_value: string; answer_unit?: string };
+export interface SourceLocation { source_id: string; source_type: Source['source_type']; filename: string; file_url: string; preview_url: string | null; preview_note: string | null; locator: { kind: string; number?: number; start?: number; end?: number } }
+export interface VisualEvidence { evidence_unit_id: string; citation: Citation; modality: string; evidence_type: string; asset_extracted: boolean; semantic_state: string; semantic_description: string | null; text: string | null; table_rows: string[][] | null; asset_url: string | null }
+export interface Diagnostic { id?: string; status: 'not_started' | 'in_progress' | 'complete'; question_count: number; questions: Question[]; completed_question_ids: string[]; message?: string }
+export interface ConceptEvidence { id: string; name: string; description: string | null; citations: Citation[] }
+export interface ConceptGraph { concepts: ConceptEvidence[]; prerequisites: { id: string; prerequisite_concept_id: string; target_concept_id: string; relation_type: string; source_backed: boolean; confidence: number | null }[] }
+export interface AssessmentReport { attempt_count: number; scored_question_count: number; correct_count: number; score: number | null; cannot_grade_count: number; repeated_attempts_excluded: number; scoring_policy: string; by_type: Record<string, {attempt_count: number; correct_count: number}>; concepts: { concept_id: string; name: string; status: string; attempt_count: number; correct_count: number }[]; untested: ConceptEvidence[]; misconceptions: { id: string; status: DiagnosisStatus; hypothesis: string | null; observed: string | null }[]; prerequisite_concerns: { id: string; reason: string }[]; next_action: string; citations: Citation[] }
+export interface SchedulingProof { segments: {pid: string | null; start: number; end: number}[]; processes: {pid: string; start: number; completion: number; turnaround: number; waiting: number; response: number}[]; averages: Record<string, number>; assumptions: string[]; tie_breaking?: string; decisions: { time: number; pid: string; remaining_before?: number; ready?: string[]; algorithm?: string }[] }

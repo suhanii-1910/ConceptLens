@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     llm_base_url: str | None = None
     llm_api_key: str | None = None
     llm_model: str | None = None
+    vision_model: str | None = None
     llm_timeout_seconds: float = 45.0
 
     model_config = {"env_prefix": "CONCEPTLENS_", "env_file": str(_ENV_FILE)}

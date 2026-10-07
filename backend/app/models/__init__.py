@@ -37,3 +37,4 @@ __all__ = [
     "LearningIntervention",
     "TransferCheck",
 ]
+from app.models.diagnostic_session import DiagnosticSession  # noqa: F401

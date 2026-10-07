@@ -26,7 +26,7 @@ PHASE7 = {'learning_sessions','learning_interventions','transfer_checks'}
 
 @pytest_asyncio.fixture
 async def migrated():
-    async with disposable_database('0006') as (engine, name):
+    async with disposable_database('head') as (engine, name):
         yield engine
 
 async def start(factory, monkeypatch, *, transfer=False):
@@ -202,12 +202,15 @@ async def test_failed_transition_rolls_back_postgres(migrated,monkeypatch):
 async def test_phase7_migration_lifecycle(monkeypatch):
     async with disposable_database('0005') as (engine,name):
         factory=async_sessionmaker(engine,expire_on_commit=False)
+        # Only fixture setup/runtime use the current ORM schema; snapshots exercise exact historical revisions.
+        await migrate(engine,name,'upgrade','head')
         async with factory() as db:
             original=await confirmed(db,monkeypatch)
             await add_prerequisite(db,original)
             async with db.begin():
                 status,_=await process_mastery_update(db,original[4],original[0].id,[original[1]])
                 original[4].mastery_update_status=status
+        await migrate(engine,name,'downgrade','0005')
         async with engine.connect() as conn:
             old_tables=set((await conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname='public'"))).scalars())-{'alembic_version'}
             assert not PHASE7 & old_tables
@@ -231,6 +234,7 @@ async def test_phase7_migration_lifecycle(monkeypatch):
                     assert {c['name'] for c in inspector.get_check_constraints(table.name)} == {c.name for c in table.constraints if isinstance(c,CheckConstraint)}
             await conn.run_sync(check_schema)
             for table in PHASE7: assert await conn.scalar(text(f'SELECT count(*) FROM "{table}"'))==0
+        await migrate(engine,name,'upgrade','head')
         # Keep original rows untouched, add a separate fully populated Phase 7 course.
         data,_,session=await start(factory,monkeypatch,transfer=True)
         async with factory() as db:
@@ -241,9 +245,10 @@ async def test_phase7_migration_lifecycle(monkeypatch):
             await api.submit_transfer_attempt(separate[0].id,separate[4].learner_id,second.id,schema.LearningAttemptCreate(selected_option_index=0),db)
         async with factory() as db:
             await db.delete(await db.get(Course,separate[0].id)); await db.commit()
+        await migrate(engine,name,'downgrade','0006')
         after=await snapshot()
         for table,rows in before.items(): assert set(rows)<=set(after[table]),table
-        assert '0006 (head)' in await migrate(engine,name,'current')
+        assert '0006' in await migrate(engine,name,'current')
         await migrate(engine,name,'downgrade','0005')
         assert await snapshot()==after
         async with engine.connect() as conn:

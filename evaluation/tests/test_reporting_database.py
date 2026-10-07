@@ -60,7 +60,7 @@ async def test_simulation_never_opens_database(config,bank):
 async def test_real_disposable_lifecycle(fail):
     r=await check_lifecycle(os.environ['CONCEPTLENS_EVAL_ADMIN_URL'],fail_inside=fail)
     assert not r['normal_development_db_touched']
-    assert any(e['action']=='migrated' and e['revision']=='0006' for e in r['events'])
+    assert any(e['action']=='migrated' and e['revision']=='0007' for e in r['events'])
     assert any(e['action']=='dropped' and e['absence_verified'] for e in r['events'])
 
 @pytest.mark.asyncio

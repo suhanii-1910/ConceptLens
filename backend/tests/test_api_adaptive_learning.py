@@ -116,17 +116,22 @@ async def test_no_prerequisite_and_early_transfer_failure(client, db_session, mo
     session=(await feedback(client,base,session,'understood')).json(); assert session['current_action']=='reconsider_diagnosis'
     assert await db_session.scalar(select(func.count()).select_from(TransferCheck))==1
 
-@pytest.mark.parametrize('status,action',[('hypothesis','diagnostic_probe'),('rejected','general_practice'),('inconclusive','reconsider_diagnosis'),('no_clear_break','general_practice'),('insufficient_reasoning','collect_more_reasoning'),('insufficient_evidence','collect_more_reasoning')])
+@pytest.mark.parametrize('status,action',[('hypothesis','diagnostic_probe'),('rejected','source_explanation'),('inconclusive','source_explanation'),('no_clear_break','source_explanation'),('insufficient_reasoning','collect_more_reasoning'),('insufficient_evidence','collect_more_reasoning')])
 async def test_nonconfirmed_safe_policy(client,db_session,monkeypatch,status,action):
     data=await confirmed(db_session,monkeypatch); provider=teaching_provider(monkeypatch)
     await db_session.execute(update(ReasoningDiagnosis).where(ReasoningDiagnosis.id==data[5].id).values(status=status)); await db_session.commit()
     base=f'/courses/{data[0].id}/learners/{data[4].learner_id}/learning-sessions'
     response=await client.post(base,json={'diagnosis_id':str(data[5].id)})
     assert response.status_code==200,response.text
-    assert response.json()['current_action']==action and response.json()['status']=='diagnosis_not_confirmed'
-    assert response.json()['current_intervention'] is None and provider.calls==[]
+    assert response.json()['current_action']==action
+    active = action == 'source_explanation'
+    assert response.json()['status']==('active' if active else 'diagnosis_not_confirmed')
+    assert bool(response.json()['current_intervention']) is active
+    assert len(provider.calls)==(2 if active else 0)
     trace=(await client.get(f'{base}/{response.json()["id"]}/trace')).json()
-    for flag in ['teaching_content_verified','transfer_check_verified','learner_update_based_on_verified_evidence']: assert trace['proof'][flag] is False
+    assert trace['interpretation']==status
+    assert trace['proof']['teaching_content_verified'] is active
+    for flag in ['transfer_check_verified','learner_update_based_on_verified_evidence']: assert trace['proof'][flag] is False
 
 @pytest.mark.parametrize('failure', ['concept','strategy','evidence','verifier_evidence','verdict','freshness','answer','markup','duplicate','provider'])
 async def test_generation_fails_closed_and_rolls_back_feedback(client,db_session,monkeypatch,failure):
@@ -197,10 +202,10 @@ async def test_unresolved_session_refreshes_after_resolution(client,db_session,m
     response=await client.post(base,json={'diagnosis_id':str(diagnosis.id)})
     assert response.status_code==200,response.text
     assert response.json()['id']==first['id']
-    assert response.json()['current_action']==('source_explanation' if selected else 'general_practice')
-    assert len(provider.calls)==(2 if selected else 0)
+    assert response.json()['current_action']=='source_explanation'
+    assert len(provider.calls)==2
     again=await client.post(base,json={'diagnosis_id':str(diagnosis.id)})
-    assert again.json()==response.json() and len(provider.calls)==(2 if selected else 0)
+    assert again.json()==response.json() and len(provider.calls)==2
 
 async def test_prerequisite_correct_does_not_invent_gap(client,db_session,monkeypatch):
     data,_,base,session=await setup(client,db_session,monkeypatch)

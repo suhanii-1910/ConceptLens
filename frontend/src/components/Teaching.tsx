@@ -205,6 +205,7 @@ export function Teaching({
           <h2>{actionLabels[session.current_action]}</h2>
         </div>
       </div>
+      {diagnosis.status !== "confirmed" && <p className="notice">The diagnosis remains uncertain. This teaching uses observed concept performance; it does not assume a misconception.</p>}
       {transfer && (
         <p className="transfer-intro">
           Let’s see whether the idea transfers to a fresh problem.

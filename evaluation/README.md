@@ -1,5 +1,7 @@
 # ConceptLens Phase 9 evaluation
 
+> Phase 10 compatibility note: current disposable evaluation databases migrate to **0007** for the updated ORM. The Phase 9 benchmark inputs and simulation policy adapter remain frozen. See [Phase 10 acceptance notes](../docs/phase10/implementation.md) and the separate pre/post simulation artifacts; historical Phase 9 results below remain unchanged.
+
 Phase 9 measures grounding and compares three tutoring policies under an explicit simulator. It adds no product features, changes no backend/frontend dependencies or behavior, and uses no migrations beyond **0006**.
 
 Start with [the judge report](reports/judge/report.md), [run verification](reports/verification.json), and [Phase 10 handoff](reports/judge/phase10-handoff.json).

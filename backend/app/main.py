@@ -29,3 +29,11 @@ app.include_router(mastery_router)
 app.include_router(reasoning_diagnosis_router)
 
 app.include_router(adaptive_learning_router)
+
+from app.api.endpoints.source_preview import router as source_preview_router
+app.include_router(source_preview_router)
+
+from app.api.endpoints.visual_evidence import router as visual_evidence_router
+app.include_router(visual_evidence_router)
+from app.api.endpoints import learner_report
+app.include_router(learner_report.router)

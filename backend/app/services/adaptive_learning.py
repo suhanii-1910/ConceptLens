@@ -148,12 +148,29 @@ async def confirmed_context(db, session):
     return diagnosis, original, probe, concepts[session.target_concept_id], citations, evidence
 
 
+async def teaching_context(db, session):
+    diagnosis = await diagnosis_service.get_diagnosis(db, session.course_id, session.learner_id, session.diagnosis_id)
+    if diagnosis.status == 'confirmed':
+        return await confirmed_context(db, session)
+    # Concept-level help is justified by a verified attempt, not a speculative diagnosis.
+    _, original = await diagnosis_service.eligible_attempt(db, session.course_id, session.learner_id, diagnosis.attempt_id)
+    concepts = [c for c in original.concepts if c.course_id == session.course_id]
+    if diagnosis.status not in {'no_clear_break', 'rejected', 'inconclusive'} or len(concepts) != 1 or len(original.concepts) != 1 or concepts[0].id != session.target_concept_id:
+        raise HTTPException(422, 'Insufficient observed concept evidence for teaching')
+    citations, evidence = await trusted_evidence(db, session.course_id, original.evidence_unit_ids)
+    if not citations or list(citations.values()) != original.citation_snapshots:
+        raise HTTPException(422, 'Insufficient trusted assessment evidence')
+    prior_probe = await db.scalar(select(DiagnosticProbe).where(DiagnosticProbe.diagnosis_id == diagnosis.id,
+        DiagnosticProbe.course_id == session.course_id, DiagnosticProbe.learner_id == session.learner_id))
+    return diagnosis, original, prior_probe, concepts[0], citations, evidence
+
+
 async def add_intervention(db: AsyncSession, session: LearningSession, strategy: schema.Strategy, reason: str,
                            prerequisite: tuple[PrerequisiteEdge, Concept, str] | None = None) -> None:
     history = await interventions(db, session)
     if strategy in {item.strategy for item in history}:
         raise HTTPException(409, 'Strategy already used')
-    diagnosis, original, probe, concept, citations, evidence = await confirmed_context(db, session)
+    diagnosis, original, probe, concept, citations, evidence = await teaching_context(db, session)
     edge = None
     if strategy.startswith('prerequisite_'):
         prerequisite = prerequisite or await select_prerequisite(db, session)
@@ -171,15 +188,17 @@ async def add_intervention(db: AsyncSession, session: LearningSession, strategy:
         citations, evidence = await trusted_evidence(db, session.course_id, ids)
         if not citations:
             raise HTTPException(422, 'Insufficient trusted prerequisite evidence')
-    previous = [{'question_text': original.question_text, 'options': original.options},
-                {'question_text': probe.question_text, 'options': probe.options}]
+    previous = [{'question_text': original.question_text, 'options': original.options}]
+    if probe is not None:
+        previous.append({'question_text': probe.question_text, 'options': probe.options})
     for item in history:
         if item.assessment_question_id:
             q = await db.get(AssessmentQuestion, item.assessment_question_id)
             previous.append({'question_text': q.question_text, 'options': q.options})
     context = dict(requested_strategy=strategy, session_target_concept_id=str(session.target_concept_id),
         selected_concept={'id': str(concept.id), 'name': concept.name},
-        observed=diagnosis.observed_reasoning, hypothesis=diagnosis.hypothesis_text,
+        observed=diagnosis.observed_reasoning, hypothesis=diagnosis.hypothesis_text if diagnosis.status == 'confirmed' else None,
+        diagnosis_status=diagnosis.status, teaching_basis='confirmed event' if diagnosis.status == 'confirmed' else 'observed concept performance; no confirmed misconception',
         evidence=evidence, prior_questions=previous,
         previous_teaching=[{'strategy': i.strategy, 'payload': i.payload} for i in history if i.payload])
     prompt = json.dumps(context, ensure_ascii=False)
@@ -237,22 +256,29 @@ async def create_session(db: AsyncSession, course_id: uuid.UUID, learner_id: uui
     safe_actions = {'hypothesis': 'diagnostic_probe', 'rejected': 'general_practice',
         'inconclusive': 'reconsider_diagnosis', 'no_clear_break': 'general_practice',
         'insufficient_reasoning': 'collect_more_reasoning', 'insufficient_evidence': 'collect_more_reasoning'}
+    _, original = await diagnosis_service.eligible_attempt(db, course_id, learner_id, diagnosis.attempt_id)
+    concepts = [c for c in original.concepts if c.course_id == course_id]
+    observed_target = concepts[0].id if len(concepts) == 1 else None
+    concept_help = diagnosis.status in {'no_clear_break', 'rejected', 'inconclusive'} and observed_target is not None and len(original.concepts) == 1
+    active = diagnosis.status == 'confirmed' or concept_help
+    target = diagnosis.target_concept_id or observed_target
+    reason = ('Confirmed event: begin source-grounded repair.' if diagnosis.status == 'confirmed' else
+        'Diagnosis remains ' + diagnosis.status + '; use the concept observed in the verified assessment. '
+        'Do not assume a misconception. Gather fresh verification after concept-level teaching.')
     existing = await db.scalar(select(LearningSession).where(LearningSession.diagnosis_id == diagnosis.id))
     if existing:
         existing = await get_session(db, course_id, learner_id, existing.id, lock=True)
-        if existing.status == 'diagnosis_not_confirmed' and diagnosis.status == 'confirmed':
+        if existing.status == 'diagnosis_not_confirmed' and active and existing.target_concept_id == target:
             existing.status = 'active'
-            await add_intervention(db, existing, 'source_explanation', 'Diagnostic probe now confirms the event; begin source-grounded repair.')
+            await add_intervention(db, existing, 'source_explanation', reason)
         elif existing.status == 'diagnosis_not_confirmed':
             existing.current_action = safe_actions[diagnosis.status]
-            existing.reason = 'Diagnosis is not confirmed; targeted repair is unavailable.'
+            existing.reason = 'Diagnosis is not confirmed; additional reasoning or source evidence is needed.'
         return existing
-    active = diagnosis.status == 'confirmed'
     session = LearningSession(id=uuid.uuid4(), course_id=course_id, learner_id=learner_id,
-        diagnosis_id=diagnosis.id, target_concept_id=diagnosis.target_concept_id,
+        diagnosis_id=diagnosis.id, target_concept_id=target,
         status='active' if active else 'diagnosis_not_confirmed',
-        current_action='source_explanation' if active else safe_actions[diagnosis.status],
-        reason='Confirmed event: begin source-grounded repair.' if active else 'Diagnosis is not confirmed; targeted repair is unavailable.')
+        current_action='source_explanation' if active else safe_actions[diagnosis.status], reason=reason)
     db.add(session)
     await db.flush()
     if active:
@@ -396,7 +422,7 @@ async def learning_trace(db: AsyncSession, session: LearningSession) -> schema.L
     transfer_valid = bool(question and question.verification_status == 'verified' and
         len(question.concepts) == 1 and question.concepts[0].id == session.target_concept_id and
         await valid_provenance(db, question, session.course_id))
-    citations_valid = diagnosis_valid and diagnostic_valid and teaching_valid and (transfer_valid if check else True)
+    citations_valid = teaching_valid and (diagnosis_valid if diagnosis.evidence_unit_ids else not diagnosis.hypothesis_text) and (diagnostic_valid if probe else diagnosis.status != 'confirmed') and (transfer_valid if check else True)
     return schema.LearningTrace(session=await public_session(db, session),
         observed=schema.ObservedReasoning(diagnosis_id=diagnosis.id, assessment_attempt_id=diagnosis.attempt_id,
             question_id=diagnosis.question_id, **{key: getattr(diagnosis, key) for key in ['reasoning_text',

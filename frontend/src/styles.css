@@ -2647,3 +2647,12 @@ mark {
     scroll-behavior: auto !important;
   }
 }
+
+.source-dialog { width: min(1000px, 94vw); max-height: 92vh; border: 1px solid var(--border); border-radius: 16px; padding: 24px; overflow: auto; }
+.source-dialog::backdrop { background: #112c36aa; }
+.source-preview, .source-dialog video { width: 100%; max-height: 68vh; object-fit: contain; background: #f1f3f1; }
+.table-scroll { overflow-x: auto; }
+.table-scroll table { border-collapse: collapse; width: 100%; }
+.table-scroll th, .table-scroll td { border: 1px solid #d9dfdb; padding: 8px; text-align: left; }
+.visual-evidence, .assessment-report { margin-top: 24px; }
+.source-dialog pre, .scheduling-proof pre { white-space: pre-wrap; overflow-wrap: anywhere; }

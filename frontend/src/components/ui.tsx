@@ -1,3 +1,5 @@
+import { SourceViewer } from "./SourceViewer";
+import { SchedulingResult } from "./TypedAssessment";
 import {
   ArrowRight,
   BookOpen,
@@ -169,6 +171,7 @@ export function Citations({
   citations: Citation[];
   compact?: boolean;
 }) {
+  const [opened, setOpened] = useState<Citation>();
   const unique = [
     ...new Map(
       citations.map((citation) => [citation.evidence_unit_id, citation]),
@@ -180,6 +183,7 @@ export function Citations({
       className={`citations ${compact ? "compact" : ""}`}
       aria-label="Source evidence"
     >
+      {opened && <SourceViewer citation={opened} onClose={() => setOpened(undefined)} />}
       {unique.map((citation) => (
         <details className="citation" key={citation.evidence_unit_id}>
           <summary>
@@ -199,11 +203,7 @@ export function Citations({
           <div className="citation-detail">
             <span className="eyebrow">Stored source location</span>
             <p>{citation.locator_label}</p>
-            <p>
-              Match this location in your original{" "}
-              {citation.source_type === "video" ? "video" : "document"}. Source
-              previews are not available in this version.
-            </p>
+            <Button onClick={() => setOpened(citation)}>Open exact source</Button>
           </div>
         </details>
       ))}
@@ -302,18 +302,19 @@ export function AttemptResult({ attempt }: { attempt: Attempt }) {
       <div className="result-title">
         {attempt.is_correct ? <Check size={21} /> : <TriangleAlert size={21} />}
         <h3>
-          {attempt.is_correct ? "That’s right." : "A useful point to revisit."}
+          {attempt.is_correct === null ? "Unable to grade this response." : attempt.is_correct ? "That’s right." : "A useful point to revisit."}
         </h3>
       </div>
-      <p>{attempt.is_correct ? "Correct response." : "Incorrect response."}</p>
+      <p>{attempt.is_correct === null ? "No mastery update was made." : attempt.is_correct ? "Correct response." : "Incorrect response."}</p>
       <p>
         Your response:{" "}
         <strong>
-          {String.fromCharCode(65 + attempt.selected_option_index)}
+          {attempt.selected_option_index === null ? attempt.submitted_answer : String.fromCharCode(65 + attempt.selected_option_index)}
         </strong>{" "}
         · Verified answer: <strong>{attempt.correct_option_text}</strong>
       </p>
       <p className="prose">{attempt.explanation}</p>
+      {attempt.grading?.solution_proof && <SchedulingResult proof={attempt.grading.solution_proof} />}
       <Citations citations={attempt.citations} compact />
       {attempt.mastery_update_status && (
         <p className="mastery-note">

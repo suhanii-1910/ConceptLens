@@ -14,6 +14,7 @@ export function QuestionGenerator({
   purpose?: "practice" | "reasoning";
 }) {
   const { course } = useLearning();
+  const [questionType, setQuestionType] = useState<Question["question_type"]>("multiple_choice");
   const [focus, setFocus] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [generation, setGeneration] = useState<Generation>();
@@ -23,7 +24,7 @@ export function QuestionGenerator({
     if (!course || !focus.trim()) return;
     setGeneration(undefined);
     const result = await task.run((signal) =>
-      api.generate(course.id, focus.trim(), difficulty, signal),
+      api.generate(course.id, focus.trim(), difficulty, signal, questionType),
     );
     if (result) {
       setGeneration(result);
@@ -41,9 +42,10 @@ export function QuestionGenerator({
       </h2>
       <p className="muted">
         Choose a focus from your course. ConceptLens will create and
-        independently verify one multiple-choice problem.
+        independently verify one fresh problem.
       </p>
       <form onSubmit={submit}>
+        {purpose === "practice" && <label>Question type<select value={questionType} disabled={task.busy} onChange={event => setQuestionType(event.target.value as Question["question_type"])}><option value="multiple_choice">Multiple choice</option><option value="short_answer">Short answer</option><option value="numerical">Numerical</option></select></label>}
         <label htmlFor="question-focus">What would you like to work on?</label>
         <input
           id="question-focus"

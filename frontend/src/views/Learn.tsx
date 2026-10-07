@@ -585,7 +585,7 @@ function LearningJourney() {
                   <p>
                     {diagnosis.status === "confirmed"
                       ? "The probe supports this possibility. ConceptLens can now choose a source-grounded repair approach."
-                      : "Targeted repair needs supporting evidence. You can add more reasoning or see the recommended next action."}
+                      : "The diagnosis is uncertain. Continue with concept-level teaching and fresh verification, or add more reasoning."}
                   </p>
                   <div className="button-row">
                     {diagnosis.status !== "confirmed" && (

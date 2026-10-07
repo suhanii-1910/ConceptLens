@@ -208,6 +208,7 @@ async def _extract_pptx(
                 if md_text.strip():
                     loc_meta = location_metadata.copy()
                     loc_meta["element_type"] = "table"
+                    loc_meta["table_rows"] = [[cell.text for cell in row.cells] for row in shape.table.rows]
                     eu = EvidenceUnit(
                         course_id=course_id,
                         source_version_id=sv_id,

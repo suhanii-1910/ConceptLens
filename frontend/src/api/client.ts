@@ -1,4 +1,5 @@
 import type {
+  AnswerInput, AssessmentReport, ConceptGraph, Diagnostic, SourceLocation, VisualEvidence,
   AskMode,
   AskResponse,
   Attempt,
@@ -130,6 +131,14 @@ const diagnoses = (course: string, learner: string) =>
 const post = <T>(path: string, body?: unknown, signal?: AbortSignal) =>
   request<T>(path, { method: "POST", body, signal });
 export const api = {
+  location: (course: string, source: string, query: string, signal?: AbortSignal) => request<SourceLocation>(`${c(course)}/sources/${source}/location?${query}`, {signal}),
+  visual: (course: string, id: string, signal?: AbortSignal) => request<VisualEvidence>(`${c(course)}/evidence/${id}`, {signal}),
+  sourceEvidence: (course: string, source: string, signal?: AbortSignal) => request<VisualEvidence[]>(`${c(course)}/sources/${source}/evidence`, {signal}),
+  interpret: (course: string, id: string, signal?: AbortSignal) => post<VisualEvidence>(`${c(course)}/evidence/${id}/interpret`, undefined, signal),
+  diagnostic: (course: string, learner: string, signal?: AbortSignal) => request<Diagnostic>(`${l(course,learner)}/diagnostic`, {signal}),
+  startDiagnostic: (course: string, learner: string, signal?: AbortSignal) => post<Diagnostic>(`${l(course,learner)}/diagnostic`, undefined, signal),
+  report: (course: string, learner: string, signal?: AbortSignal) => request<AssessmentReport>(`${l(course,learner)}/assessment-report`, {signal}),
+  graph: (course: string, signal?: AbortSignal) => request<ConceptGraph>(`${c(course)}/concept-evidence`, {signal}),
   courses: (signal?: AbortSignal) => request<Course[]>("/courses", { signal }),
   createCourse: (name: string, description: string, signal?: AbortSignal) =>
     post<Course>(
@@ -163,10 +172,11 @@ export const api = {
     focus: string,
     difficulty: Difficulty,
     signal?: AbortSignal,
+    question_type: Question["question_type"] = "multiple_choice",
   ) =>
     post<Generation>(
       `${c(course)}/assessments/generate`,
-      { focus, difficulty, count: 1 },
+      { focus, difficulty, count: 1, question_type },
       signal,
     ),
   question: (course: string, id: string, signal?: AbortSignal) =>
@@ -175,12 +185,12 @@ export const api = {
     course: string,
     learner: string,
     question: string,
-    selected: number,
+    selected: number | AnswerInput,
     signal?: AbortSignal,
   ) =>
     post<Attempt>(
       `${c(course)}/assessments/questions/${question}/attempts`,
-      { learner_id: learner, selected_option_index: selected },
+      { learner_id: learner, ...(typeof selected === "number" ? {selected_option_index: selected} : selected) },
       signal,
     ),
   mastery: (course: string, learner: string, signal?: AbortSignal) =>
@@ -283,3 +293,5 @@ export const api = {
       signal,
     }),
 };
+
+export const assetURL = (path: string) => path.startsWith("/courses/") && !path.includes("..") ? `${base}${path}` : "";

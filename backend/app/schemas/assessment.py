@@ -3,7 +3,8 @@
 import enum
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Literal
+from app.schemas.assessment_contracts import GradingContract
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -18,6 +19,8 @@ from app.schemas.learner_mastery import MasteryUpdateStatus, LearnerMasteryUpdat
 
 class AssessmentQuestionType(str, enum.Enum):
     multiple_choice = "multiple_choice"
+    short_answer = "short_answer"
+    numerical = "numerical"
 
 
 class AssessmentDifficulty(str, enum.Enum):
@@ -48,6 +51,8 @@ class AssessmentGenerationStatus(str, enum.Enum):
 # ---------------------------------------------------------------------------
 
 class AssessmentGenerationRequest(BaseModel):
+    question_type: AssessmentQuestionType = AssessmentQuestionType.multiple_choice
+    concept_id: uuid.UUID | None = None
     focus: str = Field(..., max_length=2000)
     count: int = Field(3, ge=1, le=5)
     difficulty: AssessmentDifficulty = AssessmentDifficulty.medium
@@ -90,7 +95,20 @@ class AssessmentGenerationRequest(BaseModel):
 
 class AssessmentAttemptCreate(BaseModel):
     learner_id: uuid.UUID
-    selected_option_index: int = Field(..., ge=0, le=3)
+    selected_option_index: int | None = Field(default=None, ge=0, le=3)
+    answer_text: str | None = Field(default=None, min_length=1, max_length=8000)
+    answer_value: str | None = Field(default=None, min_length=1, max_length=80)
+    answer_unit: str | None = Field(default=None, max_length=32)
+
+    @model_validator(mode="after")
+    def one_answer(self):
+        if sum(value is not None for value in [self.selected_option_index,self.answer_text,self.answer_value]) != 1:
+            raise ValueError("Submit exactly one answer form")
+        if self.answer_text is not None and not self.answer_text.strip():
+            raise ValueError("Answer cannot be blank")
+        if self.answer_unit is not None and self.answer_value is None:
+            raise ValueError("Units apply only to numerical answers")
+        return self
 
     @field_validator("selected_option_index", mode="before")
     @classmethod
@@ -115,6 +133,9 @@ class AssessmentQuestionPublic(BaseModel):
     difficulty: AssessmentDifficulty
     question_text: str
     options: List[str]
+    answer_unit: str | None = None
+    numeric_format: str | None = None
+    scenario: dict | None = None
     citations: List[Citation] = Field(default_factory=list)
     created_at: datetime
 
@@ -155,10 +176,13 @@ class AssessmentAttemptResponse(BaseModel):
     question_id: uuid.UUID
     course_id: uuid.UUID
     learner_id: uuid.UUID
-    selected_option_index: int
-    is_correct: bool
-    correct_option_index: int
-    correct_option_text: str
+    selected_option_index: int | None
+    is_correct: bool | None
+    correct_option_index: int | None
+    correct_option_text: str | None
+    question_type: AssessmentQuestionType = AssessmentQuestionType.multiple_choice
+    submitted_answer: str | None = None
+    grading: dict | None = None
     explanation: str
     citations: List[Citation]
     created_at: datetime
@@ -244,10 +268,31 @@ class DraftQuestion(BaseModel):
         return deduped
 
 
+class TypedQuestionDraft(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    question_type: Literal["short_answer", "numerical"]
+    question_text: str = Field(min_length=5,max_length=2000)
+    explanation: str = Field(min_length=1,max_length=4000)
+    evidence_unit_ids: List[uuid.UUID] = Field(min_length=1,max_length=10)
+    grading_contract: GradingContract
+    options: list[str] = Field(default_factory=list,max_length=0)
+    correct_option_index: None = None
+
+    @model_validator(mode="after")
+    def type_contract(self):
+        contract=self.grading_contract
+        if self.question_type=="short_answer":
+            if not contract.required_facts or contract.expected_value is not None or contract.scheduling is not None:
+                raise ValueError("Short answers require reference facts and no numerical key")
+        elif contract.expected_value is None and contract.scheduling is None:
+            raise ValueError("Numerical answers require an expected value or scheduling target")
+        return self
+
+
 class GeneratorDraftResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    questions: List[DraftQuestion]
+    questions: List[DraftQuestion | TypedQuestionDraft]
 
 
 class VerifierItem(BaseModel):

@@ -413,6 +413,7 @@ def _extract_tables(
             "page_index": page_index,
             "page_number": page_number,
             "printed_page_label": page_label,
+            "table_rows": [[cell or "" for cell in row] for row in rows],
             "bounding_box": list(bbox) if bbox else None,
             "block_index": table_index,
             "element_type": "table",

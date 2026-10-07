@@ -1,0 +1,860 @@
+{
+  "base_head": "c054808b43bfa3c29030bbec3433bde83da0bd61",
+  "baselines_trajectories_and_statistics_identical": true,
+  "branch": "feature/requirement-closure",
+  "commands": [
+    "backend/.venv/bin/pytest -q backend/tests/test_phase10*",
+    "CONCEPTLENS_TEST_POSTGRES=1 CONCEPTLENS_TEST_POSTGRES_URL=<explicit disposable/admin target> backend/.venv/bin/pytest backend/tests/test_phase10_postgres.py backend/tests/test_reasoning_diagnosis_postgres.py backend/tests/test_adaptive_learning_postgres.py",
+    "CONCEPTLENS_TEST_MIGRATION_LIFECYCLE=1 CONCEPTLENS_TEST_POSTGRES_URL=<explicit local /postgres admin> backend/.venv/bin/pytest backend/tests/test_reasoning_diagnosis_postgres.py::test_migration_lifecycle backend/tests/test_adaptive_learning_postgres.py::test_phase7_migration_lifecycle",
+    "Phase 5 test_mastery_postgres.py run with URL supplied by disposable_database(head), then database dropped",
+    "CONCEPTLENS_EVAL_ADMIN_URL=<explicit local /postgres admin> backend/.venv/bin/pytest -q evaluation/tests",
+    "backend/.venv/bin/pytest -q backend/tests",
+    "npm test",
+    "npm run typecheck",
+    "npm run lint",
+    "npm run build",
+    "npm run test:e2e",
+    "PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval simulate --out evaluation/reports/post-phase10-simulation.json",
+    "Same simulate command with a separate temporary output for reproducibility"
+  ],
+  "diagnosis_counts": {
+    "post": {
+      "confirmed": 27,
+      "no_clear_break": 432,
+      "rejected": 21
+    },
+    "pre": {
+      "confirmed": 35,
+      "no_clear_break": 425,
+      "rejected": 20
+    }
+  },
+  "files_added": [
+    "backend/alembic/versions/0007_phase10_requirement_closure.py",
+    "backend/app/api/endpoints/learner_report.py",
+    "backend/app/api/endpoints/source_preview.py",
+    "backend/app/api/endpoints/visual_evidence.py",
+    "backend/app/models/diagnostic_session.py",
+    "backend/app/schemas/assessment_contracts.py",
+    "backend/app/schemas/scheduling.py",
+    "backend/app/schemas/source_preview.py",
+    "backend/app/services/cold_start.py",
+    "backend/app/services/learner_report.py",
+    "backend/app/services/scheduling.py",
+    "backend/app/services/source_preview.py",
+    "backend/app/services/typed_assessment.py",
+    "backend/app/services/visual_evidence.py",
+    "backend/tests/test_phase10_assessment.py",
+    "backend/tests/test_phase10_learning.py",
+    "backend/tests/test_phase10_postgres.py",
+    "backend/tests/test_phase10_scheduling.py",
+    "backend/tests/test_phase10_sources.py",
+    "docs/phase10/implementation.md",
+    "docs/phase10/verification.json",
+    "evaluation/reports/post-phase10-simulation.json",
+    "evaluation/reports/pre-phase10-simulation.json",
+    "frontend/e2e/phase10.spec.ts",
+    "frontend/src/components/LearnerEvidence.tsx",
+    "frontend/src/components/SourceViewer.tsx",
+    "frontend/src/components/TypedAssessment.tsx",
+    "frontend/src/test/phase10.test.tsx",
+    "frontend/src/test/phase10Scenario.ts"
+  ],
+  "files_modified": [
+    "backend/app/api/endpoints/assessment.py",
+    "backend/app/core/config.py",
+    "backend/app/main.py",
+    "backend/app/models/__init__.py",
+    "backend/app/models/assessment.py",
+    "backend/app/schemas/assessment.py",
+    "backend/app/services/adaptive_learning.py",
+    "backend/app/services/assessment_generation.py",
+    "backend/app/services/assessment_grading.py",
+    "backend/app/services/pdf_ingestion.py",
+    "backend/app/services/pptx_ingestion.py",
+    "backend/app/services/reasoning_diagnosis.py",
+    "backend/tests/test_adaptive_learning_postgres.py",
+    "backend/tests/test_api_adaptive_learning.py",
+    "backend/tests/test_reasoning_diagnosis_postgres.py",
+    "evaluation/README.md",
+    "evaluation/conceptlens_eval/database.py",
+    "evaluation/tests/test_reporting_database.py",
+    "evaluation/tests/test_simulation.py",
+    "frontend/src/api/client.ts",
+    "frontend/src/api/types.ts",
+    "frontend/src/components/QuestionGenerator.tsx",
+    "frontend/src/components/Teaching.tsx",
+    "frontend/src/components/TracePanel.tsx",
+    "frontend/src/components/ui.tsx",
+    "frontend/src/styles.css",
+    "frontend/src/test/scenario.ts",
+    "frontend/src/views/Dashboard.tsx",
+    "frontend/src/views/Learn.tsx",
+    "frontend/src/views/Practice.tsx",
+    "frontend/src/views/Workspace.tsx"
+  ],
+  "final_working_head": "c054808b43bfa3c29030bbec3433bde83da0bd61",
+  "focused_counts": {
+    "assessment_diagnostic_report": 25,
+    "scheduler": 35,
+    "source_and_visual": 23,
+    "uncertain_learning": 1
+  },
+  "frontend_lint": "passed",
+  "frontend_typecheck": "passed",
+  "frozen_sha256": {
+    "backend/alembic/versions/0001_phase0a_initial_schema.py": "4e9467b861f9d81b5ff004e9aba3102bbeb6aead18083c3b9933a9f69ee77b22",
+    "backend/alembic/versions/0002_phase2a_hybrid_retrieval.py": "3761dff537968712b8d60ad7c4a07a5b25cf711ab670961b558a104d4bbcd243",
+    "backend/alembic/versions/0003_phase4_grounded_assessment.py": "0565ba50ca6c6d425c81e43f543e6a2ec3732ea43503e28dc5f9efc5ed80685a",
+    "backend/alembic/versions/0004_phase5_learner_mastery.py": "c8a80afabd560721e30a98382777128a38e9f09ab37680494d59f2b8b8cf2fde",
+    "backend/alembic/versions/0005_phase6_reasoning_diagnosis.py": "5ccd93857eb04e61052c0f680407fa50f5def9f6ae45a119c55b909207a00774",
+    "backend/alembic/versions/0006_phase7_adaptive_learning.py": "6598d8484a384e1fb327693dff444f8a3635b2f14fe0be2e10c26ef5955d2359",
+    "evaluation/conceptlens_eval/metrics.py": "648525c79d10c6c9c6484dfcaf4e60fbab9c25027e2655ce5d2bcd9d1a732a15",
+    "evaluation/conceptlens_eval/policy.py": "3134435e7dc072be223f401fc664006d637b68eba3dda9ba007880e3717191bf",
+    "evaluation/conceptlens_eval/simulation.py": "b147f95b85e6e9beb8776f1aa91e00258d72ccd582a64e65e9bf7bfdf6659c8d",
+    "evaluation/configuration/simulation.json": "e01974d0f4d03397be4890c4bc430f67991cbb249fbbc457bf83f6c7d22af3bc",
+    "evaluation/datasets/grounding.json": "35012a52fbb31646d27eec20ae87cc9707cedc7a6b0f9698f71d200c19e71f87",
+    "evaluation/datasets/items.json": "ba4c0d9745a3f5eb97fd799b054e8ae4980a73b7a9f2367641c7850d67bdbf77"
+  },
+  "git_diff_check": "passed",
+  "historical_baseline_byte_identical": true,
+  "live_backend_smoke": "not run; two opt-in browser cases skipped",
+  "live_provider_acceptance": "pending configuration",
+  "no_commit": true,
+  "no_merge": true,
+  "no_push": true,
+  "no_reset": true,
+  "no_stash": true,
+  "normal_development_database_touched": false,
+  "post_artifact_sha256": "b36b4d914974e52149965070fc9ae746e6477e95e61ed8b79491a5183f6cd445",
+  "post_statistics": {
+    "CONCEPTLENS": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.23824408887193227,
+          0.2708622481498196
+        ],
+        "mean": 0.25398955958385494,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.10700105666357064,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          6.60738255033557,
+          7.676579925650557
+        ],
+        "mean": 7.1192982456140355,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 6.305518821796293,
+        "sd_n_defined": 116
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.20648138658188706,
+          0.21799317388388276
+        ],
+        "mean": 0.21232918105089407,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.10823321664975546,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.029199843749999996,
+          0.038909335062499995
+        ],
+        "mean": 0.03406711985833333,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.04805531153321367,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.1623555310952119,
+          0.1827438370846731
+        ],
+        "mean": 0.17289972899728998,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.08342584174726558,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5479166666666667,
+          0.6291666666666667
+        ],
+        "mean": 0.5895833333333333,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.28951537551754386,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          3.0875,
+          3.36875
+        ],
+        "mean": 3.2270833333333333,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 1.2955952499992922,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.7435616438356164,
+          0.7522594364699627
+        ],
+        "mean": 0.7479674796747967,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.029124030976592243,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5541666666666667,
+          0.6333333333333333
+        ],
+        "mean": 0.59375,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.26541251387417364,
+        "sd_n_defined": 120
+      }
+    },
+    "FIXED": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.22715627179291695,
+          0.2613830396084817
+        ],
+        "mean": 0.24393040667622598,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.11544745932397107,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          4.832214765100671,
+          5.55984555984556
+        ],
+        "mean": 5.179856115107913,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 3.17556704414429,
+        "sd_n_defined": 114
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.1957944387425942,
+          0.1957944387425942
+        ],
+        "mean": 0.1957944387425942,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.07882451427057871,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        "mean": 0.3333333333333333,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5375,
+          0.6270833333333333
+        ],
+        "mean": 0.58125,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.29198412095652787,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2,
+          2
+        ],
+        "mean": 2,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.75,
+          0.75
+        ],
+        "mean": 0.75,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5395833333333333,
+          0.6208333333333333
+        ],
+        "mean": 0.5791666666666667,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.2806492572629418,
+        "sd_n_defined": 120
+      }
+    },
+    "SIMPLE ADAPTIVE": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.2462227695463324,
+          0.2754772685396665
+        ],
+        "mean": 0.26094256437203356,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.12375445428384917,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          6.30718954248366,
+          7.4840989399293285
+        ],
+        "mean": 6.871527777777778,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 5.860647481767456,
+        "sd_n_defined": 116
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.21740994511123546,
+          0.23435095372842218
+        ],
+        "mean": 0.2259839691618271,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.1145602023881535,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.3220338983050847,
+          0.35397039030955585
+        ],
+        "mean": 0.3382352941176471,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.13223082729729943,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.8354166666666667,
+          0.8895833333333333
+        ],
+        "mean": 0.8625,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.17103859704953228,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2.9604166666666667,
+          3.2916666666666665
+        ],
+        "mean": 3.122916666666667,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 1.2213076033107966,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.8305084745762712,
+          0.8384925975773889
+        ],
+        "mean": 0.8345588235294118,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.033057706824324844,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.55625,
+          0.64375
+        ],
+        "mean": 0.6,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.27577240646603357,
+        "sd_n_defined": 120
+      }
+    }
+  },
+  "postgres_cleanup": {
+    "normal_development_db_connected": false,
+    "remaining_test_databases": []
+  },
+  "postgres_runtime_counts": {
+    "phase10": 3,
+    "phase5": 7,
+    "phase6": 4,
+    "phase7": 7
+  },
+  "pre_artifact_sha256": "f1a8f9c871919234846bdf157b8f97583970e4620f3a326490c5e8dd9545164c",
+  "pre_statistics": {
+    "CONCEPTLENS": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.24259857840768737,
+          0.27789168758110583
+        ],
+        "mean": 0.26022418593469965,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.11328901511124621,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2.3345864661654137,
+          2.836909871244635
+        ],
+        "mean": 2.574712643678161,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 2.396883301138791,
+        "sd_n_defined": 113
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.08191992341573563,
+          0.09082734319730794
+        ],
+        "mean": 0.0863110375364321,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.04851173186822856,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0017208333333333316,
+          0.005541666666666663
+        ],
+        "mean": 0.003529166666666664,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.011275260311763942,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.29212752114508783,
+          0.3069371727748691
+        ],
+        "mean": 0.29960835509138384,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.04611042165402216,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.020833333333333332,
+          0.052083333333333336
+        ],
+        "mean": 0.035416666666666666,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.09334940087787229,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.30625,
+          0.5041666666666667
+        ],
+        "mean": 0.4,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.6984376321837334,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.7473958333333334,
+          0.7527868852459016
+        ],
+        "mean": 0.75,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.01458214783039886,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5020833333333333,
+          0.5875
+        ],
+        "mean": 0.54375,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.28561907552283866,
+        "sd_n_defined": 120
+      }
+    },
+    "FIXED": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.22715627179291695,
+          0.2613830396084817
+        ],
+        "mean": 0.24393040667622598,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.11544745932397107,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          4.832214765100671,
+          5.55984555984556
+        ],
+        "mean": 5.179856115107913,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 3.17556704414429,
+        "sd_n_defined": 114
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.1957944387425942,
+          0.1957944387425942
+        ],
+        "mean": 0.1957944387425942,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.07882451427057871,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        "mean": 0.3333333333333333,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5375,
+          0.6270833333333333
+        ],
+        "mean": 0.58125,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.29198412095652787,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2,
+          2
+        ],
+        "mean": 2,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.75,
+          0.75
+        ],
+        "mean": 0.75,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.5395833333333333,
+          0.6208333333333333
+        ],
+        "mean": 0.5791666666666667,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.2806492572629418,
+        "sd_n_defined": 120
+      }
+    },
+    "SIMPLE ADAPTIVE": {
+      "bkt_absolute_error": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.2462227695463324,
+          0.2754772685396665
+        ],
+        "mean": 0.26094256437203356,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.12375445428384917,
+        "sd_n_defined": 120
+      },
+      "interventions_per_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          6.30718954248366,
+          7.4840989399293285
+        ],
+        "mean": 6.871527777777778,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 5.860647481767456,
+        "sd_n_defined": 116
+      },
+      "latent_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.21740994511123546,
+          0.23435095372842218
+        ],
+        "mean": 0.2259839691618271,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.1145602023881535,
+        "sd_n_defined": 120
+      },
+      "prerequisite_mastery_gain": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.0,
+        "sd_n_defined": 120
+      },
+      "question_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.3220338983050847,
+          0.35397039030955585
+        ],
+        "mean": 0.3382352941176471,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.13223082729729943,
+        "sd_n_defined": 120
+      },
+      "session_completion": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.8354166666666667,
+          0.8895833333333333
+        ],
+        "mean": 0.8625,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.17103859704953228,
+        "sd_n_defined": 120
+      },
+      "strategy_changes": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          2.9604166666666667,
+          3.2916666666666665
+        ],
+        "mean": 3.122916666666667,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 1.2213076033107966,
+        "sd_n_defined": 120
+      },
+      "template_repetition": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.8305084745762712,
+          0.8384925975773889
+        ],
+        "mean": 0.8345588235294118,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.033057706824324844,
+        "sd_n_defined": 120
+      },
+      "transfer_success": {
+        "bootstrap_defined": 1000,
+        "ci95": [
+          0.55625,
+          0.64375
+        ],
+        "mean": 0.6,
+        "n_learners": 120,
+        "n_sessions": 480,
+        "sd_across_learners": 0.27577240646603357,
+        "sd_n_defined": 120
+      }
+    }
+  },
+  "production_and_evaluation_hashes_match_post_artifact": true,
+  "providers": {
+    "evaluator_configured": false,
+    "generator_configured": false,
+    "verifier_configured": false,
+    "vision_configured": false
+  },
+  "repeated_simulation_payload_identical": true,
+  "tests": {
+    "backend_full": {
+      "log": "conceptlens-phase10-backend.log",
+      "result": "555 passed, 23 skipped"
+    },
+    "evaluation": {
+      "log": "conceptlens-phase10-evaluation.log",
+      "result": "80 passed"
+    },
+    "frontend_build": {
+      "log": "conceptlens-phase10-build.log",
+      "result": "built in"
+    },
+    "frontend_unit": {
+      "log": "conceptlens-phase10-frontend.log",
+      "result": "Tests  52 passed"
+    },
+    "historical_migrations_current_checkout": {
+      "log": "conceptlens-phase10-current-historical.log",
+      "result": "2 passed"
+    },
+    "historical_migrations_frozen_base": {
+      "log": "conceptlens-phase10-history.log",
+      "result": "2 passed"
+    },
+    "phase10_focused": {
+      "log": "conceptlens-phase10-focused.log",
+      "result": "84 passed, 3 skipped"
+    },
+    "playwright": {
+      "log": "conceptlens-phase10-e2e.log",
+      "result": "8 passed"
+    },
+    "postgres_final_phase10": {
+      "log": "conceptlens-phase10-postgres-focused.log",
+      "result": "3 passed"
+    },
+    "postgres_phase5": {
+      "log": "conceptlens-phase10-history.log",
+      "result": "7 passed"
+    },
+    "postgres_phase6_phase7_and_initial_phase10": {
+      "log": "conceptlens-phase10-postgres.log",
+      "result": "13 passed, 2 skipped"
+    }
+  },
+  "unexpected_files": []
+}

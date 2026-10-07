@@ -150,6 +150,8 @@ async def create_diagnosis(db: AsyncSession, course_id: uuid.UUID, learner_id: u
                            request: DiagnosisCreate) -> ReasoningDiagnosis:
     """Caller owns the transaction, including response validation and commit."""
     attempt, question = await eligible_attempt(db, course_id, learner_id, request.attempt_id)
+    if attempt.is_correct is None:
+        raise HTTPException(422, "An ungradable response cannot support a reasoning diagnosis")
     diagnosis = ReasoningDiagnosis(
         id=uuid.uuid4(), course_id=course_id, learner_id=learner_id,
         attempt_id=attempt.id, question_id=question.id,
@@ -172,6 +174,8 @@ async def create_diagnosis(db: AsyncSession, course_id: uuid.UUID, learner_id: u
             "original_question": {"question_text": question.question_text, "options": question.options,
                 "correct_option_index": question.correct_option_index, "explanation": question.explanation},
             "selected_option_index": attempt.selected_option_index,
+            "submitted_response": attempt.response_data, "grading_result": attempt.grading_result,
+            "question_type": question.question_type,
             "permitted_concepts": [{"id": str(c.id), "name": c.name[:255]} for c in concepts.values()],
             "evidence": evidence,
         }

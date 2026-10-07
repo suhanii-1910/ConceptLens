@@ -1,3 +1,4 @@
+import { DiagnosticPanel, ConceptEvidencePanel, ReportPanel } from "../components/LearnerEvidence";
 import { useCallback } from "react";
 import {
   ArrowDown,
@@ -82,6 +83,9 @@ function EvidenceDashboard() {
   );
   return (
     <>
+      <DiagnosticPanel onEvidence={query.reload}/>
+      <ConceptEvidencePanel/>
+      <ReportPanel key={observations}/>
       <div className="metric-grid">
         <div className="metric">
           <Layers size={20} />
@@ -233,7 +237,7 @@ function EvidenceDashboard() {
           ) : (
             <p>
               A reasoning diagnosis can reveal related prerequisites here.
-              There’s no course-wide graph available yet.
+              The course-wide concept evidence is available above.
             </p>
           )}
           <div className="rule" />

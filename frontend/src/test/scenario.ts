@@ -37,7 +37,7 @@ export const citation: Citation = {
   source_filename: "CPU Scheduling.pdf",
   source_type: "pdf",
   modality: "text",
-  locator: { page: 4 },
+  locator: { page_number: 4 },
   location_metadata: { page_number: 4 },
   locator_label: "Page 4",
 };

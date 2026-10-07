@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowRight, ScanLine, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
-import type { Attempt, Question } from "../api/types";
+import type { AnswerInput, Attempt, Question } from "../api/types";
 import { useTask } from "../hooks";
 import { useLearning } from "../state";
 import { QuestionGenerator } from "../components/QuestionGenerator";
@@ -13,8 +13,10 @@ import {
   ErrorNotice,
   NoCourse,
   PageHeading,
-  QuestionForm,
 } from "../components/ui";
+
+import { TypedAssessment } from "../components/TypedAssessment";
+import { ReportPanel } from "../components/LearnerEvidence";
 
 export function Practice() {
   const { course, learner, remember } = useLearning();
@@ -22,7 +24,7 @@ export function Practice() {
   const [attempt, setAttempt] = useState<Attempt>();
   const task = useTask();
   const navigate = useNavigate();
-  const submit = async (selected: number) => {
+  const submit = async (selected: AnswerInput) => {
     if (!course || !question) return;
     const result = await task.run((signal) =>
       api.attempt(course.id, learner, question.id, selected, signal),
@@ -64,7 +66,7 @@ export function Practice() {
                 </div>
                 {!attempt ? (
                   <>
-                    <QuestionForm
+                    <TypedAssessment
                       question={question}
                       onSubmit={(selected) => void submit(selected)}
                       busy={task.busy}
@@ -76,7 +78,7 @@ export function Practice() {
                     <p className="problem-recap">{question.question_text}</p>
                     <AttemptResult attempt={attempt} />
                     <div className="button-row">
-                      <Button onClick={learn}>
+                      <Button onClick={learn} disabled={attempt.is_correct === null}>
                         <ScanLine size={17} /> Debug my reasoning
                       </Button>
                       <Button
@@ -110,10 +112,8 @@ export function Practice() {
               follows adaptive teaching to see whether understanding carries
               into a fresh problem.
             </p>
-            <p className="quiet-note">
-              Multiple-choice questions are available. Short-answer and
-              numerical grading are not yet supported.
-            </p>
+            <p className="quiet-note">Multiple choice, grounded short answers, and deterministic numerical grading.</p>
+            <ReportPanel key={attempt?.attempt_id ?? 'initial'} />
           </aside>
         </div>
       )}

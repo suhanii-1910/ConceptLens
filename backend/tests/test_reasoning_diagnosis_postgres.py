@@ -182,6 +182,8 @@ async def test_migration_lifecycle(monkeypatch):
         async with engine.connect() as conn:
             phase5_tables = set((await conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname='public'"))).scalars()) - {'alembic_version'}
             assert not phase5_tables & PHASE6
+        # Current ORM needs 0007 columns; seed MCQ data at head, then verify the historical cycle at its exact revisions.
+        await migrate(engine, name, 'upgrade', 'head')
         async with factory() as db:
             course, concept, evidence, question, attempt = await seed(db)
             async with db.begin():
@@ -190,6 +192,7 @@ async def test_migration_lifecycle(monkeypatch):
         async def snapshot():
             async with engine.connect() as conn:
                 return {table: sorted([r[0] for r in (await conn.execute(text(f'SELECT to_jsonb(t)::text FROM "{table}" t'))).all()]) for table in sorted(phase5_tables)}
+        await migrate(engine, name, 'downgrade', '0004')
         before = await snapshot()
         print('Phase 5 seed IDs:', course.id, concept.id, question.id, attempt.id, flush=True)
         print('Phase 5 counts:', {t:len(v) for t,v in before.items()}, flush=True)
@@ -202,6 +205,7 @@ async def test_migration_lifecycle(monkeypatch):
             assert {'fk_diagnosis_attempt_scope','fk_probe_diagnosis_scope','fk_probe_attempt_scope','ck_probe_option','ck_probe_attempt_option','uq_probe_diagnosis','ck_diagnosis_status'} <= constraints
             index = await conn.scalar(text("SELECT indexdef FROM pg_indexes WHERE indexname='uq_probe_first_resolution'"))
             assert 'UNIQUE' in index and 'WHERE (applied_outcome IS NOT NULL)' in index
+        await migrate(engine, name, 'upgrade', 'head')
         provider_for(monkeypatch, *payloads(concept, evidence))
         async with factory() as db:
             diag = await create_reasoning_diagnosis(course.id, attempt.learner_id, DiagnosisCreate(attempt_id=attempt.id, reasoning_steps=STEPS), db)
@@ -217,9 +221,10 @@ async def test_migration_lifecycle(monkeypatch):
             set_committed_value(course_to_delete, 'learning_sessions', [])
             await db.delete(course_to_delete)
             await db.commit()
+        await migrate(engine, name, 'downgrade', '0005')
         assert await snapshot() == before
         assert '0005' in await migrate(engine, name, 'current')
-        assert '0006 (head)' in await migrate(engine, name, 'heads')
+        assert '0007 (head)' in await migrate(engine, name, 'heads')
         await migrate(engine, name, 'downgrade', '0004')
         assert await snapshot() == before
         async with engine.connect() as conn:
