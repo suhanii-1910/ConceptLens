@@ -306,3 +306,72 @@ async def test_persistence_failure_rolls_back_whole_action(client,db_session,mon
     assert current['current_intervention']['feedback'] is None
     assert await db_session.scalar(select(func.count()).select_from(LearningIntervention))==1
     assert await db_session.scalar(select(func.count()).select_from(TransferCheck))==0
+
+
+async def test_transfer_wrong_quantity_rejected_before_save(
+    client, db_session, monkeypatch
+):
+    _, provider, base, session = await setup(
+        client, db_session, monkeypatch
+    )
+
+    def incorrect_transfer(draft):
+        if draft["strategy"] != "transfer_check":
+            return draft
+
+        question = {
+            **draft["question"],
+            "question_text": (
+                "Under SRTF, P1 originally needs 12 ms and has "
+                "executed 5 ms. P2 originally needs 8 ms and has "
+                "executed 2 ms. P3 needs 7 ms and has not executed. "
+                "Which process runs next?"
+            ),
+            "options": [
+                "P1",
+                "P2",
+                "P3",
+                "All have equal remaining time",
+            ],
+            "correct_option_index": 1,
+            "explanation": (
+                "P1 has 7 ms remaining, P2's original burst time "
+                "is 6 ms, and P3 has 7 ms remaining. P2 runs."
+            ),
+        }
+        return {**draft, "question": question}
+
+    provider.change_draft = incorrect_transfer
+
+    # Simulate the independent verifier detecting the contradiction.
+    provider.change_verdict = lambda verdict: {
+        **verdict,
+        "verdict": "rejected",
+        "answer_supported": False,
+    }
+
+    response = await feedback(
+        client, base, session, "understood"
+    )
+
+    assert response.status_code == 422, response.text
+
+    verifier_system, verifier_input = provider.calls[-1]
+
+    assert "independently solve the problem" in verifier_system
+    assert "P2's original burst time is 6 ms" in verifier_input
+
+    current = (
+        await client.get(f'{base}/{session["id"]}')
+    ).json()
+
+    assert current["current_action"] == "source_explanation"
+    assert current["current_intervention"]["feedback"] is None
+
+    assert await db_session.scalar(
+        select(func.count()).select_from(TransferCheck)
+    ) == 0
+
+    assert await db_session.scalar(
+        select(func.count()).select_from(LearningIntervention)
+    ) == 1
