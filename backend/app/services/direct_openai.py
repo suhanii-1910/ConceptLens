@@ -190,7 +190,7 @@ class DirectOpenAIProvider:
             [{
                 "role": "user",
                 "content": [
-                    {"type": "input_text", "text": prompt},
+                    {"type": "input_text", "text": prompt + "\nReturn a valid JSON object."},
                     {
                         "type": "input_image",
                         "image_url": image_url,

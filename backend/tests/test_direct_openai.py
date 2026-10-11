@@ -60,6 +60,7 @@ async def test_vision_request():
         body = json.loads(request.content)
         parts = body["input"][0]["content"]
 
+        assert "json" in parts[0]["text"].lower()
         assert parts[1]["type"] == "input_image"
         assert parts[1]["image_url"].startswith(
             "data:image/png;base64,"
