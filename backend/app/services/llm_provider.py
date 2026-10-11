@@ -131,12 +131,19 @@ class OpenAILLMProvider:
         return content
 
 
-def get_llm_provider() -> LLMProvider:
+def get_llm_provider(*, tier: str = "standard") -> LLMProvider:
     """Resolve and instantiate the configured LLMProvider.
 
     Raises LLMConfigurationError if required configuration is missing.
     """
     from app.core.config import settings
+
+    if settings.provider_mode == "direct_openai":
+        from app.services.direct_openai import get_direct_provider
+        return get_direct_provider(tier)
+
+    if settings.provider_mode != "compatible":
+        raise LLMConfigurationError("Unknown LLM provider mode.")
 
     base_url = settings.llm_base_url or os.environ.get("CONCEPTLENS_LLM_BASE_URL")
     api_key = settings.llm_api_key or os.environ.get("CONCEPTLENS_LLM_API_KEY")
@@ -160,3 +167,16 @@ def get_llm_provider() -> LLMProvider:
         model=model,
         timeout_seconds=timeout_seconds,
     )
+
+
+def get_verifier_provider(
+    generator_provider: LLMProvider,
+    *,
+    injected: bool,
+) -> LLMProvider:
+    from app.core.config import settings
+
+    if injected or settings.provider_mode != "direct_openai":
+        return generator_provider
+
+    return get_llm_provider(tier="deep")

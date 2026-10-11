@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     llm_model: str | None = None
     vision_model: str | None = None
     llm_timeout_seconds: float = 45.0
+    provider_mode: str = "compatible"
+    openai_api_key: str | None = None
 
     model_config = {"env_prefix": "CONCEPTLENS_", "env_file": str(_ENV_FILE)}
 

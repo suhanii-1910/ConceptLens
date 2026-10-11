@@ -189,7 +189,9 @@ async def create_diagnosis(db: AsyncSession, course_id: uuid.UUID, learner_id: u
             verifier_prompt = prompt + "\nCANDIDATE:\n" + draft.model_dump_json() + "\nOUTPUT SCHEMA:\n" + json.dumps(DiagnosisVerification.model_json_schema())
             if len(verifier_prompt) > MAX_PROMPT_CHARS:
                 raise InvalidLLMResponseError("Diagnosis verification context exceeds limit.")
-            verdict = parse_response(await provider.generate(system_prompt=VERIFIER_PROMPT,
+            from app.services.llm_provider import get_verifier_provider
+            verifier_provider = get_verifier_provider(provider, injected=False)
+            verdict = parse_response(await verifier_provider.generate(system_prompt=VERIFIER_PROMPT,
                 user_prompt=verifier_prompt), DiagnosisVerification)
             if not set(verdict.evidence_unit_ids + verdict.probe_evidence_unit_ids) <= set(snapshots):
                 raise UnsafeCitationReferenceError("Unallowed verifier evidence.")

@@ -235,7 +235,9 @@ async def add_intervention(db: AsyncSession, session: LearningSession, strategy:
     verifier_prompt = prompt + '\nCANDIDATE:\n' + draft.model_dump_json() + '\nOUTPUT SCHEMA:\n' + json.dumps(schema.TeachingVerification.model_json_schema())
     if len(verifier_prompt) > 96000:
         raise InvalidLLMResponseError('Teaching verification context too large')
-    verdict = diagnosis_service.parse_response(await provider.generate(system_prompt=VERIFIER,
+    from app.services.llm_provider import get_verifier_provider
+    verifier_provider = get_verifier_provider(provider, injected=False)
+    verdict = diagnosis_service.parse_response(await verifier_provider.generate(system_prompt=VERIFIER,
         user_prompt=verifier_prompt), schema.TeachingVerification)
     if not set(verdict.evidence_unit_ids) <= set(citations):
         raise UnsafeCitationReferenceError('Unallowed verifier evidence')
