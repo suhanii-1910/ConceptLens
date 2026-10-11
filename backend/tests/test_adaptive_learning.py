@@ -95,3 +95,38 @@ def test_verifier_flags_strict(field):
          'no_answer_leak','no_permanent_label','same_target_rule','fresh_structure']})
     verdict[field]='true'
     with pytest.raises(ValidationError): schema.TeachingVerification.model_validate(verdict)
+
+
+def test_rejected_teaching_verifier_may_omit_evidence():
+    verdict = dict(
+        verdict="rejected",
+        strategy_matches=True,
+        addresses_gap=True,
+        source_supported=True,
+        materially_different=True,
+        answer_supported=True,
+        no_answer_leak=True,
+        no_permanent_label=True,
+        same_target_rule=True,
+        fresh_structure=False,
+    )
+    parsed = schema.TeachingVerification.model_validate(verdict)
+    assert parsed.verdict == "rejected"
+    assert parsed.evidence_unit_ids == []
+
+
+def test_verified_teaching_verifier_requires_evidence():
+    verdict = dict(
+        verdict="verified",
+        strategy_matches=True,
+        addresses_gap=True,
+        source_supported=True,
+        materially_different=True,
+        answer_supported=True,
+        no_answer_leak=True,
+        no_permanent_label=True,
+        same_target_rule=True,
+        fresh_structure=True,
+    )
+    with pytest.raises(ValidationError):
+        schema.TeachingVerification.model_validate(verdict)

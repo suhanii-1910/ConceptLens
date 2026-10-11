@@ -100,7 +100,15 @@ class TeachingVerification(StrictModel):
     no_permanent_label: bool = Field(strict=True)
     same_target_rule: bool = Field(strict=True)
     fresh_structure: bool = Field(strict=True)
-    evidence_unit_ids: EvidenceIDs = Field(min_length=1)
+    evidence_unit_ids: EvidenceIDs = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def require_evidence_for_verified(self):
+        if self.verdict == "verified" and not self.evidence_unit_ids:
+            raise ValueError(
+                "Verified teaching content requires supporting evidence."
+            )
+        return self
 
 
 class InterventionPublic(StrictModel):

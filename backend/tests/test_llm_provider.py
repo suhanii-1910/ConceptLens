@@ -22,6 +22,7 @@ async def test_provider_success_wire_format():
         body = json.loads(request.content.decode("utf-8"))
         assert body["model"] == "test-model"
         assert body["temperature"] == 0
+        assert body["response_format"] == {"type": "json_object"}
         assert body["messages"] == [
             {"role": "system", "content": "system prompt test"},
             {"role": "user", "content": "user prompt test"},
