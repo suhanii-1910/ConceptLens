@@ -373,3 +373,53 @@ async def test_process_video_small_terminal_timestamp_overshoot_is_bounded(
     assert loc["end_ms"] == 10000
     assert loc["timestamp_adjustment"] == "bounded_to_source_duration"
     assert loc["source_duration_seconds"] == 10.0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "overshoot, accepted",
+    [(0.541, True), (1.1, False)],
+)
+async def test_terminal_timestamp_overshoot_boundary(
+    db_session,
+    sample_video_source,
+    fake_media_tools,
+    overshoot,
+    accepted,
+):
+    provider = FakeTranscriptionProvider()
+    provider.segments[0].start_seconds = 9.0
+    provider.segments[0].end_seconds = 10.0 + overshoot
+
+    if not accepted:
+        with pytest.raises(VideoProcessingError, match="Impossible end timestamp"):
+            await process_video(
+                db_session,
+                source_version=sample_video_source,
+                transcription_provider=provider,
+            )
+        await db_session.refresh(sample_video_source)
+        assert sample_video_source.processing_status == ProcessingStatus.failed
+        return
+
+    result = await process_video(
+        db_session,
+        source_version=sample_video_source,
+        transcription_provider=provider,
+    )
+    assert result.processing_status == "ready"
+
+    units = (
+        await db_session.scalars(
+            select(EvidenceUnit).where(
+                EvidenceUnit.source_version_id == sample_video_source.id,
+                EvidenceUnit.modality == Modality.video,
+            )
+        )
+    ).all()
+
+    assert len(units) == 1
+    metadata = units[0].location_metadata
+    assert metadata["end_seconds"] == 10.0
+    assert metadata["provider_end_seconds"] == pytest.approx(10.0 + overshoot)
+    assert metadata["timestamp_adjustment"] == "bounded_to_source_duration"
