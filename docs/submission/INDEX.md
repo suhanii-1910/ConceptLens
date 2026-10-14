@@ -21,8 +21,8 @@ The original documentation proposal was prepared on Priyanshu's Mac against `9fe
 
 ## Information and assets still needed
 
-1. A successful real provider journey, or an explicit limitation in both Devpost and the recorded demonstration. Reachable health endpoints do not clear the completion blocker.
-2. Curated real Observatory screenshots with capture commit/date and data provenance. Test-generated review files remain local and uncommitted.
+1. A successful direct OpenAI walkthrough is documented in LIVE_WALKTHROUGH_2026-10-14.md. The historical compatible-gateway issue remains distinct.
+2. Actual Observatory screenshots have been added locally under docs/assets/screenshots/. They still require final review, commit and publication.
 3. Confirmed real full names, contribution summaries, Devpost accounts and project membership for all team members.
 4. Final public repository/ref, YouTube URL, Devpost URL and official deadline/timezone. The supplied event requirements have not been independently verified against an organizer URL.
 5. Team acceptance of the disclosed Git author contact information and local username/path before any visibility change. The binary/content publication review passed; see [follow-up results](INTEGRATION_VERIFICATION.md#publication-and-clean-install-follow-up).

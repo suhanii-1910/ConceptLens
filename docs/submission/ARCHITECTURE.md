@@ -1,6 +1,6 @@
 # ConceptLens architecture
 
-**Integrated source review · merge `16d208c` · 14 October 2026.** The Observatory frontend is integrated; backend behavior is unchanged. These diagrams describe implementation, not successful real-provider generation. See [integration verification](INTEGRATION_VERIFICATION.md) and [repository provenance](INDEX.md).
+**Integrated source review · merge `16d208c` · 14 October 2026.** The Observatory frontend is integrated. The direct OpenAI adapter subsequently received a JSON-format fix, and one real learning walkthrough succeeded. These diagrams describe implementation; the dated walkthrough records observed runtime results. See [integration verification](INTEGRATION_VERIFICATION.md) and [repository provenance](INDEX.md).
 
 ## 1. Application structure
 
@@ -162,10 +162,10 @@ BKT updates are persisted with before/after values. The Dashboard report separat
 | Inspected mode | Transport and routing | What remains unverified |
 | --- | --- | --- |
 | `compatible` (default) | Configured base URL plus `/chat/completions`; text model and optional vision model. Separate verification calls use the same configured provider/model. | Actual gateway completion, schema support and model quality |
-| `direct_openai` | Direct Responses adapter; light/standard/deep routing in source. Concise Ask uses light; normal generation uses standard; wired verification uses deep. | Authorized access to the exact source identifiers and successful live generation/verification |
+| `direct_openai` | Direct Responses adapter; light/standard/deep routing in source. Concise Ask uses light; normal generation uses standard; wired verification uses deep. | One successful direct OpenAI learning walkthrough recorded; broader reliability and quality remain unverified |
 
 Tier names and settings are documented in the [README draft](README_REVIEW_DRAFT.md#model-api-and-gateway-configuration). They are implementation facts, not claims about public model availability. No private endpoint details or credentials are required to understand the architecture. The older demo helper requires explicit mode isolation; see its caveat in the README draft.
 
-The inspected application has no authentication, external queue, production hosting configuration or successful deployment claim. Local browser/API/database communication and fixture-tested provider adapters must be distinguished from a working external completion and a verified full learning loop.
+The inspected application has no authentication, external queue, production hosting configuration or successful deployment claim. Historical fixture tests must be distinguished from the separately documented successful direct OpenAI walkthrough. One demonstration does not prove general reliability.
 
 **Source:** [configuration](../../backend/app/core/config.py), [compatible provider and routing](../../backend/app/services/llm_provider.py), [direct adapter](../../backend/app/services/direct_openai.py), [demo helper](../../demo-course/prepare.py).

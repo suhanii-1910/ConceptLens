@@ -169,7 +169,7 @@ class DirectOpenAIProvider:
             [{
                 "role": "user",
                 "content": [
-                    {"type": "input_text", "text": user_prompt}
+                    {"type": "input_text", "text": user_prompt + "\nReturn a JSON object."}
                 ],
             }],
         )
