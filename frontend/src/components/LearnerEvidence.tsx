@@ -35,10 +35,4 @@ export function ReportPanel() {
       {r.prerequisite_concerns.map(p=><p key={p.id}>{p.reason}</p>)}<p>{r.next_action}</p><Citations citations={r.citations}/></>}
   </section>;
 }
-export function ConceptEvidencePanel() {
-  const {course}=useLearning(); const query=useQuery(useCallback((signal:AbortSignal)=>api.graph(course!.id,signal),[course])); const graph=query.data;
-  return <section className="card"><h2>Concepts and prerequisites</h2><ErrorNotice error={query.error} retry={query.reload}/>{query.loading && <Loading/>}
-    {graph?.concepts.map(c=><details key={c.id}><summary>{c.name}</summary><p>{c.description}</p><Citations citations={c.citations}/><ul>{graph.prerequisites.filter(e=>e.target_concept_id===c.id).map(e=><li key={e.id}>{graph.concepts.find(n=>n.id===e.prerequisite_concept_id)?.name} → {c.name} · {e.relation_type} · {e.source_backed?'Source-backed relationship':'Recorded relationship; source backing not verified'}</li>)}</ul></details>)}
-    <p className="quiet-note">A prerequisite relationship alone does not establish learner weakness. Observation counts and assessment evidence are shown separately.</p>
-  </section>;
-}
+export { ConceptEvidencePanel } from "./ConceptExplorer";

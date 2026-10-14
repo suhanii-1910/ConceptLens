@@ -12,9 +12,9 @@ npm ci                 # npm install also works when updating dependencies
 npm run dev
 ```
 
-Frontend: `http://127.0.0.1:5173`. Backend: `http://127.0.0.1:8000`.
+Frontend: `http://127.0.0.1:5174`. The default backend proxy target is `http://127.0.0.1:8001`, matching the isolated Observatory runtime.
 
-The default `VITE_API_BASE_URL=/api` uses Vite's development proxy: `/api/courses` becomes `http://127.0.0.1:8000/courses`. Export `CONCEPTLENS_API_PROXY_TARGET` when a disposable backend uses another port. This is a Vite server setting, not a browser credential. No backend CORS change is needed for this setup. Copy `.env.example` to `.env.local` only if overriding the public API prefix. Vite variables are public build-time settings; never put provider secrets there.
+The default `VITE_API_BASE_URL=/api` uses Vite's development proxy: `/api/courses` becomes `http://127.0.0.1:8001/courses`. If the backend started using the repository README runs on port 8000, start Vite with `CONCEPTLENS_API_PROXY_TARGET=http://127.0.0.1:8000 npm run dev`. Set this override to the actual backend URL when using another port. This is a Vite server setting, not a browser credential. No backend CORS change is needed for this setup. Copy `.env.example` to `.env.local` only if overriding the public API prefix. Vite variables are public build-time settings; never put provider secrets there.
 
 Configure the backend's existing `CONCEPTLENS_LLM_BASE_URL`, `CONCEPTLENS_LLM_MODEL`, and `CONCEPTLENS_LLM_API_KEY` settings for generated learning content. Missing provider configuration is shown as an unavailable-provider state. Upload, process, and index real material before asking questions or generating assessments. Mastery also requires curated backend concept/evidence mappings; the frontend does not create them.
 
@@ -29,7 +29,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Playwright starts Vite and checks desktop (1440 px) and mobile (390 px) layouts. Its isolated API fixtures exercise the full judge journey, answer hiding, retained feedback, source citations, strategy changes, prerequisite choices, Transfer Check, trace proof, and failure states. Fixtures live only in test files and are not imported by the application. Screenshots and failure traces are written to ignored `test-results/` directories. These checks validate frontend behavior; they do not claim live provider verification.
+Playwright starts Vite on port 5174 and checks desktop (1440 px) and mobile (390 px) layouts. Its isolated API fixtures exercise the full judge journey, answer hiding, retained feedback, source citations, strategy changes, prerequisite choices, Transfer Check, trace proof, and failure states. Observatory checks cover the introduction, motion controls, concept map and service-unavailable views. Fixtures live only in test files and are not imported by the application. Failure screenshots and traces are written to ignored `test-results/` directories; Observatory review screenshots are written to `review/` and should be kept out of source commits. These checks validate frontend behavior; they do not claim live provider verification.
 
 For live acceptance, use the [disposable demo helper](../docs/phase11/demo-guide.md#safe-live-smoke-and-provider-acceptance) from the repository root. It starts an isolated backend and runs both live browser cases:
 
