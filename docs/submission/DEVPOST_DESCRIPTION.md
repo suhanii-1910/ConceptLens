@@ -68,7 +68,9 @@ The integrated checkout passed **590 ordinary backend tests**, plus all **23 Pos
 
 A fresh disposable API run verified real PDF processing, eight cached-model embeddings from nine evidence units, supported retrieval, an exact-page preview, three explicitly curated concepts and one prerequisite. It created no learner attempts. Ask, assessment generation and visual interpretation correctly returned 503 with providers deliberately unconfigured for that test process. This does not establish that the existing gateway can complete a model request. Disposable database cleanup was verified.
 
-See [integration verification details](INTEGRATION_VERIFICATION.md) for dates, scope and pending gates. No real-student learning improvements, production-scale performance or successful live AI workflow is claimed.
+The follow-up publication audit and clean-install checks also passed: fresh npm/pip installs, frontend build, dependency consistency and a disposable backend smoke. The three publishable evaluation binaries were reviewed without confirmed sensitive content. Installation was checked on Apple Silicon macOS using existing PostgreSQL and cached model weights, not a new Docker/model download or cross-platform matrix. These results do not clear the unresolved OmniRoute completion blocker.
+
+See [integration verification details](INTEGRATION_VERIFICATION.md) for dates, scope and pending gates, and the [README AI coding-assistant disclosure](../../README.md#ai-coding-assistant-disclosure) for OpenAI Codex assistance and its scope. No real-student learning improvements, production-scale performance or successful live AI workflow is claimed.
 
 ## Limitations and next steps
 

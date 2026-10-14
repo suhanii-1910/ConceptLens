@@ -4,7 +4,7 @@
 
 ConceptLens connects course evidence to the next learning action: ask a grounded question, explain your reasoning, work through targeted teaching, and check understanding on a fresh problem.
 
-**Integration review · 14 October 2026:** the Concept Observatory frontend and backend/submission documentation are merged locally on `feature/final-integration` at `16d208c`. Frontend and backend automated checks pass; the existing gateway completion timeout remains unresolved. This branch has not been pushed or merged into main. [Integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) · [Architecture](docs/submission/ARCHITECTURE.md) · [Demo script](docs/submission/DEMO_VIDEO_SCRIPT.md) · [Submission checklist](docs/submission/SUBMISSION_CHECKLIST.md).
+**Integration review · 14 October 2026:** the Concept Observatory frontend and backend/submission documentation are merged locally on `feature/final-integration` at `16d208c`. Frontend and backend automated checks pass; the existing gateway completion timeout remains unresolved. The integration branch is published to origin; it has not been merged into main by this workflow. [Integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) · [Architecture](docs/submission/ARCHITECTURE.md) · [Demo script](docs/submission/DEMO_VIDEO_SCRIPT.md) · [Submission checklist](docs/submission/SUBMISSION_CHECKLIST.md).
 
 **Video:** `YOUTUBE_URL_PENDING` — insert the actual Public or Unlisted YouTube link after upload.
 
@@ -70,7 +70,7 @@ storage/uploads/     Local source storage; not submission assets
 
 ## Install dependencies and configure the environment
 
-Use the final integrated ref after the team approves and publishes it. The current integration branch is local only. On Suhani's Mac, use the existing `ConceptLens-integration` worktree; do not replace either earlier checkout. [Current local run commands](docs/submission/INTEGRATION_VERIFICATION.md#run-the-reviewed-application) reuse the existing isolated backend.
+Use the reviewed `feature/final-integration` ref on origin. On Suhani's Mac, use the existing `ConceptLens-integration` worktree; do not replace either earlier checkout. [Current local run commands](docs/submission/INTEGRATION_VERIFICATION.md#run-the-reviewed-application) reuse the existing isolated backend.
 
 For a new standalone checkout, from the repository root (do not reinstall into the read-only shared Python environment used by this local integration):
 
@@ -211,7 +211,7 @@ Fixture Playwright journeys exercise UI states at desktop/mobile sizes. The acce
 
 For a disposable real-ingestion browser smoke, use the helper command above with `--browser-smoke` instead of `--serve`; it starts the necessary servers and tests. This requires PostgreSQL, cached/downloadable embeddings and a browser, and still does not certify real generation. For optional evaluation/database suites and their separate locked framework environment, follow [evaluation/README.md](evaluation/README.md). No benchmark rerun is required simply to try the app.
 
-Integration review: **590 ordinary backend tests passed; all 23 opt-in PostgreSQL/migration tests passed separately; 55 frontend unit tests and 20 browser tests passed; typecheck, lint and build passed.** Four browser cases used the real existing backend for page/data checks. A fresh disposable API run verified PDF ingestion, real cached embeddings, retrieval and previews. See [integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) for test scope, commands and limitations. A clean dependency install and successful live-provider journey remain unverified.
+Integration review: **590 ordinary backend tests passed; all 23 opt-in PostgreSQL/migration tests passed separately; 55 frontend unit tests and 20 browser tests passed; typecheck, lint and build passed.** Four browser cases used the real existing backend for page/data checks. A fresh disposable API run verified PDF ingestion, real cached embeddings, retrieval and previews. See [integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) for test scope, commands and limitations. The follow-up publication audit and clean-install checks **passed** at `9961bc3`: fresh npm/pip installs, production build, dependency consistency and a disposable backend migration/ingestion/retrieval/preview smoke. These checks used Apple Silicon macOS, existing PostgreSQL and cached model weights; fresh Docker/model downloads and other platforms were not tested. Live OmniRoute AI completion and the downstream generated learning journey remain **unverified**. See [publication and clean-install results](docs/submission/INTEGRATION_VERIFICATION.md#publication-and-clean-install-follow-up).
 
 ## Limitations and troubleshooting
 
@@ -255,4 +255,14 @@ Phase 9 results and Phase 10 pre/post artifacts are historical records. Phase 11
 | `MEMBER_1_FULL_NAME` | `CONFIRMED_CONTRIBUTION` | `MEMBER_1_DEVPOST_URL` |
 | `MEMBER_2_FULL_NAME_IF_APPLICABLE` | `CONFIRMED_CONTRIBUTION` | `MEMBER_2_DEVPOST_URL` |
 
-Confirm the final roster of 1–4 members; add/remove rows accordingly. Do not infer full names from machine paths or Git handles. **Development assistance:** AI coding and review assistance, including Codex, was used during development. Human review and responsibility remain with the project team.
+Confirm the final roster of 1–4 members; add/remove rows accordingly. Do not infer full names from machine paths or Git handles.
+
+## AI coding-assistant disclosure
+
+**OpenAI Codex** was used for the following evidenced parts of this project work:
+
+- Reviewing the Concept Observatory frontend code and investigating React/FastAPI and model-gateway connectivity.
+- Writing local verification tooling, integrating the frontend/backend/documentation contributions, running automated checks, and reviewing clean-install and publication-safety results.
+- Drafting and revising the README, setup instructions, Devpost description, architecture notes, demo script, verification records and submission checklist.
+
+This disclosure identifies the assistance evidenced in the reviewed work; it does not attribute every original application component to Codex. The project team is responsible for reviewing the resulting code, documentation and submission claims. Coding assistance and passing fixture tests do not establish successful live OmniRoute AI completion.

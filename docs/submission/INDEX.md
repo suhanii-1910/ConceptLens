@@ -1,6 +1,6 @@
 # ConceptLens submission documentation
 
-**Integrated review · 14 October 2026 · not yet cleared for final submission.** Backend/documentation `ac36dd4` and Observatory frontend `6b1a441` were merged without conflicts on local branch `feature/final-integration`, merge commit `16d208cfecf4472f172bc9d496f5fdc89c75d74d`. Both descend from `9fe1751`; no shared backend commits were cherry-picked. No integration push, main merge, deployment or visibility change has occurred.
+**Integrated review · 14 October 2026 · not yet cleared for final submission.** Backend/documentation `ac36dd4` and Observatory frontend `6b1a441` were merged without conflicts on local branch `feature/final-integration`, merge commit `16d208cfecf4472f172bc9d496f5fdc89c75d74d`. Both descend from `9fe1751`; no shared backend commits were cherry-picked. The integration branch is now published to origin. This workflow has not merged into main, deployed or changed repository visibility. The follow-up publication audit and clean-install checks passed; live OmniRoute completion remains unverified.
 
 | Document | Purpose |
 | --- | --- |
@@ -25,8 +25,8 @@ The original documentation proposal was prepared on Priyanshu's Mac against `9fe
 2. Curated real Observatory screenshots with capture commit/date and data provenance. Test-generated review files remain local and uncommitted.
 3. Confirmed real full names, contribution summaries, Devpost accounts and project membership for all team members.
 4. Final public repository/ref, YouTube URL, Devpost URL and official deadline/timezone. The supplied event requirements have not been independently verified against an organizer URL.
-5. Final human publication review, including binary assets and history beyond the automated text secret scan.
+5. Team acceptance of the disclosed Git author contact information and local username/path before any visibility change. The binary/content publication review passed; see [follow-up results](INTEGRATION_VERIFICATION.md#publication-and-clean-install-follow-up).
 
 ## Safe handoff
 
-Review the local integration and documentation diff first. After explicit approval, push only `feature/final-integration` and open a pull request into `main`. Do not reapply the shared backend commits. Complete publication/visibility review before changing repository visibility. Record the demo against the approved revision and label fixture, historical and real runtime evidence accurately.
+Review the published `feature/final-integration` branch before opening or finalizing a pull request into `main`. Do not reapply the shared backend commits. Publication-safety checks passed; repository visibility changes and merging into main still require explicit approval. Record the demo against the approved revision and label fixture, historical and real runtime evidence accurately.

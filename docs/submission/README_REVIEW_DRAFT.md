@@ -12,7 +12,7 @@ Applied corrections:
 - Historical simulation/evaluation disclosure retained from the previous root README.
 - Team, video, deadline and curated screenshot placeholders remain incomplete.
 
-See [current integration verification](INTEGRATION_VERIFICATION.md) for exact commands and scope. Clean-clone dependency installation and a successful live AI journey are still unverified.
+See [current integration verification](INTEGRATION_VERIFICATION.md) for exact commands and scope. The publication audit and fresh dependency installation/build/runtime checks passed; see the [follow-up results](INTEGRATION_VERIFICATION.md#publication-and-clean-install-follow-up) for platform/cache scope and personal-metadata disclosures. A successful live OmniRoute AI journey remains unverified. The [README AI coding-assistant disclosure](../../README.md#ai-coding-assistant-disclosure) identifies OpenAI Codex and the evidenced assisted work.
 
 ## Model API and gateway configuration
 

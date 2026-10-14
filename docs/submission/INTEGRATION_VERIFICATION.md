@@ -4,7 +4,7 @@
 
 Application merge: `16d208cfecf4472f172bc9d496f5fdc89c75d74d` on `feature/final-integration`. Parents: backend/documentation `ac36dd46c0dc6ed31853dcafc14f25cfe7002040` and frontend `6b1a441041c2ca2782c2fe834bb67a5c96c43ab5`; shared baseline `9fe1751b6f7242308739b47135ce0ff2204d98e3`. Remote tips were checked, refs fetched, and an unused integration worktree/branch created before the conflict-free merge. Shared backend commits were not cherry-picked.
 
-Subsequent changes are documentation reconciliation and local-artifact ignore rules. Frontend source/configuration is identical to `6b1a441`; backend application code and migrations are identical to `ac36dd4`. No provider credentials, permanent model defaults, routing, original checkout files or application databases were changed. Nothing on the integration branch has been pushed, merged into main or deployed.
+Subsequent changes are documentation reconciliation and local-artifact ignore rules. Frontend source/configuration is identical to `6b1a441`; backend application code and migrations are identical to `ac36dd4`. No provider credentials, permanent model defaults, routing, original checkout files or application databases were changed. At the original integration checkpoint, the branch had not been pushed, merged into main or deployed. It is now published to origin; this workflow has not merged into main, deployed or changed visibility.
 
 ## Actual results
 
@@ -21,7 +21,7 @@ Subsequent changes are documentation reconciliation and local-artifact ignore ru
 | Fresh real-ingestion smoke | Passed | Integrated backend started separately on 8101; actual authored PDF, real cached embeddings, retrieval and source inspection |
 | Disposable cleanup | Verified | Created test database dropped and absence checked; temporary API stopped |
 
-Backend warnings include dependency/Python deprecations and synchronous tests marked asyncio; they are not hidden or counted as failures. Tests reused installed dependencies: Node 26.9.0 and Python 3.14.2. A separate copy of frontend dependencies was used; the existing Python environment was reused read-only with bytecode writes disabled and integrated source first on `PYTHONPATH`. This is not a clean dependency installation rehearsal.
+Backend warnings include dependency/Python deprecations and synchronous tests marked asyncio; they are not hidden or counted as failures. Tests reused installed dependencies: Node 26.9.0 and Python 3.14.2. A separate copy of frontend dependencies was used; the existing Python environment was reused read-only with bytecode writes disabled and integrated source first on `PYTHONPATH`. That initial integration run was not a clean dependency installation rehearsal; the successful fresh-install follow-up is recorded below.
 
 Browser tests used an ignored config on port 5175 rather than the occupied default 5174. Two temporary harness startup mistakes (npm initially launched from the repository root; then an ESM config interpreted as CommonJS) were corrected locally before the successful suite. Neither required application changes. Sixteen browser cases check fixture/interface behavior; four check real page/data availability. Generated screenshots remain local, uncommitted review artifacts. They are not evidence of live AI generation.
 
@@ -62,7 +62,7 @@ cd /Users/suhanigarg670/Projects/ConceptLens-uiux
 ./backend/run-uiux.sh
 ```
 
-That launcher and its private environment are local runtime tools, not part of the published UI commit. Do not copy secrets into frontend settings or point tests at the original application database. For a new clone, use the [canonical setup](../../README.md#install-dependencies-and-configure-the-environment); the local integration ref must first be approved and published.
+That launcher and its private environment are local runtime tools, not part of the published UI commit. Do not copy secrets into frontend settings or point tests at the original application database. For a new clone, use the [canonical setup](../../README.md#install-dependencies-and-configure-the-environment); use the published `feature/final-integration` ref.
 
 ## Commands and test isolation
 
@@ -110,11 +110,34 @@ The scan skipped text inspection of **58 binary blobs** and no oversized blobs. 
 
 Private `.env`, backups, runtime data, diagnostic tools and generated screenshots are excluded. The ignored dependency symlink and generated review folder remain local. The original checkout's untracked environment backup remains untouched and must never be blanket-staged.
 
-**Public visibility is not yet recommended as an automatic next action.** Complete human publication review of binary assets and remaining submission placeholders, then obtain explicit approval for visibility changes. No credential rotation, history rewriting or visibility change was performed.
+**Publication-safety follow-up: PASS.** The binary review and fresh-install checks below supersede the earlier pending gates. No confirmed sensitive material was found in the reviewed publishable content. Git author contact information and the local username/path remain explicit disclosures for team acceptance. Visibility changes still require approval; no credential rotation, history rewriting or visibility change was performed.
+
+## Publication and clean-install follow-up
+
+**PASS · reviewed application revision `9961bc345a9d44bd4d7609f800a3d3681cd7a6df`.** These are completed follow-up checks, separate from the earlier integration suites. No large backend/browser suite was rerun and no new external AI completion request was made.
+
+| Check | Verified result |
+| --- | --- |
+| Fresh frontend install/build | `npm ci` with a new cache passed; production build passed with the same asset names/sizes as the integrated build |
+| Fresh backend install | New Python virtual environment and pip cache; documented editable `./backend[dev]` installation passed; `pip check` found no broken requirements |
+| Fresh backend runtime | New disposable database migrated to 0007; backend startup, course creation, PDF ingestion, eight real cached embeddings from nine evidence units, supported retrieval and exact preview passed |
+| Provider failure boundary | Ask/assessment/visual requests returned expected 503 with external providers deliberately unconfigured; no live AI success inferred |
+| Cleanup | Test database absence confirmed; temporary API stopped; existing services and development databases preserved |
+| Publishable binaries | Only three of the 58 historical binaries are reachable from integration/published branch history: authored evaluation PDF, PPTX and MP4; no sensitive content found |
+
+Environment: Apple Silicon macOS, Node 26.9.0/npm 11.19.1, Python 3.14.2. Existing PostgreSQL and cached model weights were reused. Fresh Docker/model downloads, other platforms and an alternate Python-version matrix were not tested. Backend dependency ranges allow future version drift. npm lifecycle-script and PyMuPDF deprecation warnings did not prevent successful installation/build/runtime checks.
+
+The four-page PDF has empty identifying metadata and no attachments, annotations or links. The two-slide PPTX has no macros, embedded files, notes/comments or external relationships; its core properties match the upstream library template, including the template last-modifier name. All 584 decoded MP4 frames show the same plain background; local audio transcription matches the authored teaching script. All three files match the frozen dataset hashes; the largest is 425,660 bytes. The largest tracked file is a 3.24 MB synthetic simulation report, not a learner/database export.
+
+The other 55 binary objects are local checkpoints: 54 design/review PNGs and one text clipping. They are not reachable from branch/tag or origin histories and are excluded from a normal named-branch push. Their metadata and PNG OCR checks found no credential/contact/private-path patterns. The clipping contains only a diagnostic-procedure label.
+
+Two Git authors' real names/email addresses and a local username/path remain visible in repository history/documentation. These are attribution/setup disclosures, not credentials or technical publication blockers; the team should accept their public exposure before changing visibility. No history rewrite was performed. Publication review does not guarantee detection of every possible secret format.
+
+**Live OmniRoute completion remains unverified.** The passing audit and installation checks do not establish generated Ask answers, Learn/Practice generation, downstream AI learning, live vision or resulting mastery updates. Submission team/video/deadline placeholders remain open.
 
 ## Remaining delivery gates
 
-- Approve the local integration/documentation diff, then push only `feature/final-integration` and open a PR into `main`.
+- Review the published integration/documentation branch, then open or finalize its PR into `main` with the AI limitations retained.
 - Resolve the real completion blocker or retain explicit limitations throughout Devpost and the video. Do not call fixture-generated results live AI success.
 - Curate real screenshots; record the actual application with honest narration; upload the approved video and test the link.
 - Fill confirmed team names/accounts, Devpost URL, YouTube URL and official deadline/timezone. Organizer requirements still need an authoritative event link.
