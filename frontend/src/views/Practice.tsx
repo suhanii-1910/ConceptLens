@@ -97,6 +97,7 @@ export function Practice() {
                 <ErrorNotice error={task.error} />
               </section>
             )}
+            <ReportPanel key={attempt?.attempt_id ?? 'initial'} />
           </div>
           <aside className="card">
             <p className="eyebrow">Practice with a purpose</p>
@@ -113,7 +114,6 @@ export function Practice() {
               into a fresh problem.
             </p>
             <p className="quiet-note">Multiple choice, grounded short answers, and deterministic numerical grading.</p>
-            <ReportPanel key={attempt?.attempt_id ?? 'initial'} />
           </aside>
         </div>
       )}

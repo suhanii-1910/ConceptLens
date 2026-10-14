@@ -33,8 +33,8 @@ export function Dashboard() {
   return (
     <>
       <PageHeading
-        eyebrow="Dashboard / Your learning evidence"
-        title="Progress you can point to."
+        eyebrow="Dashboard / Knowledge Observatory"
+        title="Your knowledge, in perspective."
         description="What you’ve demonstrated, what’s still untested, and the evidence behind your next step."
       />
       {course ? <EvidenceDashboard /> : <NoCourse />}
@@ -83,9 +83,6 @@ function EvidenceDashboard() {
   );
   return (
     <>
-      <DiagnosticPanel onEvidence={query.reload}/>
-      <ConceptEvidencePanel/>
-      <ReportPanel key={observations}/>
       <div className="metric-grid">
         <div className="metric">
           <Layers size={20} />
@@ -106,6 +103,7 @@ function EvidenceDashboard() {
           <strong>{concepts.length - observed.length}</strong>
         </div>
       </div>
+      <ConceptEvidencePanel/>
       {observed.length === 0 && (
         <div className="cold-start">
           <span className="icon-tile">
@@ -247,6 +245,7 @@ function EvidenceDashboard() {
           </p>
         </aside>
       </div>
+      <div className="dashboard-tools"><DiagnosticPanel onEvidence={query.reload}/><ReportPanel key={observations}/></div>
     </>
   );
 }

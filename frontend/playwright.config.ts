@@ -7,7 +7,7 @@ export default defineConfig({
   workers: 2,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:5173",
+    baseURL: "http://127.0.0.1:5174",
     browserName: "chromium",
     channel: process.env.PLAYWRIGHT_CHANNEL,
     trace: "retain-on-failure",
@@ -26,8 +26,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev",
-    url: "http://127.0.0.1:5173",
+    command: "npm run dev -- --port 5174",
+    url: "http://127.0.0.1:5174",
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
   },
