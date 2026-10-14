@@ -6,7 +6,7 @@ ConceptLens connects course evidence to the next learning action: ask a grounded
 
 **Live demonstration · 14 October 2026:** The integrated application successfully demonstrated source-grounded AI answers, verified assessment, reasoning analysis, adaptive teaching, a fresh Transfer Check, and persisted mastery observations using direct OpenAI. The diagnosis returned an uncertain result rather than a confirmed misconception. The direct OpenAI JSON request-format fix is included in commit `d0da5f9`. The historical compatible gateway issue remains separate. See [verification](docs/submission/INTEGRATION_VERIFICATION.md), [architecture](docs/submission/ARCHITECTURE.md), and [submission checklist](docs/submission/SUBMISSION_CHECKLIST.md).
 
-**Video:** `YOUTUBE_URL_PENDING` — insert the actual Public or Unlisted YouTube link after upload.
+**Demo video:** [Watch the ConceptLens demonstration](https://youtu.be/2f-XE-Ref1I).
 
 ## Concept Observatory screenshots
 
