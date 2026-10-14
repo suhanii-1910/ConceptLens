@@ -24,7 +24,7 @@ async def test_text_request():
         assert body["store"] is False
         assert body["text"]["format"] == {"type": "json_object"}
         assert "temperature" not in body
-        assert body["input"][0]["content"][0]["text"] == "question"
+        assert body["input"][0]["content"][0]["text"] == "question\nReturn a JSON object."
 
         return httpx.Response(200, json={
             "status": "completed",
