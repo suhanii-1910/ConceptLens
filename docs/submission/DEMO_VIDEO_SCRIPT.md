@@ -2,7 +2,7 @@
 
 **Target: 4 minutes 40 seconds · English narration · actual running application.** The supplied requirement is 3–10 minutes on YouTube, Public or Unlisted. The team will record and upload. This document is a script, not a recorded demonstration.
 
-**Current gate:** the final Observatory frontend is integrated and its browser checks pass. Successful live-provider evidence is still unavailable. Use the failure alternative for any AI operation that has not actually succeeded; do not infer success from the passing fixture suite. See [current verification and run commands](INTEGRATION_VERIFICATION.md).
+**Updated status · 14 October 2026:** A real operator-run direct OpenAI learning walkthrough succeeded, including grounded Ask, verified assessment, uncertain reasoning diagnosis, adaptive teaching and a successful Transfer Check. Use [the actual walkthrough evidence](LIVE_WALKTHROUGH_2026-10-14.md) when recording. The older CPU Scheduling script remains an alternative scenario, not the completed MIT lecture demonstration. Do not claim a confirmed misconception or real-student learning gain.
 
 ## Recording preparation
 

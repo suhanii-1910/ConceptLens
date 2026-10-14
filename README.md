@@ -4,13 +4,44 @@
 
 ConceptLens connects course evidence to the next learning action: ask a grounded question, explain your reasoning, work through targeted teaching, and check understanding on a fresh problem.
 
-**Integration review · 14 October 2026:** the Concept Observatory frontend and backend/submission documentation are merged locally on `feature/final-integration` at `16d208c`. Frontend and backend automated checks pass; the existing gateway completion timeout remains unresolved. The integration branch is published to origin; it has not been merged into main by this workflow. [Integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) · [Architecture](docs/submission/ARCHITECTURE.md) · [Demo script](docs/submission/DEMO_VIDEO_SCRIPT.md) · [Submission checklist](docs/submission/SUBMISSION_CHECKLIST.md).
+**Live demonstration · 14 October 2026:** The integrated application successfully demonstrated source-grounded AI answers, verified assessment, reasoning analysis, adaptive teaching, a fresh Transfer Check, and persisted mastery observations using direct OpenAI. The diagnosis returned an uncertain result rather than a confirmed misconception. The direct OpenAI JSON request-format fix is included in commit `d0da5f9`. The historical compatible gateway issue remains separate. See [verification](docs/submission/INTEGRATION_VERIFICATION.md), [architecture](docs/submission/ARCHITECTURE.md), and [submission checklist](docs/submission/SUBMISSION_CHECKLIST.md).
 
 **Video:** `YOUTUBE_URL_PENDING` — insert the actual Public or Unlisted YouTube link after upload.
 
 ## Concept Observatory screenshots
 
-**Public demo assets remain pending.** Integration browser tests produced local review captures, including clearly identified fixtures; these have not been curated or committed as submission screenshots. No fixture image is presented as a successful real AI journey. Add screenshots of Workspace with a source preview, Ask with citations, Learn with its trace, Practice feedback and Dashboard. Record the capture commit and real/fixture provenance in each caption. See the [handoff requirements](docs/submission/INDEX.md#information-and-assets-still-needed). No broken image links are included in this draft.
+Actual application screenshots captured during the 14 October 2026 local demonstration. The CPU Scheduling prerequisite graph is a separate curated-course example. Images are clickable for full-resolution viewing.
+
+### The Concept Observatory
+
+[![ConceptLens cinematic Observatory introduction](docs/assets/screenshots/01-conceptlens-hero.png)](docs/assets/screenshots/01-conceptlens-hero.png)
+
+*See how ideas connect — the ConceptLens learning observatory.*
+
+### Learning with evidence
+
+| Source-grounded AI explanation | Verified assessment |
+| --- | --- |
+| [![AI answer with lecture citation](docs/assets/screenshots/04-grounded-ai-answer.png)](docs/assets/screenshots/04-grounded-ai-answer.png) | [![Verified quadratic complexity question](docs/assets/screenshots/05-verified-assessment.png)](docs/assets/screenshots/05-verified-assessment.png) |
+| Explains quadratic scaling with a timestamped citation to the uploaded lecture. | Tests understanding with a verified, source-linked question. |
+
+### From teaching to understanding
+
+| Adaptive teaching | Successful Transfer Check |
+| --- | --- |
+| [![Evidence-grounded adaptive teaching](docs/assets/screenshots/06-adaptive-teaching.png)](docs/assets/screenshots/06-adaptive-teaching.png) | [![Transfer Check verified](docs/assets/screenshots/08-transfer-verified.png)](docs/assets/screenshots/08-transfer-verified.png) |
+| Provides step-by-step teaching after an uncertain diagnosis without inventing a misconception. | Records a correct fresh assessment and updates provisional mastery estimates. |
+
+### Concepts and original sources
+
+| Prerequisite relationships | Timestamped video evidence |
+| --- | --- |
+| [![CPU Scheduling prerequisite knowledge graph](docs/assets/screenshots/09-prerequisite-knowledge-graph.png)](docs/assets/screenshots/09-prerequisite-knowledge-graph.png) | [![Uploaded video and corresponding transcript](docs/assets/screenshots/03-timestamped-video-evidence.png)](docs/assets/screenshots/03-timestamped-video-evidence.png) |
+| Displays curated prerequisite relationships and source references. | Opens the original lecture video alongside extracted transcript evidence. |
+
+Additional screenshots: [Workspace](docs/assets/screenshots/02-multimodal-workspace.png) · [Fresh Transfer Check](docs/assets/screenshots/07-transfer-check.png) · [Knowledge Dashboard](docs/assets/screenshots/10-learning-dashboard.png) · [All captions](docs/assets/screenshots/CAPTIONS.md).
+
+**Evidence note:** This was an operator-run demonstration with a simulated learner. The diagnosis was uncertain, not a verified misconception. Estimated mastery is a provisional model output, not a measured real-student learning gain.
 
 ## Overview and features
 
@@ -22,7 +53,24 @@ ConceptLens connects course evidence to the next learning action: ask a grounded
 | Practice | Verified MCQ, short-answer and numerical assessments; short course diagnostic; deterministic scheduling proof where applicable |
 | Dashboard | Assessment report, eligible BKT mastery observations, Untested concepts and recorded prerequisite relationships |
 
-Generation-dependent features are implemented and fixture-tested; the available reports do not verify a successful live-provider learning loop. ConceptLens differs from a document chatbot by connecting the student's own reasoning to inspectable learning decisions and new assessment evidence. Reading explanations alone does not increase mastery.
+Generation-dependent features are tested, and one complete direct OpenAI adaptive-learning journey was demonstrated live. This does not establish reliability across all courses or prove that a particular misconception can always be identified. ConceptLens differs from a document chatbot by connecting the student's own reasoning to inspectable learning decisions and new assessment evidence. Reading explanations alone does not increase mastery.
+
+## Verified live learning walkthrough
+
+[Read the dated walkthrough evidence](docs/submission/LIVE_WALKTHROUGH_2026-10-14.md).
+
+On 14 October 2026, ConceptLens was demonstrated using an uploaded MIT algorithms lecture with real timestamped transcript evidence.
+
+1. **Grounded Ask:** Explained quadratic time complexity using a citation to the lecture at 00:27–00:32.
+2. **Verified assessment:** Generated a question testing how O(n²) scales when input size triples. The demonstration learner deliberately selected an incorrect answer.
+3. **Reasoning Debugger:** Processed the learner's explanation and returned **no clear reasoning break found**. The system did not invent a confirmed misconception.
+4. **Adaptive teaching:** Presented a source-grounded, step-by-step explanation of quadratic scaling.
+5. **Transfer Check:** Generated a fresh problem involving a limit of 225 operations. The learner answered 15, which was graded correct.
+6. **Mastery tracking:** Displayed an estimated change from 13% after one verified observation to 46% after two observations.
+
+This was a simulated learner demonstration, not a controlled student study. Mastery percentages are provisional model estimates, not measured educational improvement. Concept relationships and prerequisite links shown in the demo were curated.
+
+The screenshots document the actual application rather than fixture-generated learning results.
 
 ## Technology and architecture
 
@@ -211,7 +259,7 @@ Fixture Playwright journeys exercise UI states at desktop/mobile sizes. The acce
 
 For a disposable real-ingestion browser smoke, use the helper command above with `--browser-smoke` instead of `--serve`; it starts the necessary servers and tests. This requires PostgreSQL, cached/downloadable embeddings and a browser, and still does not certify real generation. For optional evaluation/database suites and their separate locked framework environment, follow [evaluation/README.md](evaluation/README.md). No benchmark rerun is required simply to try the app.
 
-Integration review: **590 ordinary backend tests passed; all 23 opt-in PostgreSQL/migration tests passed separately; 55 frontend unit tests and 20 browser tests passed; typecheck, lint and build passed.** Four browser cases used the real existing backend for page/data checks. A fresh disposable API run verified PDF ingestion, real cached embeddings, retrieval and previews. See [integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) for test scope, commands and limitations. The follow-up publication audit and clean-install checks **passed** at `9961bc3`: fresh npm/pip installs, production build, dependency consistency and a disposable backend migration/ingestion/retrieval/preview smoke. These checks used Apple Silicon macOS, existing PostgreSQL and cached model weights; fresh Docker/model downloads and other platforms were not tested. Live OmniRoute AI completion and the downstream generated learning journey remain **unverified**. See [publication and clean-install results](docs/submission/INTEGRATION_VERIFICATION.md#publication-and-clean-install-follow-up).
+Integration review: **590 ordinary backend tests passed; all 23 opt-in PostgreSQL/migration tests passed separately; 55 frontend unit tests and 20 browser tests passed; typecheck, lint and build passed.** Four browser cases used the real existing backend for page/data checks. A fresh disposable API run verified PDF ingestion, real cached embeddings, retrieval and previews. See [integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) for test scope, commands and limitations. The follow-up publication audit and clean-install checks **passed** at `9961bc3`: fresh npm/pip installs, production build, dependency consistency and a disposable backend migration/ingestion/retrieval/preview smoke. These checks used Apple Silicon macOS, existing PostgreSQL and cached model weights; fresh Docker/model downloads and other platforms were not tested. The historical OmniRoute gateway completion remained unverified in that audit. A separate direct OpenAI walkthrough on 14 October 2026 successfully demonstrated generated learning and transfer. See [publication and clean-install results](docs/submission/INTEGRATION_VERIFICATION.md#publication-and-clean-install-follow-up).
 
 ## Limitations and troubleshooting
 
@@ -226,7 +274,7 @@ Integration review: **590 ordinary backend tests passed; all 23 opt-in PostgreSQ
 | No concept/mastery change | Curated mappings, a fresh eligible verified question and a gradable attempt. Repeats, ambiguous mappings and ungradable responses may be excluded. |
 | PPTX looks different | Preview approximates source content; complex charts, groups, themes and effects may be omitted. Open the original file. |
 
-No general scanned-PDF OCR, PDF region highlighting, handwritten learner reasoning, durable chat history or authentication is implemented. Keep the unauthenticated prototype local. BKT defaults are uncalibrated and small-sample estimates provisional. Scheduling models one CPU with integer ticks and no context-switch overhead. Real AI acceptance, real vision quality and real grounding scores remain pending; simulations are not student outcome evidence.
+No general scanned-PDF OCR, PDF region highlighting, handwritten learner reasoning, durable chat history or authentication is implemented. Keep the unauthenticated prototype local. BKT defaults are uncalibrated and small-sample estimates provisional. Scheduling models one CPU with integer ticks and no context-switch overhead. Broader provider reliability, real vision-quality measurements and framework grounding scores remain pending. Simulations and one successful demonstration are not evidence of real-student learning gains.
 
 ## Evaluation: evidence and trade-offs
 
@@ -252,8 +300,8 @@ Phase 9 results and Phase 10 pre/post artifacts are historical records. Phase 11
 
 | Real full name | Contribution | Devpost account |
 | --- | --- | --- |
-| `MEMBER_1_FULL_NAME` | `CONFIRMED_CONTRIBUTION` | `MEMBER_1_DEVPOST_URL` |
-| `MEMBER_2_FULL_NAME_IF_APPLICABLE` | `CONFIRMED_CONTRIBUTION` | `MEMBER_2_DEVPOST_URL` |
+| Priyanshu Pandey | Backend and AI integration, testing, demo video | `@GODLIKEyp` |
+| Suhani Garg | Frontend/UI design, testing, documentation and submission | `@suhanigarg5670` |
 
 Confirm the final roster of 1–4 members; add/remove rows accordingly. Do not infer full names from machine paths or Git handles.
 
@@ -265,4 +313,4 @@ Confirm the final roster of 1–4 members; add/remove rows accordingly. Do not i
 - Writing local verification tooling, integrating the frontend/backend/documentation contributions, running automated checks, and reviewing clean-install and publication-safety results.
 - Drafting and revising the README, setup instructions, Devpost description, architecture notes, demo script, verification records and submission checklist.
 
-This disclosure identifies the assistance evidenced in the reviewed work; it does not attribute every original application component to Codex. The project team is responsible for reviewing the resulting code, documentation and submission claims. Coding assistance and passing fixture tests do not establish successful live OmniRoute AI completion.
+This disclosure identifies the assistance evidenced in the reviewed work; it does not attribute every original application component to Codex. The project team is responsible for reviewing the resulting code, documentation and submission claims. Coding assistance and passing fixture tests are separate from the subsequently observed direct OpenAI learning walkthrough. Historical OmniRoute gateway completion remains unverified.
