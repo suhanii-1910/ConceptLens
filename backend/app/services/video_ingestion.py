@@ -324,7 +324,7 @@ async def process_video(
 
                         overshoot = provider_end_seconds - duration
 
-                        if overshoot > 0.5:
+                        if overshoot > 1.0:
                             raise VideoProcessingError(
                                 f"Impossible end timestamp beyond media duration: "
                                 f"end={provider_end_seconds}, duration={duration}"

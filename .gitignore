@@ -43,3 +43,10 @@ pgdata/
 
 # Generated derived artifacts
 storage/derived/
+
+# Isolated local runtime artifacts
+.runtime/
+
+# Local integration dependencies and generated browser captures
+/backend/.venv
+/frontend/review/

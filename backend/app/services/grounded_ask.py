@@ -38,6 +38,15 @@ logger = logging.getLogger(__name__)
 
 MAX_ANSWER_EVIDENCE = 8
 
+
+def get_ask_provider(mode: AskMode) -> LLMProvider:
+    from app.core.config import settings
+
+    if settings.provider_mode == "direct_openai" and mode == AskMode.just_answer:
+        return get_llm_provider(tier="light")
+
+    return get_llm_provider()
+
 SYSTEM_PROMPT = """You are ConceptLens, a source-grounded learning assistant.
 You must adhere strictly to the following rules:
 1. Use ONLY the supplied evidence items to answer the learner's question.
@@ -243,7 +252,7 @@ async def execute_grounded_ask(
 
     # Resolve provider only when evidence is supported
     if provider is None:
-        provider = get_llm_provider()
+        provider = get_ask_provider(request.mode)
 
     system_prompt = SYSTEM_PROMPT
     user_prompt = format_user_prompt(request.question, request.mode, supported_items)

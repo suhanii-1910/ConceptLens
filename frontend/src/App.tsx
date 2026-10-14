@@ -23,6 +23,7 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+import { Observatory } from "./components/Observatory";
 import { api } from "./api/client";
 import type { Course } from "./api/types";
 import { useQuery } from "./hooks";
@@ -47,6 +48,14 @@ export const destinations = [
   { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
 ];
 export default function App() {
+  const location = useLocation();
+  if (location.pathname === "/") {
+    return !readStorage("conceptlens:intro-seen") || new URLSearchParams(location.search).has("intro")
+      ? <Observatory /> : <Navigate to="/workspace" replace />;
+  }
+  return <LearningApp />;
+}
+function LearningApp() {
   const courses = useQuery(
     useCallback((signal: AbortSignal) => api.courses(signal), []),
   );
@@ -94,15 +103,13 @@ export default function App() {
           className="brand"
           aria-label="ConceptLens workspace"
         >
-          <img src="/lens.svg" alt="" width="36" height="36" />
+          <span className="lens-logo" aria-hidden="true" />
           <span>
             Concept<span className="brand-light">Lens</span>
           </span>
         </NavLink>
         <p className="brand-tagline">
-          Learn anything.
-          <br />
-          Debug your understanding.
+          CONCEPT OBSERVATORY
         </p>
         <p className="nav-label">Your learning space</p>
         <nav aria-label="Principal navigation">
@@ -123,6 +130,7 @@ export default function App() {
           ))}
         </nav>
         <div className="sidebar-bottom">
+          <NavLink to="/?intro=1" className="sidebar-observatory"><span className="mini-orb" aria-hidden="true"/><span>See how ideas connect<small>Visit the Observatory ↗</small></span></NavLink>
           <div className="sidebar-principle">
             <Compass size={21} />
             <p>
@@ -156,7 +164,7 @@ export default function App() {
         <header className="topbar">
           <div className="breadcrumb">
             <BookOpen size={16} />
-            <span>Your workspace</span>
+            <span>Observatory</span>
             <span className="slash">/</span>
             <strong>{mode}</strong>
           </div>
@@ -184,8 +192,6 @@ export default function App() {
         <main id="main-content" tabIndex={-1}>
           {courses.loading ? (
             <Loading label="Opening your learning workspace…" />
-          ) : courses.error ? (
-            <ErrorNotice error={courses.error} retry={courses.reload} />
           ) : (
             <LearningProvider
               key={`${course?.id ?? "none"}:${learner}`}
@@ -193,6 +199,7 @@ export default function App() {
               learner={learner}
               coursesChanged={coursesChanged}
             >
+              {!!courses.error && <div className="service-unavailable"><p className="eyebrow">Connection to your learning service</p><ErrorNotice error={courses.error} retry={courses.reload} /><p>Your courses and saved evidence will appear when the service is available.</p></div>}
               <Routes>
                 <Route path="/workspace" element={<Workspace />} />
                 <Route path="/ask" element={<Ask />} />

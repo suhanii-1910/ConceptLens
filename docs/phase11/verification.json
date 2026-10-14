@@ -1,0 +1,383 @@
+{
+  "phase": 11,
+  "recorded_at": "2026-10-07T16:48:05.762414+00:00",
+  "base_commit": "37ef33dace275cc3e92d8e1296b9c8a42972ba96",
+  "branch": "feature/final-polish",
+  "start_state": {
+    "working_tree": "clean",
+    "expected_branch_and_base_matched": true,
+    "remote_refs_matched": true
+  },
+  "implementation_status": "complete, uncommitted; independent review required before Git integration",
+  "files_added": [
+    "backend/tests/test_phase11_demo.py",
+    "demo-course/cpu-scheduling.md",
+    "demo-course/prepare.py",
+    "docs/phase11/demo-guide.md",
+    "docs/phase11/submission.md",
+    "docs/phase11/verification.json"
+  ],
+  "files_modified": [
+    ".env.example",
+    "README.md",
+    "evaluation/README.md",
+    "frontend/README.md",
+    "frontend/vite.config.ts"
+  ],
+  "scope": {
+    "production_backend_changes": false,
+    "production_frontend_change": "configurable Vite development proxy target",
+    "new_dependencies": false,
+    "new_migration": false,
+    "optional_polish_items": 0,
+    "principal_views": [
+      "Workspace",
+      "Ask",
+      "Learn",
+      "Practice",
+      "Dashboard"
+    ]
+  },
+  "focused_tests": {
+    "command": "backend/.venv/bin/pytest -q backend/tests/test_phase11_demo.py backend/tests/test_phase10_scheduling.py",
+    "result": "40 passed, 366 warnings"
+  },
+  "backend_test_result": {
+    "command": "backend/.venv/bin/pytest -q backend/tests",
+    "result": "560 passed, 23 skipped, 5091 warnings",
+    "skip_reason": "existing opt-in PostgreSQL and migration suites"
+  },
+  "postgres_test_result": {
+    "status": "passed: disposable demo API integration and evaluation lifecycle tests",
+    "historical_phase5_phase6_phase7_phase10_regression_suites": "not run separately; no backend persistence logic or migrations changed"
+  },
+  "evaluation_test_result": {
+    "command": "CONCEPTLENS_EVAL_ADMIN_URL='postgresql+asyncpg://conceptlens:conceptlens@127.0.0.1:55432/postgres' PYTHONPATH=evaluation:backend backend/.venv/bin/pytest -q evaluation/tests",
+    "result": "80 passed, 141 warnings",
+    "framework_fixtures": "actual locked RAGAS positive/negative fixture tests; not real model scores"
+  },
+  "frontend_test_result": {
+    "cwd": "frontend",
+    "command": "npm test",
+    "result": "52 passed (52)"
+  },
+  "frontend_typecheck": {
+    "cwd": "frontend",
+    "command": "npm run typecheck",
+    "result": "passed; exit 0"
+  },
+  "frontend_lint": {
+    "cwd": "frontend",
+    "command": "npm run lint",
+    "result": "passed; exit 0"
+  },
+  "frontend_build": {
+    "cwd": "frontend",
+    "command": "npm run build",
+    "result": "built in 1.13s"
+  },
+  "playwright_fixture_result": {
+    "cwd": "frontend",
+    "command": "CI=1 npm run test:e2e",
+    "result": "8 passed (9.4s)",
+    "skipped": 2,
+    "skip_reason": "opt-in live cases executed separately"
+  },
+  "live_backend_result": {
+    "command": "CONCEPTLENS_EVAL_ADMIN_URL='postgresql+asyncpg://conceptlens:conceptlens@127.0.0.1:55432/postgres' HF_HUB_OFFLINE=1 backend/.venv/bin/python demo-course/prepare.py --browser-smoke",
+    "browser_command": "npm run test:e2e -- --grep \"live backend:\" --output <owned temporary directory>/playwright",
+    "result": "2 passed (4.3s)",
+    "observed": {
+      "label": "DISPOSABLE DEMO ACCEPTANCE \u2014 NOT MODEL QUALITY",
+      "events": [
+        {
+          "action": "created",
+          "database": "conceptlens_eval_5a8aa49dd5c642ac913210d84f14f896"
+        },
+        {
+          "action": "migrated",
+          "revision": "0007"
+        }
+      ],
+      "course_id": "95b3c7a9-4edb-49d1-9a9d-eca0878265f8",
+      "source_id": "1b184c17-aec5-4663-a796-924b20c2c1e3",
+      "index": {
+        "total_evidence": 9,
+        "searchable_evidence": 8,
+        "embedded_count": 8,
+        "skipped_unchanged_count": 0,
+        "skipped_no_text_count": 1
+      },
+      "retrieval": "supported",
+      "exact_page_preview": "passed",
+      "curated_concepts": 3,
+      "source_backed_prerequisites": 1,
+      "untested_concepts": 3,
+      "learner_attempts": 0,
+      "visual_asset": "extracted, not interpreted",
+      "visual_evidence_id": "f991a6e9-6b81-4b42-bb1b-80ceb2ce022e",
+      "unconfigured_provider_boundary": "Ask, assessment and visual interpretation returned 503"
+    },
+    "cleanup_events": [
+      {
+        "action": "created",
+        "database": "conceptlens_eval_5a8aa49dd5c642ac913210d84f14f896"
+      },
+      {
+        "action": "migrated",
+        "revision": "0007"
+      },
+      {
+        "action": "dropped",
+        "database": "conceptlens_eval_5a8aa49dd5c642ac913210d84f14f896",
+        "absence_verified": true
+      }
+    ],
+    "embedding": "real local sentence-transformers adapter, cached model, fake flags removed"
+  },
+  "real_provider_result": {
+    "ask": "PENDING CONFIGURATION",
+    "assessment_generation": "PENDING CONFIGURATION",
+    "assessment_verifier": "PENDING CONFIGURATION",
+    "short_answer_grading": "PENDING CONFIGURATION",
+    "reasoning_diagnosis": "PENDING CONFIGURATION",
+    "adaptive_teaching": "PENDING CONFIGURATION",
+    "transfer_generation": "PENDING CONFIGURATION",
+    "vision_interpretation": "PENDING CONFIGURATION",
+    "vision_verification": "PENDING CONFIGURATION",
+    "framework_grounding": "PENDING CONFIGURATION"
+  },
+  "vision_provider_result": "PENDING CONFIGURATION; actual extracted image served; unconfigured interpretation returned 503",
+  "provider_configuration_audit": {
+    "process_and_effective_text_settings_present": false,
+    "process_and_effective_vision_model_present": false,
+    "secret_values_printed": false
+  },
+  "scheduler_case_results": [
+    {
+      "input": {
+        "algorithm": "srtf",
+        "processes": [
+          {
+            "pid": "P1",
+            "arrival": 0,
+            "burst": 8
+          },
+          {
+            "pid": "P2",
+            "arrival": 5,
+            "burst": 4
+          }
+        ]
+      },
+      "segments": [
+        {
+          "pid": "P1",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "pid": "P2",
+          "start": 8,
+          "end": 12
+        }
+      ],
+      "decisions": [
+        {
+          "time": 0,
+          "pid": "P1",
+          "remaining_before": 8,
+          "ready": [],
+          "algorithm": "srtf"
+        },
+        {
+          "time": 5,
+          "pid": "P1",
+          "remaining_before": 3,
+          "ready": [
+            "P2"
+          ],
+          "algorithm": "srtf"
+        },
+        {
+          "time": 8,
+          "pid": "P2",
+          "remaining_before": 4,
+          "ready": [],
+          "algorithm": "srtf"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "input": {
+        "algorithm": "srtf",
+        "processes": [
+          {
+            "pid": "P1",
+            "arrival": 0,
+            "burst": 9
+          },
+          {
+            "pid": "P2",
+            "arrival": 4,
+            "burst": 3
+          }
+        ]
+      },
+      "segments": [
+        {
+          "pid": "P1",
+          "start": 0,
+          "end": 4
+        },
+        {
+          "pid": "P2",
+          "start": 4,
+          "end": 7
+        },
+        {
+          "pid": "P1",
+          "start": 7,
+          "end": 12
+        }
+      ],
+      "decisions": [
+        {
+          "time": 0,
+          "pid": "P1",
+          "remaining_before": 9,
+          "ready": [],
+          "algorithm": "srtf"
+        },
+        {
+          "time": 4,
+          "pid": "P2",
+          "remaining_before": 3,
+          "ready": [
+            "P1"
+          ],
+          "algorithm": "srtf"
+        },
+        {
+          "time": 7,
+          "pid": "P1",
+          "remaining_before": 5,
+          "ready": [],
+          "algorithm": "srtf"
+        }
+      ],
+      "status": "passed"
+    }
+  ],
+  "demo_hardcoded_production_branch": false,
+  "frozen_input_integrity": {
+    "status": "passed",
+    "comparison": "byte-identical to base commit",
+    "sha256": {
+      "evaluation/configuration/simulation.json": "e01974d0f4d03397be4890c4bc430f67991cbb249fbbc457bf83f6c7d22af3bc",
+      "evaluation/datasets/items.json": "ba4c0d9745a3f5eb97fd799b054e8ae4980a73b7a9f2367641c7850d67bdbf77",
+      "evaluation/datasets/grounding.json": "35012a52fbb31646d27eec20ae87cc9707cedc7a6b0f9698f71d200c19e71f87",
+      "evaluation/conceptlens_eval/policy.py": "3134435e7dc072be223f401fc664006d637b68eba3dda9ba007880e3717191bf",
+      "evaluation/conceptlens_eval/simulation.py": "b147f95b85e6e9beb8776f1aa91e00258d72ccd582a64e65e9bf7bfdf6659c8d"
+    }
+  },
+  "migration_integrity": {
+    "status": "passed",
+    "comparison": "byte-identical to base commit",
+    "sha256": {
+      "backend/alembic/versions/0001_phase0a_initial_schema.py": "4e9467b861f9d81b5ff004e9aba3102bbeb6aead18083c3b9933a9f69ee77b22",
+      "backend/alembic/versions/0002_phase2a_hybrid_retrieval.py": "3761dff537968712b8d60ad7c4a07a5b25cf711ab670961b558a104d4bbcd243",
+      "backend/alembic/versions/0003_phase4_grounded_assessment.py": "0565ba50ca6c6d425c81e43f543e6a2ec3732ea43503e28dc5f9efc5ed80685a",
+      "backend/alembic/versions/0004_phase5_learner_mastery.py": "c8a80afabd560721e30a98382777128a38e9f09ab37680494d59f2b8b8cf2fde",
+      "backend/alembic/versions/0005_phase6_reasoning_diagnosis.py": "5ccd93857eb04e61052c0f680407fa50f5def9f6ae45a119c55b909207a00774",
+      "backend/alembic/versions/0006_phase7_adaptive_learning.py": "6598d8484a384e1fb327693dff444f8a3635b2f14fe0be2e10c26ef5955d2359",
+      "backend/alembic/versions/0007_phase10_requirement_closure.py": "1d3b38c953bc8a635eec71caef0b604ea440d33b17cb95ee615acfc27dc2d2c8"
+    }
+  },
+  "historical_artifact_integrity": {
+    "status": "passed",
+    "comparison": "byte-identical to base commit",
+    "sha256": {
+      "docs/phase10/implementation.md": "114f88f383cf6a10db5147f0bbc437a29b9f884bd8d869fdce9b06b1b35f134d",
+      "docs/phase10/verification.json": "17ff15a076107ce991008e43e42fdbc8a7bac1d56e75f41ca885174b5514cfee",
+      "evaluation/reports/database-check.json": "8daa10b6d9080de9db13fcec1ae4351f5915ddab8675da336a8851b26b7581f5",
+      "evaluation/reports/files-added.md": "c96a591107f54ab1682eb6ebb1d37aee7f39fae26f3875f4e41fafdb5b5e8970",
+      "evaluation/reports/grounding.json": "fe72b1f5699a31fd5c6ce2b7980b660bf369b85669b25e276462940334d6b867",
+      "evaluation/reports/judge/failure-categories.svg": "2d1d9928241b031ea03373ed628aaf2af1c7e81636c3fda621df7b51d6eeda3c",
+      "evaluation/reports/judge/failures.csv": "9a31bb065a9aee09f181813384b5402635a320a99f4b63f7c999b90bcc93ee70",
+      "evaluation/reports/judge/grounding-cases.csv": "7659b218cd943e9b29733137f12f30df32dff1ca78bab3f453776bca99f35702",
+      "evaluation/reports/judge/grounding-modality.svg": "86752d332f03c55dd8ea5c6845c07dceaec38c8e9252f2c284febcd7b29b635e",
+      "evaluation/reports/judge/grounding-summary.svg": "65afc2e5aa9c9a9ff9054d59473d990d29ea44ef084f61dfaf3c0aa19f5ee1c5",
+      "evaluation/reports/judge/intervention-efficiency.svg": "c2e4a6ce813cb45a8bbc5ba8b279607623a21511b0539b86b82880845741f846",
+      "evaluation/reports/judge/phase10-handoff.json": "18b773b25e28fc79aad46482918cf1af6caf8b10707dc8e354a8fae030ad5359",
+      "evaluation/reports/judge/question-repetition.svg": "8162ba2c08d3f08812f2d2700521751e1815eb7e7137ce761193232254f2c49a",
+      "evaluation/reports/judge/report.md": "5582efee76c08f650b9d96038e2bac4a686aace687daffb243eba65d7755268d",
+      "evaluation/reports/judge/simulation-sessions.csv": "b5fa67c957fad1b520f7cbaccf1fef79b0f3db8c95404763d1239b1d3b3b687c",
+      "evaluation/reports/judge/simulation-summary.csv": "7296dc7db296602645b66135c28413df6ed012e1b789a49296ac245b52a83613",
+      "evaluation/reports/judge/summary.json": "e09c8ff358e8ca9b76c252906037bc0840de8d7d3daa6aaa15ba155e41ebc93a",
+      "evaluation/reports/judge/transfer-success.svg": "e36ea64b2020763759e5bf953bbfa842873abcb0c0e2cbe288e87f9b595790b4",
+      "evaluation/reports/post-phase10-simulation.json": "b36b4d914974e52149965070fc9ae746e6477e95e61ed8b79491a5183f6cd445",
+      "evaluation/reports/pre-phase10-simulation.json": "f1a8f9c871919234846bdf157b8f97583970e4620f3a326490c5e8dd9545164c",
+      "evaluation/reports/reproducibility.json": "8bf551e34d6642bae81856f301bed795d7bffd3f7af9b2897254bbd6ad6c8682",
+      "evaluation/reports/simulation.json": "f1a8f9c871919234846bdf157b8f97583970e4620f3a326490c5e8dd9545164c",
+      "evaluation/reports/verification.json": "b4444188e49d566e7fe3923fa9ab981dc272c85ba0cf8f644d08429772792ad4"
+    }
+  },
+  "simulation_rerun": "not run; production policy and frozen inputs unchanged; historical Phase10 results presented without modification",
+  "database_safety": {
+    "normal_database": "conceptlens",
+    "connected": false,
+    "mutated": false,
+    "migrated": false,
+    "disposable_prefix": "conceptlens_eval_",
+    "administration_database": "postgres",
+    "cleanup": {
+      "remaining_evaluation_databases": [],
+      "ports_listening": {
+        "8100": false,
+        "5173": false
+      },
+      "admin_database": "postgres",
+      "normal_development_database_connected": false
+    }
+  },
+  "hygiene": {
+    "status": "passed for proposed changes",
+    "apparent_real_secret_findings": 0,
+    "tracked_or_proposed_generated_artifacts": 0,
+    "new_dependencies": 0,
+    "personal_paths": "Only an existing synthetic private frame path in test_citation_grounding.py tests path redaction; unchanged",
+    "relevant_todo_fixme_findings": 0,
+    "broken_document_links": 0,
+    "temporary_storage_and_owned_servers": "cleaned up; no listeners on ports 8100 or 5173",
+    "ignored_local_build_and_fixture_screenshots": "not included in proposed files"
+  },
+  "visual_review": {
+    "method": "inspected desktop Learning Trace and mobile Reasoning Debugger fixture screenshots",
+    "result": "readable hierarchy, tentative language visible, no observed clipping; responsive overflow assertions also passed",
+    "provenance": "API fixtures, not live AI acceptance"
+  },
+  "git_diff_check": "passed",
+  "git_actions": {
+    "commit": false,
+    "push": false,
+    "merge": false,
+    "reset": false,
+    "stash": false,
+    "branch_switch": false
+  },
+  "known_limitations": [
+    "Real provider learning and visual semantics acceptance pending configuration; exact generated question/diagnosis/transfer outcome not guaranteed.",
+    "Real framework grounding scores pending; fixture metrics are not model quality measurements.",
+    "PPTX preview approximates content; no PDF highlighting or general scanned-document OCR.",
+    "Accepted visual interpretation requires explicit re-indexing in Workspace.",
+    "Scheduling uses a single CPU, integer ticks and no context-switch overhead.",
+    "Concept mappings and prerequisites require curation; demo helper supplies metadata only, never learner attempts.",
+    "BKT defaults are uncalibrated; small-sample reports provisional; repeated exposures may be excluded from new mastery evidence.",
+    "Simulation is not a real student study or a significance claim; efficiency and baseline trade-offs are disclosed.",
+    "No authentication, public production deployment, persistent chat or handwritten learner-reasoning interpretation.",
+    "Forced process termination or machine failure may prevent finally cleanup; only exact owned resources may be recovered.",
+    "Existing dependency deprecation warnings remain; no failing release tests."
+  ]
+}

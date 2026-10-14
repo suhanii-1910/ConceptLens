@@ -21,6 +21,7 @@ import type {
 } from "../api/types";
 import { useQuery, useTask } from "../hooks";
 import { useLearning, type JourneyRefs } from "../state";
+import { ConceptEvidencePanel } from "../components/ConceptExplorer";
 import { QuestionGenerator } from "../components/QuestionGenerator";
 import { ReasoningDebugger, ReasoningEditor } from "../components/Reasoning";
 import { Teaching, actionLabels } from "../components/Teaching";
@@ -43,7 +44,7 @@ export function Learn() {
     <>
       <PageHeading
         eyebrow="Learn / The reasoning workspace"
-        title="Find the turning point in your thinking."
+        title="Make the connections. Find your clarity."
         description="Follow your reasoning, test a possible gap, and find a learning approach that helps."
       />
       {course ? <LearningJourney /> : <NoCourse />}
@@ -154,6 +155,7 @@ function LearningJourney() {
       [course, learner],
     ),
   );
+  const [showInitialMap] = useState(() => typeof window.matchMedia !== "function" || !window.matchMedia("(max-width: 760px)").matches);
   const [question, setQuestion] = useState<Question>();
   const [attemptId, setAttemptId] = useState<string>();
   const [diagnosis, setDiagnosis] = useState<Diagnosis>();
@@ -382,6 +384,10 @@ function LearningJourney() {
           </li>
         ))}
       </ol>
+      <details className="learn-atlas" open={!question && showInitialMap}>
+        <summary>Explore concepts and source connections</summary>
+        <ConceptEvidencePanel />
+      </details>
       <div className="learn-layout">
         <div className="learn-main">
           {notice && (

@@ -1,6 +1,7 @@
 import pytest
 import uuid
 import math
+from typing import List
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select

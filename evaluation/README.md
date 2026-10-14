@@ -1,8 +1,8 @@
-# ConceptLens Phase 9 evaluation
+# ConceptLens evaluation — frozen Phase 9 benchmark, Phase 10 results
 
-> Phase 10 compatibility note: current disposable evaluation databases migrate to **0007** for the updated ORM. The Phase 9 benchmark inputs and simulation policy adapter remain frozen. See [Phase 10 acceptance notes](../docs/phase10/implementation.md) and the separate pre/post simulation artifacts; historical Phase 9 results below remain unchanged.
+> Current run instructions: disposable evaluation databases migrate to **0007**. The Phase 9 benchmark inputs and simulation policy adapter remain frozen. Use `reports/post-phase10-simulation.json` for current production-policy results and comparison; `reports/simulation.json`, `reports/judge/` and the Phase 10 handoff are historical Phase 9 outputs. See [Phase 11 release verification](../docs/phase11/verification.json) and [Phase 10 acceptance notes](../docs/phase10/implementation.md). Do not overwrite historical artifacts when rerunning.
 
-Phase 9 measures grounding and compares three tutoring policies under an explicit simulator. It adds no product features, changes no backend/frontend dependencies or behavior, and uses no migrations beyond **0006**.
+Phase 9 measures grounding and compares three tutoring policies under an explicit simulator. Its original implementation added no product features, changed no backend/frontend dependencies or behavior, and used migrations through **0006**. The current harness uses **0007** for ORM compatibility.
 
 Start with [the judge report](reports/judge/report.md), [run verification](reports/verification.json), and [Phase 10 handoff](reports/judge/phase10-handoff.json).
 
@@ -15,9 +15,9 @@ The core evaluator uses the existing backend environment (Python 3.14.2 was test
 ```sh
 export PYTHONPATH="$PWD/evaluation:$PWD/backend"
 backend/.venv/bin/python -m conceptlens_eval validate-dataset
-backend/.venv/bin/python -m conceptlens_eval grounding
-backend/.venv/bin/python -m conceptlens_eval simulate
-backend/.venv/bin/python -m conceptlens_eval report
+backend/.venv/bin/python -m conceptlens_eval grounding --out /tmp/conceptlens-grounding.json
+backend/.venv/bin/python -m conceptlens_eval simulate --out /tmp/conceptlens-simulation.json
+backend/.venv/bin/python -m conceptlens_eval report --grounding /tmp/conceptlens-grounding.json --simulation /tmp/conceptlens-simulation.json --out /tmp/conceptlens-report
 backend/.venv/bin/pytest -q evaluation/tests
 ```
 
@@ -66,13 +66,13 @@ Credentials are never written to artifacts or command arguments by the harness. 
 With those variables configured, the **one command** to execute the real frozen test benchmark is:
 
 ```sh
-PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval grounding --split test --out evaluation/reports/grounding.json
+PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval grounding --split test --out /tmp/conceptlens-grounding-real.json
 ```
 
 Then regenerate the report:
 
 ```sh
-PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval report
+PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval report --grounding /tmp/conceptlens-grounding-real.json --simulation evaluation/reports/post-phase10-simulation.json --out /tmp/conceptlens-real-report
 ```
 
 Actual ingestion runs on the original PDF/PPTX/MP4 assets, then the production embedding/indexing service, hybrid retrieval, citation grounding, evidence boundary and `execute_grounded_ask` run. This needs the normal local embedding/ASR model availability and FFmpeg, in addition to the generator. On this Mac, video ingestion uses the existing MLX Whisper provider. No authored transcript is substituted for ASR. `video-script.json` documents the original narration and measured clip spans, and is never supplied to retrieval or generation.
@@ -83,12 +83,12 @@ The runner captures the same grounded retrieval objects consumed by each Ask cal
 
 Simulation uses Python memory and files only. Grounding accepts **no existing evaluation or normal development database URL**. The administration URL must explicitly name `/postgres` on localhost, 127.0.0.1 or ::1, with no query options. It is never derived from `settings.database_url`.
 
-The context manager creates a random `conceptlens_eval_<32 hex digits>` database, passes only that URL to Alembic, upgrades specifically to `0006`, seeds/evaluates, disposes connections, and drops it in `finally`. The drop guard accepts only the exact generated namespace; database absence is checked afterward. Extraction artifacts live in a temporary directory. The normal development database is never connected to, reset, or seeded. No migration 0007 exists.
+The context manager creates a random `conceptlens_eval_<32 hex digits>` database, passes only that URL to Alembic, upgrades specifically to `0007`, seeds/evaluates, disposes connections, and drops it in `finally`. The drop guard accepts only the exact generated namespace; database absence is checked afterward. Extraction artifacts live in a temporary directory. The normal development database is never connected to, reset, or seeded.
 
 After exporting the administration URL, verify both successful and failed-work cleanup:
 
 ```sh
-PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval db-check
+PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval db-check --out /tmp/conceptlens-db-check.json
 CONCEPTLENS_EVAL_ADMIN_URL="$CONCEPTLENS_EVAL_ADMIN_URL" PYTHONPATH=evaluation:backend backend/.venv/bin/pytest -q evaluation/tests
 ```
 
@@ -191,7 +191,7 @@ PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval simul
 PYTHONPATH=evaluation:backend backend/.venv/bin/python - <<'PY'
 import json
 from pathlib import Path
-saved = json.loads(Path('evaluation/reports/simulation.json').read_text())
+saved = json.loads(Path('evaluation/reports/post-phase10-simulation.json').read_text())
 repeat = json.loads(Path('/tmp/conceptlens-repeat.json').read_text())
 assert saved['payload'] == repeat['payload']
 print('identical simulation payload')
@@ -212,4 +212,4 @@ Results include JSON, per-case and per-session CSV, Markdown and six standalone 
 | `reports/judge/*.svg` | Framework summary, modality coverage, failure categories, transfer, efficiency, repetition |
 | `reports/judge/phase10-handoff.json` | Five prioritized weaknesses and Phase 10 scope |
 
-The implementation leaves all files uncommitted. Grounding/provider/visual quality remains a pending measurement; exact source opening, true visual evidence, short-answer/numerical assessment, CPU scheduling verification, stronger cold start, post-assessment reports and remaining Track-D closure remain Phase 10.
+The checked-in Phase 9 records describe their original pre-integration state. Phase 10 subsequently implemented exact source opening, image-backed interpretation/verification, typed assessments, deterministic scheduling, persistent cold start and learner reports. Phase 11 preserves those historical records and frozen inputs. Grounding/provider/visual quality remains a pending measurement; current release status is documented in the [root README](../README.md).

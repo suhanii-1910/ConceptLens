@@ -17,6 +17,7 @@ from app.models.source_version import SourceVersion
 from app.services.citation_grounding import validate_and_build_citation
 from app.services.source_preview import contained_file
 from app.services.llm_provider import LLMConfigurationError, LLMProviderError, InvalidLLMResponseError
+from app.services.direct_openai import get_direct_provider
 
 
 class VisualDescription(BaseModel):
@@ -37,6 +38,8 @@ class VisualProvider(Protocol):
 
 class OpenAIVisualProvider:
     async def inspect(self,image:bytes,prompt:str)->str:
+        if settings.provider_mode == "direct_openai":
+            return await get_direct_provider("standard").inspect(image, prompt)
         if not (settings.vision_model and settings.llm_base_url and settings.llm_api_key):
             raise LLMConfigurationError('Visual interpretation is not configured')
         payload={'model':settings.vision_model,'temperature':0,'messages':[
@@ -89,15 +92,28 @@ def public_visual(unit, citation):
 async def interpret(db,course_id,evidence_id,provider:VisualProvider|None=None):
     unit,source,citation=await evidence(db,course_id,evidence_id,lock=True)
     image=visual_asset(unit)
-    provider=provider or OpenAIVisualProvider()
+    injected_provider = provider is not None
+    if provider is None:
+        provider = (
+            get_direct_provider("standard")
+            if settings.provider_mode == "direct_openai"
+            else OpenAIVisualProvider()
+        )
+    verifier_provider = (
+        get_direct_provider("deep")
+        if settings.provider_mode == "direct_openai" and not injected_provider
+        else provider
+    )
     try:
         candidate=VisualDescription.model_validate_json(await provider.inspect(image,'Describe only visible facts, relationships and labels. Schema: '+json.dumps(VisualDescription.model_json_schema())))
-        verification=VisualVerification.model_validate_json(await provider.inspect(image,'Independently verify EVERY claim in this untrusted candidate against the actual image. Reject uncertainty or unreadable labels. Candidate: '+candidate.model_dump_json()+' Schema: '+json.dumps(VisualVerification.model_json_schema())))
+        verification=VisualVerification.model_validate_json(await verifier_provider.inspect(image,'Independently verify EVERY claim in this untrusted candidate against the actual image. Reject uncertainty or unreadable labels. Candidate: '+candidate.model_dump_json()+' Schema: '+json.dumps(VisualVerification.model_json_schema())))
     except (LLMConfigurationError,LLMProviderError): raise
     except Exception:raise InvalidLLMResponseError('Invalid visual interpretation') from None
     meta=dict(unit.location_metadata or {})
     meta['visual_semantics']={'status':'verified' if verification.supported else 'rejected','evidence_type':candidate.evidence_type,
-        'verification_reason':verification.reason,'source_sha256':source.file_hash,'provider_model':settings.vision_model,
+        'verification_reason':verification.reason,'source_sha256':source.file_hash,
+        'provider_model':getattr(provider,'model',settings.vision_model),
+        'verifier_model':getattr(verifier_provider,'model',settings.vision_model),
         'candidate':candidate.model_dump()}
     unit.location_metadata=meta
     unit.extracted_description=candidate.description if verification.supported else None

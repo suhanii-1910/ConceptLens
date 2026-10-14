@@ -1,422 +1,268 @@
 # ConceptLens
 
-**Learn anything. Debug your understanding.**
+### Learn anything. Debug your understanding.
 
-ConceptLens is a multimodal adaptive-learning platform. It builds a model of the learning material, a model of the learner, and a policy for choosing the next learning action.
+ConceptLens connects course evidence to the next learning action: ask a grounded question, explain your reasoning, work through targeted teaching, and check understanding on a fresh problem.
 
----
+**Integration review · 14 October 2026:** the Concept Observatory frontend and backend/submission documentation are merged locally on `feature/final-integration` at `16d208c`. Frontend and backend automated checks pass; the existing gateway completion timeout remains unresolved. The integration branch is published to origin; it has not been merged into main by this workflow. [Integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) · [Architecture](docs/submission/ARCHITECTURE.md) · [Demo script](docs/submission/DEMO_VIDEO_SCRIPT.md) · [Submission checklist](docs/submission/SUBMISSION_CHECKLIST.md).
 
-## Current implementation status
+**Video:** `YOUTUBE_URL_PENDING` — insert the actual Public or Unlisted YouTube link after upload.
 
-**Phase 8 — React frontend for the existing evidence and adaptive-learning backend implemented.**
+## Concept Observatory screenshots
 
-The five principal views are Workspace, Ask, Learn, Practice, and Dashboard. Learn connects a verified assessment response to typed reasoning, a diagnostic probe, server-selected teaching, prerequisite repair, a Transfer Check, and the persisted Learning Trace. See [frontend setup and acceptance checks](frontend/README.md).
+**Public demo assets remain pending.** Integration browser tests produced local review captures, including clearly identified fixtures; these have not been curated or committed as submission screenshots. No fixture image is presented as a successful real AI journey. Add screenshots of Workspace with a source preview, Ask with citations, Learn with its trace, Practice feedback and Dashboard. Record the capture commit and real/fixture provenance in each caption. See the [handoff requirements](docs/submission/INDEX.md#information-and-assets-still-needed). No broken image links are included in this draft.
 
-### Phase 0A — Backend foundation
+## Overview and features
 
-- FastAPI backend skeleton
-- PostgreSQL + pgvector database configuration
-- Database models (Course, SourceVersion, EvidenceUnit, Concept, PrerequisiteEdge)
-- Alembic migrations
-- Course CRUD API
-- Raw source file upload and storage (PDF, PPTX, PPT, MP4)
+| Module | Implemented purpose |
+| --- | --- |
+| Workspace | Course creation, PDF/PPTX/MP4 upload, explicit processing/indexing, extracted evidence and source previews |
+| Ask | Hybrid evidence retrieval, supported-answer generation, citation inspection and insufficient-evidence refusal |
+| Learn | Learner-authored reasoning, tentative diagnosis and probe, adaptive strategies, fresh Transfer Check and Learning Trace |
+| Practice | Verified MCQ, short-answer and numerical assessments; short course diagnostic; deterministic scheduling proof where applicable |
+| Dashboard | Assessment report, eligible BKT mastery observations, Untested concepts and recorded prerequisite relationships |
 
-### Phase 1A — PDF ingestion
+Generation-dependent features are implemented and fixture-tested; the available reports do not verify a successful live-provider learning loop. ConceptLens differs from a document chatbot by connecting the student's own reasoning to inspectable learning decisions and new assessment evidence. Reading explanations alone does not increase mastery.
 
-- **Text extraction**: Page-by-page, block-by-block via PyMuPDF with minimum-content threshold (≥20 non-whitespace characters)
-- **Table extraction**: pdfplumber `find_tables()` per page, serialised as Markdown pipe-delimited format
-- **Image extraction**: Embedded raster images via PyMuPDF, filtered for minimum dimensions (50×50 px), saved to derived storage
-- **Provenance**: Every EvidenceUnit carries `location_metadata` with page_index (0-based), page_number (1-based), printed_page_label, bounding_box, block_index, element_type
-- **Processing status**: Transitions `uploaded → processing → ready` (or `→ failed` on error)
-- **Idempotency**: Already-processed sources return existing results without creating duplicates; failed sources can be retried
-- **Derived storage**: Extracted images stored under `storage/derived/<source_version_id>/`, separate from originals
-- **API endpoint**: `POST /courses/{course_id}/sources/{source_version_id}/process` (201 on fresh processing, 200 if already processed)
-- **Scanned PDFs**: Process successfully with zero text evidence (no OCR, no fabrication)
-- **Automated regression suite**: 72 passing tests across backend ingestion and API behavior
+## Technology and architecture
 
-### Phase 1B — PPTX ingestion
+React 19, TypeScript, Vite 7, React Router and Lucide; FastAPI, Pydantic, SQLAlchemy and Alembic; PostgreSQL 16 with pgvector; sentence-transformers; PyMuPDF, pdfplumber, python-pptx, FFmpeg/FFprobe and Apple Silicon MLX Whisper. Exact frontend resolutions are in [package-lock.json](frontend/package-lock.json); backend dependency ranges are in [pyproject.toml](backend/pyproject.toml).
 
-- **Text extraction**: Normal text extraction preserving slide structure
-- **Table extraction**: Native tables correctly rendered as deterministic Markdown pipe-delimited tables
-- **Image extraction**: Embedded raster image extraction to derived storage
-- **Provenance**: Slide index, slide number, shape index, exact bounding box
-- **Resilience**: Idempotent processing and failure/partial evidence safety
+```mermaid
+flowchart TD
+    UI[React: Workspace / Ask / Learn / Practice / Dashboard] -->|Vite /api proxy| API[FastAPI]
+    API --> Sources[Source processing and previews]
+    Sources --> Files[Course originals and derived files]
+    Sources --> DB[(PostgreSQL 16 + pgvector)]
+    API --> Retrieval[Hybrid retrieval and citation checks]
+    Retrieval <--> DB
+    API --> Learning[Assessment / diagnosis / adaptive policy / BKT]
+    Learning <--> DB
+    Retrieval --> Models[Configured text provider]
+    Learning --> Models
+    Sources --> Vision[Optional image interpretation and verification]
+```
 
-### Phase 1C — Video ingestion
+The API is a modular monolith. Source processing is explicitly requested; there is no separate ingestion worker to start. Local embeddings index searchable text, including accepted image descriptions; these are not native image embeddings. [Detailed flows and source references](docs/submission/ARCHITECTURE.md).
 
-- **Media inspection**: FFprobe detects source duration and available audio/video streams
-- **Local transcription**: Timestamped speech transcription through a provider interface, with MLX Whisper (`mlx-community/whisper-base-mlx`) as the default Apple Silicon provider
-- **Grounded transcript provenance**: Transcript EvidenceUnits preserve real provider timestamps and source duration
-- **Terminal timestamp hardening**: Small ASR end-boundary overshoots are bounded to the real source duration while preserving the provider's original timestamp and adjustment metadata
-- **Decoded-frame provenance**: Representative visual evidence is selected only from actual FFprobe-decoded frames — citation timestamps are never mathematically fabricated
-- **Frame extraction**: Selected frames are extracted by decoded frame index with source frame index, real timestamp, width, height, keyframe flag, selection method, and source duration recorded in provenance
-- **Source immutability**: Original video SHA-256 is verified before and after processing
-- **Derived storage**: Extracted frames are stored separately under `storage/derived/<source_version_id>/`
-- **Stream resilience**: Video-only and audio-only media are handled with explicit warnings; media with no usable streams fails
-- **Idempotency**: Reprocessing an already-ready source creates no duplicate EvidenceUnits or derived frames
-- **Failure cleanup**: Partially created derived frame artifacts are removed when processing fails
-- **No visual semantic interpretation yet**: Frames are preserved as grounded visual evidence but are not captioned or interpreted by an AI model in Phase 1C
-
-
-### Phase 2A — Hybrid evidence retrieval
-
-- **Explicit evidence indexing**: Course-scoped indexing prepares existing extracted EvidenceUnits for retrieval without creating new evidence
-- **Local semantic embeddings**: `sentence-transformers/all-MiniLM-L6-v2` generates normalized 384-dimensional embeddings
-- **Embedding change detection**: SHA-256 content hashes and model identifiers prevent unnecessary re-embedding of unchanged evidence
-- **Dense retrieval**: PostgreSQL `pgvector` cosine-distance search over indexed EvidenceUnits
-- **Lexical retrieval**: PostgreSQL full-text search using `to_tsvector`, `websearch_to_tsquery`, and ranked lexical candidates
-- **Hybrid ranking**: Reciprocal Rank Fusion (RRF) combines dense and lexical rankings without mixing incomparable raw score scales
-- **Course isolation**: Dense and lexical retrieval are both restricted to the requested course
-- **Evidence safety**: Retrieval includes only extracted EvidenceUnits from ready SourceVersions
-- **Optional filters**: Retrieval supports modality and source-version filtering
-- **Grounded results**: Retrieval returns stored EvidenceUnit provenance and source metadata without fabricating page, slide, timestamp, or bounding-box information
-- **Image limitation**: Raw image EvidenceUnits without real semantic descriptions remain unembedded and are not semantically searchable
-- **API endpoints**:
-  - `POST /courses/{course_id}/retrieval/index`
-  - `POST /courses/{course_id}/retrieval/search`
-
-### Phase 2B — Citation + Grounding Validation
-
-- **Deterministic provenance validation**: Every retrieval result is validated against stored evidence before any citation is issued — no citations are fabricated
-- **PDF page grounding**: Page index, page number, and optional printed page label are validated for internal consistency; bounding boxes are checked for geometric validity
-- **PPTX slide grounding**: Slide index, slide number, and optional shape index are validated; bounding boxes are checked
-- **Video transcript timestamp grounding**: Start/end seconds are validated for ordering, finiteness, and bounds against recorded source duration
-- **Decoded video-frame grounding**: Frame timestamps and source frame indices are validated; timestamps are never mathematically derived — only real decoded-frame provenance is accepted
-- **Structured citation objects**: Valid results carry a `Citation` with `locator`, `locator_label`, `location_metadata`, source identity, and modality
-- **Invalid provenance rejection**: Any inconsistency (wrong course, source mismatch, bad locator, unready source) produces `grounding_status=invalid` with structured `grounding_errors`; the HTTP response is still 200
-- **Course/source/status consistency checks**: Evidence unit course, source version course, and expected course are compared directly; source version must be `ready` and evidence unit must be `extracted`
-- **Safe public provenance metadata**: Citation and retrieval result `location_metadata` are filtered through a per-source-type allowlist — only known safe keys are exposed
-- **Local derived/storage paths excluded**: Fields such as `derived_path` carrying filesystem paths are excluded from all public surfaces by the allowlist; raw DB metadata is never mutated
-- **`only_grounded` downstream boundary**: A utility filter exposes only fully-validated results to downstream consumers, enforcing the grounding boundary
-
-### Phase 2C — Unsupported / Insufficient-Evidence Boundary
-
-- **Deterministic evidence support classification**: Every search response includes an `evidence_boundary` decision object with one of three stable statuses: `supported`, `insufficient_evidence`, or `unsupported`
-- **Distinct relevance and grounding requirements**: Relevance qualification (is this evidence semantically or lexically related?) and grounding validation (is this evidence citable?) are evaluated separately — a result can be relevant but ungradeable, or graded but irrelevant
-- **Dense relevance signal**: An evidence unit is relevance-qualified by dense retrieval when its cosine distance is finite, non-negative, and at or below the 0.55 threshold (conservatively calibrated for the `all-MiniLM-L6-v2` embedding space, range approximately [0, 2])
-- **Lexical relevance signal**: An evidence unit is also relevance-qualified when its PostgreSQL `ts_rank` score is a positive finite number (any FTS match)
-- **RRF rank and fused score are NOT support signals**: `dense_rank`, `lexical_rank`, and `fused_score` are relative ranking signals; they are never treated as calibrated evidence quality probabilities; rank #1 alone cannot make evidence supported
-- **Grounded citation required**: A relevance-qualified evidence unit is usable only when Phase 2B grounding is `valid` AND a `Citation` object is present — both conditions must hold
-- **Three decision states**:
-  - `supported`: at least one retrieved result is relevance-qualified, grounding valid, and has a citation — future answer generation may use only those usable results
-  - `insufficient_evidence`: at least one result is relevance-qualified but no relevance-qualified result is safely grounded — related material was found but source-backed answers cannot be issued
-  - `unsupported`: no results at all, or no result met the relevance threshold — the current uploaded course materials do not provide sufficiently relevant support for the query
-- **"Unsupported" is not real-world falsity**: The absence of support in uploaded course materials does not mean the claim is false in the world; decline messages say exactly that
-- **Stable, safe decline messages**: Human-readable decline messages are deterministic string constants (not generated text); `supported` carries no message
-- **`only_supported_evidence` downstream gate**: A pure helper function returns only usable evidence units for future answer generation; it preserves retrieval order, all ranking scores, all citation data, and all provenance without rescoring or mutation
-- **Future answer generation must use only supported evidence**: The boundary decision is the enforceable gate between retrieval and any future RAG or Ask phase; downstream consumers must check `should_decline` before generating a source-backed answer
-- **No database mutation**: Phase 2C performs no DB writes, no extra DB reads, and does not alter any stored provenance
-- **No LLM required**: The boundary classification is entirely deterministic — no language model is called at any point in the boundary decision
-- **`evidence_boundary` field is additive**: The search API still returns all retrieved results in `results` for inspection; the boundary object is added alongside, not in place of, existing results
-
-### Phase 3 — Grounded Ask Experience
-
-- **Stateless grounded question answering**: `POST /courses/{course_id}/ask` accepts a learner question and an ask mode, answering strictly from grounded course evidence without maintaining server-side conversational state.
-- **Three ask modes**:
-  - `just_answer`: Direct, concise answer grounded in course material.
-  - `explain`: Structured step-by-step conceptual explanation with grounded answer blocks.
-  - `guide`: Socratic guiding hints and scaffolding, concluding with a targeted follow-up question (`next_question`).
-- **End-to-end grounded pipeline**:
-  `retrieval → grounding → evidence boundary → supported-only evidence → provider → evidence-ID validation → server citation mapping`
-- **Pre-generation deterministic boundary gate**:
-  Retrieval and Phase 2C evidence boundary qualification run before any provider call. If the evidence boundary evaluates to `unsupported` or `insufficient_evidence`, the endpoint immediately returns HTTP 200 with status `declined` and a deterministic decline message. The external LLM provider is **never called**, preventing hallucination and unnecessary provider spend.
-- **Model sees only supported evidence**:
-  Only evidence units that pass both Phase 2A relevance qualification and Phase 2B grounding validation are supplied to the model. Ungrounded or irrelevant material is excluded.
-- **Model never authors Citation objects**:
-  The language model returns only draft answer blocks referencing `evidence_unit_ids`. The model never generates citations, locator labels, page/slide numbers, or file paths.
-- **Server-driven citation mapping**:
-  The server validates referenced `evidence_unit_ids` against the verified supported evidence set and maps them directly to immutable, exact Phase 2B `Citation` objects.
-- **Fail-closed on hallucinated evidence IDs**:
-  If the model cites unknown, unprovided, or hallucinated `evidence_unit_ids`, or returns malformed output, the system fails closed with HTTP 502 Bad Gateway without returning partial or ungrounded answers.
-- **Answer construction**:
-  The final top-level `answer` is constructed server-side by joining validated block texts; the provider returns block drafts only.
-- **Untrusted data & prompt injection defense**:
-  All source evidence content is strictly demarcated as untrusted data in prompts. Prompt injection instructions appearing inside course evidence are systematically ignored. Learner requests to bypass grounding or answer from outside knowledge are declined.
-- **Private path and prompt safety**:
-  Responses expose zero private filesystem paths (`storage_path`, `derived_path`), system prompts, internal prompts, or provider credentials.
-- **OpenAI-compatible provider adapter**:
-  Configurable LLM provider integration via standard HTTP client (`httpx`) targeting any OpenAI-compatible API endpoint with zero temperature and structured JSON response handling.
-- **Server-only provider credentials**:
-  API keys and endpoint configurations remain strictly server-side and are never exposed across API boundaries or logged.
-- **Exact citation provenance preserved**:
-  Downstream citations preserve exact source provenance from Phase 1 and Phase 2 (PDF page numbers, PPTX slide numbers, transcript start/end timestamps, decoded video frame timestamps, and public locator labels).
-
-### Phase 4 — Grounded Assessment System
-
-- **MCQ assessment v1**: Generates 4-option single-select multiple choice questions anchored strictly to verified course evidence.
-- **API Endpoints**:
-  - `POST /courses/{course_id}/assessments/generate`: Request generation of questions for a topic focus and requested difficulty (`easy`, `medium`, `hard`).
-  - `GET /courses/{course_id}/assessments/questions/{question_id}`: Fetch public representation of a verified question.
-  - `POST /courses/{course_id}/assessments/questions/{question_id}/attempts`: Submit learner attempt and receive deterministic grading.
-- **Pipeline flow**:
-  - `hybrid retrieval → Phase 2B grounding → Phase 2C evidence boundary`.
-  - Only supported evidence reaches generator and verifier.
-  - Unsupported or insufficient evidence calls provider 0 times (early decline with HTTP 200).
-- **Dual-model generation & independent verification**:
-  - Generator and verifier are separate, decoupled provider calls.
-  - Only independently verified questions are persisted transactionally to the database.
-  - Server validates all generator and verifier claimed evidence unit IDs against the supported allowlist (tampered or unallowed IDs fail closed).
-- **Exact Phase 2B citation snapshots**:
-  - Stored questions record immutable, exact Phase 2B `Citation` snapshots, preserving full source provenance while guaranteeing public safety (no internal `storage_path` or `derived_path` leaks).
-- **Public question answer-key safety**:
-  - Public generated/fetched questions hide answer key (`correct_option_index`, `correct_option_text`).
-  - Public generated/fetched questions hide `explanation`.
-- **Deterministic grading**:
-  - Deterministic grading after learner submission via direct index comparison on server.
-  - Grading uses NO LLM (0 provider calls).
-- **Attempt immutability**:
-  - Attempts are immutable append-only rows (`AssessmentAttempt`).
-  - Second submission creates a new attempt; previous attempt rows remain unchanged.
-- **Post-submission reveal**:
-  - Attempt response reveals answer, explanation, and citations only after submission.
-- **Difficulty and focus**:
-  - Requested difficulty `easy` / `medium` / `hard`.
-- **Learner identity & state**:
-  - `learner_id` is an opaque client-provided UUID, not authenticated identity.
-  - Phase 4 alone performs no mastery updates; Phase 5 adds the policy below.
-
-### Phase 5 — Persistent Learner Mastery
-
-- **Trusted mapping prerequisite:** course Concepts and `evidence_concept_link` annotations must already be curated. Ingestion does not infer concepts. New verified questions freeze their deduplicated same-course mapping from verifier-approved evidence only; existing questions remain unmapped.
-- **Deterministic BKT v1:** initial mastery `0.20`, learn `0.10`, guess `0.20`, slip `0.10`, model version `bkt-v1`. These defaults are **uncalibrated estimates**. Stored mastery is capped at `1 - 1e-12` to avoid absorbing certainty; mastery bands are presentation labels, not diagnoses.
-- **Singleton and first-exposure policy:** exactly one mapped concept and no previous learner/question attempt produces `updated`. Otherwise the attempt persists with `skipped_unmapped`, `skipped_ambiguous`, or `skipped_repeated_question`. Historical Phase 4 attempts count as prior exposure.
-- **Atomic persistence:** attempt, mastery counters/probability, and immutable ordered observations commit together. PostgreSQL insert-on-conflict plus a row lock serializes mastery updates; exposure is rechecked under that lock. Repeats never increment observations or change `last_attempt_id`.
-- **Read-only API:** `GET /courses/{course_id}/learners/{learner_id}/mastery` lists every course concept by name then UUID; appending `/{concept_id}` reads one. Unseen concepts return virtual `0.20` mastery, zero counts, `unseen`, and null timestamps/last attempt. Reads create no state.
-- **Isolation and boundaries:** grading and mastery call no LLM/provider. Course and learner UUID scope every estimate; an opaque learner UUID provides no authentication. Question answers remain hidden until submission.
-- **Verification:** Phase 5 unit/API tests cover mapping, BKT, reads, and rollback. Run `CONCEPTLENS_TEST_POSTGRES=1 .venv/bin/python -m pytest tests/test_mastery_postgres.py` from `backend` for real PostgreSQL concurrency acceptance. It uses disposable schemas on the local development database (or `CONCEPTLENS_TEST_POSTGRES_URL`), without rerunning migrations or changing application rows.
-
-### Phase 6 — Reasoning Debugger
-
-- **Event-scoped hypotheses:** a diagnosis belongs to an existing learner assessment attempt and its still-verified, same-course question. A wrong answer alone never diagnoses a misconception. The observation and tentative hypothesis remain separate, inspectable fields; neither becomes a permanent learner label.
-- **Typed reasoning:** accepts `reasoning_text` (up to 8,000 characters), `reasoning_steps` (up to 20 nonblank steps of 1,000 characters), or both, with a combined 12,000-character limit. Original input is preserved. First-break excerpts must occur verbatim in that input; structured-step indices are zero-based and validated against the submitted steps.
-- **Fail closed:** `no_clear_break`, `insufficient_reasoning`, and `insufficient_evidence` produce no hypothesis or probe. Very short explanations (under 12 trimmed characters) decline without a provider call. Unmapped questions and missing/unusable frozen evidence also decline. Unsupported or tampered model IDs and malformed responses return 502; provider configuration/network failures return 503.
-- **Independent verification:** generation proposes one diagnosis/probe pair; a separate verifier checks the earliest break, tentative interpretation, allowed concept, supporting rule, fresh probe, unique correct answer, and absence of answer leakage. Only approved content persists; verifier-selected evidence replaces generator-selected evidence. Rejected candidates become `no_clear_break` without storing their proposed interpretation.
-- **Server-owned citations:** context starts from the question's verifier-approved evidence IDs, exact frozen citation snapshots, and frozen concept mapping. Existing evidence/source rows are checked for course and provenance consistency. Context is bounded to 10 evidence items, 6,000 characters per item, 24,000 evidence characters, and 64,000 characters per user prompt. This implementation conservatively uses frozen evidence only; it does not retrieve additional evidence when that context is insufficient. Models cannot supply citation objects or source locators.
-- **Existing prerequisite graph only:** public context lists up to 20 actual incoming same-course prerequisite edges for the verified target, in stable UUID order. Missing graph data yields an empty list. No graph or prerequisite lesson is generated.
-- **Diagnostic probe:** one independently verified four-option MCQ tests the suspected reasoning distinction using fresh context. Public creation/GET responses hide its answer key and explanation. Submission grades deterministically, reveals the verified answer/explanation and exact citations, and requires no provider call.
-- **Resolution means evidence, not certainty:** the first valid correct response rejects the hypothesis; an incorrect response confirms it **by this diagnostic probe**. These are not psychological certainties. Unsafe stored probe data resolves `inconclusive` and reveals no unsafe answer. Repeated attempts append audit rows but cannot flip the outcome. PostgreSQL `SELECT FOR UPDATE` serializes submissions; a partial unique index permits only one applied resolution per diagnosis.
-- **Mastery remains separate:** diagnosis and probe processing never modify BKT state or observations. The read-only `cold_start` field is true when the learner has no positive mastery observation count in the course. Cold start remains untested; no new mastery estimate is created.
-- **Atomic, auditable persistence:** diagnosis/probe creation and first resolution each commit as one transaction. Composite foreign keys enforce attempt/diagnosis/probe scope; original assessments and mappings remain untouched. ORM writes protect diagnosis content, probes, and append-only attempts. Whole-course ORM deletion cleans up the aggregate. Direct administrative SQL is outside the ORM immutability boundary.
-- **Routes:** `POST /courses/{course_id}/learners/{learner_id}/reasoning-diagnoses` accepts `attempt_id` and reasoning; `GET .../{diagnosis_id}` returns the public event; `POST .../{diagnosis_id}/probe-attempts` accepts only `selected_option_index`.
-- **Migration:** `0005` adds three Phase 6 tables and a composite unique key on assessment attempts, with no historical diagnosis backfill. Prior migrations remain unchanged. The normal development database is not migrated by acceptance tests.
-- **Acceptance commands** (from `backend`):
-  - `.venv/bin/pytest tests/test_reasoning_diagnosis.py tests/test_api_reasoning_diagnosis.py`
-  - `CONCEPTLENS_TEST_POSTGRES=1 .venv/bin/pytest tests/test_reasoning_diagnosis_postgres.py -k 'not migration_lifecycle'`
-  - `CONCEPTLENS_TEST_MIGRATION_LIFECYCLE=1 .venv/bin/pytest tests/test_reasoning_diagnosis_postgres.py -k migration_lifecycle -s`
-  - PostgreSQL acceptance creates unique disposable databases on the configured test server (optional `CONCEPTLENS_TEST_POSTGRES_URL`), runs actual Alembic migrations, and drops only those databases. The role needs database-creation permission. The lifecycle check preserves representative Phase 5 rows through `0004 → 0005 → 0004 → 0005`.
-
-### Phase 7 — Adaptive learning and Learning Trace
-
-- **Eligibility:** targeted repair starts only from a confirmed, same-course/learner Phase 6 diagnosis with a verified original assessment, frozen target concept, actual confirming diagnostic response, and valid source evidence. Other diagnosis statuses return safe actions without teaching the suspected gap as fact. An unresolved session can start repair after its diagnostic probe confirms the event. Phase 6 history stays unchanged.
-- **Deterministic policy:** `source_explanation` → if confused, `visual_explanation` → if still confused, a real `prerequisite_probe` (or `worked_example` when no prerequisite exists). Understood feedback advances to a **Transfer Check**. Recap/practice returns to a worked example, then Transfer Check. Each strategy is used at most once per session; policy reasons are returned and persisted.
-- **Learner control:** feedback requires the current `intervention_id` and `understood` or `still_confused`. A wrong prerequisite response offers exactly `sixty_second_recap`, `practice_prerequisite`, and `continue_anyway`. The selected choice is stored and honored. A correct prerequisite response proceeds to a worked example without labeling a weakness.
-- **Real prerequisites:** actual same-course edges and concept/evidence links only. Selection ranks lowest observed mastery first, then concept UUID and edge UUID; unseen prerequisites are explicitly untested and sort after observed prerequisites. Selection and all teaching/prerequisite interactions create no mastery updates.
-- **Verified source-grounded repair:** separate generator and authoritative verifier calls must approve every action. The server selects strategy and concepts; the model returns only bounded content and allowlisted evidence UUIDs. Verifier evidence wins. Public citations are built from stored source/evidence provenance. Context is bounded to 10 evidence items, 6,000 characters per item, 24,000 source characters, and 96,000 characters per prompt. Visual payloads contain plain titles, steps, labels, and annotations; executable markup is rejected.
-- **Transfer Check:** one fresh four-option MCQ per session reuses `AssessmentQuestion`, its frozen concept mapping, shared deterministic grading, and ordinary `AssessmentAttempt` records. The verifier checks the same target rule, exactly one supported answer, changed structure, and no repetition/paraphrase of the original, diagnostic, or prior session questions. Exact duplicate stems also fail a server check. Answer keys and explanations are hidden until submission.
-- **Mastery and result:** the first eligible Transfer Check attempt calls the existing Phase 5 BKT service. Repeats append attempts with `skipped_repeated_question`, never replace the resolving attempt, and never advance policy again. Passing completes the session. Failure selects meaningful unused repair; exhaustion recommends `reconsider_diagnosis`, without rewriting the original diagnosis. There is no second Transfer Check in that session.
-- **Learning Trace / Proof:** a typed, read-only persisted chain links observed reasoning, tentative hypothesis, diagnostic responses, interpretation, interventions, Transfer Check resolution, and actual mastery observations. It makes no provider call. Proof flags require corresponding stored verification, valid current provenance, and actual learner-state updates; absent proof remains false.
-- **Atomicity and scope:** session row locks serialize learner actions; diagnosis locking serializes creation. Unique constraints enforce one session per diagnosis, one intervention per strategy/sequence, and one Transfer Check per session. Composite foreign keys constrain course/learner/target/question/edge/attempt relationships. ORM history guards protect content; a PostgreSQL trigger also prevents SQL replacement of a resolved Transfer Check's status or resolving attempt. Whole-course deletion cascades the aggregate.
-- **Failure behavior:** missing trusted evidence or verifier rejection returns 422; invalid/foreign model output returns 502; provider failures return 503. The entire transition rolls back, including attempts and BKT observations if generating the next action fails. No unverified teaching is persisted.
-- **Routes:** prefix `/courses/{course_id}/learners/{learner_id}/learning-sessions`. `POST` accepts `diagnosis_id`; `GET /{session_id}` reads state; `POST /{session_id}/feedback` accepts `intervention_id` and `feedback`; `POST /{session_id}/prerequisite-choice` accepts `intervention_id` and `choice`. Submit `selected_option_index` to `POST /{session_id}/interventions/{intervention_id}/attempts` for prerequisite probe/practice or `POST /{session_id}/transfer-check/attempts`. `GET /{session_id}/trace` returns the proof chain. Session-owned questions must use these scoped submission routes; the ordinary assessment submission route returns 409 for them. Ordinary Phase 4 questions retain their existing behavior.
-- **Migration:** `0006` follows `0005`, adds three tables, scope constraints and the resolution trigger, and performs no backfill. Downgrade removes only these Phase 7 objects/constraints; reusable assessment/attempt/mastery rows remain. Normal development data is not migrated by acceptance tests.
-- **Acceptance** (from `backend`):
-  - `.venv/bin/pytest tests/test_adaptive_learning.py tests/test_api_adaptive_learning.py`
-  - `CONCEPTLENS_TEST_POSTGRES=1 .venv/bin/pytest tests/test_adaptive_learning_postgres.py -k 'not migration_lifecycle'`
-  - `CONCEPTLENS_TEST_MIGRATION_LIFECYCLE=1 .venv/bin/pytest tests/test_adaptive_learning_postgres.py -k migration_lifecycle -s`
-  - PostgreSQL checks reuse the existing disposable-database harness and create/drop only uniquely named test databases. They cover races, scope constraints, immutable resolution, rollback, cascade, and `0005 → 0006 → 0005 → 0006` data preservation.
-- **Limits:** semantic freshness/source support still depend on the independent model verifier; deterministic checks cannot prove arbitrary paraphrase equivalence. Missing trusted prerequisite evidence fails closed. BKT defaults remain uncalibrated. Frontend, formal evaluation/baselines, full short-answer/numerical assessment, image/handwritten reasoning interpretation, and authentication remain unimplemented.
-
-### Explicitly NOT yet implemented
-
-- adaptive difficulty selection from mastery
-- formal evaluation/baselines
-- full short-answer/numerical assessment expansion
-- persistent chat history
-- image/handwritten/screenshot learner-reasoning interpretation (a later multimodal/UI requirement)
-- authentication
-
-### Current limitations
-
-- No legacy .ppt support
-- No SmartArt, chart, or vector-diagram interpretation
-- No WordArt semantics, OLE, or macro interpretation
-- **No OCR** — scanned PDFs produce zero text evidence
-- **No authentication** — all endpoints are open
-- **Stateless Ask** — no conversational follow-up memory; learner state includes concept mastery estimates and event-scoped diagnosis evidence
-
-### NOT implemented (future phases)
-
-- OCR for scanned documents
-- AI descriptions / captions for images
-- persistent conversations
-- adaptive difficulty selection from mastery
-- image/handwritten learner-reasoning interpretation
-- formal evaluation/baselines
-- full short-answer/numerical assessment expansion
-- Authentication / authorization
-
----
+```text
+backend/app/          API, schemas, models and services
+backend/alembic/      Database migrations 0001–0007
+backend/tests/        Unit, API and opt-in PostgreSQL tests
+frontend/src/         Five views, components, API client and state
+frontend/e2e/         Playwright fixture and opt-in live tests
+evaluation/          Frozen datasets, simulator and historical reports
+demo-course/         Authored CPU Scheduling material and isolated demo helper
+docs/phase10/         Historical implementation and verification
+docs/phase11/         Historical demo guide and verification
+docs/submission/      This submission package
+storage/uploads/     Local source storage; not submission assets
+```
 
 ## Prerequisites
 
-- Python 3.12+
-- Docker & Docker Compose (for PostgreSQL)
-- FFmpeg / FFprobe (required for video ingestion)
-- Apple Silicon macOS for the default local MLX Whisper transcription provider
-- [uv](https://docs.astral.sh/uv/) (recommended) or pip
+- Python **3.12+**. The integration checks reused an existing Python 3.14.2 environment read-only. Use an explicit Python 3.12+ executable; check its version before installation.
+- Node **22.12+** and npm; integration checks used Node 26.9.0.
+- Docker with Compose, or a separately configured PostgreSQL 16 database with the `vector` extension available.
+- FFmpeg and FFprobe on `PATH` for MP4 processing. The built-in transcription provider needs Apple Silicon macOS and MLX Whisper. PDF/PPTX workflows do not require video transcription.
+- Initial download access or cached local embedding/Whisper model weights. The default embedding path expects 384 dimensions.
+- Authorized access to a compatible text provider; image-capable access for visual interpretation. Ingestion and inspection can be used without external generation.
 
----
+## Install dependencies and configure the environment
 
-## Environment setup
+Use the reviewed `feature/final-integration` ref on origin. On Suhani's Mac, use the existing `ConceptLens-integration` worktree; do not replace either earlier checkout. [Current local run commands](docs/submission/INTEGRATION_VERIFICATION.md#run-the-reviewed-application) reuse the existing isolated backend.
 
-```bash
-# 1. Clone and enter the repository
-cd ConceptLens
-
-# 2. Copy environment config
-cp .env.example .env
-# Edit .env if you need non-default database credentials
-
-# 3. Create virtual environment and install dependencies
-cd backend
-uv venv --python 3.12 .venv
-source .venv/bin/activate
-uv pip install -e ".[dev]"
-```
-
----
-
-## Database startup
-
-```bash
-# From the repository root
-docker compose up -d
-
-# Verify PostgreSQL is running
-docker compose ps
-```
-
-This starts PostgreSQL 16 with the pgvector extension pre-installed.  The container's port 5432 is mapped to **host port 55432** (localhost only) to avoid conflicts with any existing local PostgreSQL installation.
-
-Default connection: `postgresql+asyncpg://conceptlens:conceptlens@localhost:55432/conceptlens`
-
-> **`.env` location:** The `.env` file lives at the **repository root** (`ConceptLens/.env`), not inside `backend/`.  The application resolves this path automatically regardless of your working directory.
-
----
-
-## Migration commands
-
-```bash
-cd backend
-source .venv/bin/activate
-
-# Run all migrations (initialize a clean database)
-alembic upgrade head
-
-# Check current migration status
-alembic current
-
-# Downgrade one revision
-alembic downgrade -1
-```
-
----
-
-## Backend startup
-
-```bash
-cd backend
-source .venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API is then available at `http://localhost:8000`.
-
-API docs: `http://localhost:8000/docs` (Swagger UI)
-
----
-
-## Test commands
-
-Tests run against an in-memory SQLite database — no PostgreSQL required.
-
-```bash
-cd backend
-source .venv/bin/activate
-pytest tests/ -v
-```
-
----
-
-## Directory overview
-
-```
-ConceptLens/
-├── backend/
-│   ├── app/
-│   │   ├── api/            # Route handlers (health, courses, sources)
-│   │   ├── core/           # Configuration (settings from env vars)
-│   │   ├── db/             # Database engine, session, base model
-│   │   ├── models/         # SQLAlchemy ORM models
-│   │   ├── schemas/        # Pydantic request/response schemas
-│   │   ├── services/       # Ingestion, embeddings, indexing, and hybrid retrieval
-│   │   └── main.py         # FastAPI app entry point
-│   ├── tests/              # Pytest test suite
-│   │   └── fixtures/       # Programmatic PDF fixture factory
-│   ├── alembic/            # Database migrations
-│   ├── alembic.ini         # Alembic configuration
-│   └── pyproject.toml      # Python project & dependencies
-├── frontend/               # React/TypeScript evidence and learning workspace
-├── worker/                 # (future) Ingestion/background worker
-├── evaluation/             # (future) Evaluation runner
-├── storage/
-│   ├── uploads/            # Uploaded source files
-│   └── derived/            # Extracted artifacts (images, etc.)
-├── demo-course/            # (future) Demo course data
-├── docs/                   # (future) Documentation
-├── docker-compose.yml      # PostgreSQL + pgvector
-├── .env.example            # Environment variable template
-└── CLAUDE.md               # Engineering constitution
-```
-
----
-
-## API endpoints
-
-| Method | Path                                                          | Description               |
-|--------|---------------------------------------------------------------|---------------------------|
-| GET    | `/health`                                                     | Health check              |
-| POST   | `/courses`                                                    | Create a course           |
-| GET    | `/courses`                                                    | List all courses          |
-| GET    | `/courses/{course_id}`                                        | Get a single course       |
-| POST   | `/courses/{course_id}/sources`                                | Upload a source file      |
-| GET    | `/courses/{course_id}/sources`                                | List sources for a course |
-| POST   | `/courses/{course_id}/sources/{source_version_id}/process`    | Process a supported source |
-| POST   | `/courses/{course_id}/retrieval/index`                       | Index searchable evidence |
-| POST   | `/courses/{course_id}/retrieval/search`                      | Hybrid evidence search    |
-
----
-
-## Known limitations
-
-- **No Docker in CI/dev environment**: Migrations require a running PostgreSQL instance started via `docker compose up -d`. Tests use in-memory SQLite and do not require PostgreSQL.
-- **Supported processing formats**: PDF, PPTX, and MP4 video. Legacy `.ppt` is not supported.
-- **No OCR**: Scanned PDFs produce zero text evidence — no text is fabricated.
-- **Video visual semantics**: Video frames are grounded to real decoded-frame timestamps, but Phase 1C does not yet perform OCR, captioning, diagram interpretation, or other visual semantic analysis.
-- **Image semantic retrieval**: Raster image EvidenceUnits without a real `extracted_description` are intentionally not embedded or semantically searchable yet.
-- **No authentication**: All endpoints are open.
-- **Duplicate detection is per-course**: The same file uploaded to different courses creates separate records.
-- **No file-size limits enforced at the application level**: Large uploads are accepted (rely on reverse proxy limits in production).
-
-## Phase 9 — evaluation
-
-The isolated [evaluation harness](evaluation/README.md) adds a versioned PDF/PPTX/video grounding benchmark, genuine RAGAS 0.4.3 metrics, deterministic citation/refusal checks, and reproducible multi-session simulations comparing **FIXED**, **SIMPLE ADAPTIVE**, and **CONCEPTLENS** using production policy decisions. It changes no product behavior and uses only disposable PostgreSQL databases or memory.
-
-See the [judge report](evaluation/reports/judge/report.md) and [Phase 10 handoff](evaluation/reports/judge/phase10-handoff.json). Current real grounding scores are **pending provider configuration**; personalization results are explicitly **simulation**, not real student learning gains.
+For a new standalone checkout, from the repository root (do not reinstall into the read-only shared Python environment used by this local integration):
 
 ```sh
-PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval validate-dataset
-PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval simulate
-PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval grounding
-PYTHONPATH=evaluation:backend backend/.venv/bin/python -m conceptlens_eval report
+# Preserve any existing local environment file.
+test -e .env || cp .env.example .env
+python3.12 -m venv backend/.venv
+backend/.venv/bin/python -m pip install -e './backend[dev]'
+cd frontend
+npm ci
+cd ..
 ```
+
+Use an installed Python 3.12+ executable if it has another name. Do not replace an existing virtual environment without first checking it. Edit the untracked root `.env` locally; never publish its contents. The application resolves that file from the repository root regardless of the current directory.
+
+```dotenv
+# Repository-provided local development database defaults only.
+CONCEPTLENS_DATABASE_URL=postgresql+asyncpg://conceptlens:conceptlens@127.0.0.1:55432/conceptlens
+CONCEPTLENS_UPLOAD_DIR=../storage/uploads
+CONCEPTLENS_DEBUG=false
+CONCEPTLENS_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+CONCEPTLENS_EMBEDDING_DIMENSIONS=384
+CONCEPTLENS_EMBEDDING_BATCH_SIZE=32
+```
+
+Start the backend from `backend/` so the relative upload path resolves correctly. Database credentials above are the defaults in the checked-in Compose file, not production credentials. The 384-dimensional embedding provider/schema must remain compatible; simply changing a dimension setting does not migrate stored vectors.
+
+### Model API and gateway configuration
+
+Choose the mode authorized for your environment; this documentation does not change routing. The current [.env.example](.env.example) documents compatible mode but omits the newer direct-mode settings.
+
+**Compatible gateway (default):** add these backend-only settings, substituting real authorized values. Leaving the three required fields empty yields an unavailable-provider state.
+
+```dotenv
+CONCEPTLENS_PROVIDER_MODE=compatible
+CONCEPTLENS_LLM_BASE_URL=https://YOUR_AUTHORIZED_GATEWAY.example/v1
+CONCEPTLENS_LLM_API_KEY=YOUR_BACKEND_ONLY_KEY
+CONCEPTLENS_LLM_MODEL=YOUR_AUTHORIZED_TEXT_MODEL
+CONCEPTLENS_LLM_TIMEOUT_SECONDS=45
+CONCEPTLENS_VISION_MODEL=YOUR_AUTHORIZED_IMAGE_MODEL
+```
+
+The text adapter appends `/chat/completions`; supply the base URL, not that full route. The provider must support the adapter's structured JSON contract; image interpretation additionally needs an image-capable endpoint. Separate generator/verifier calls share the configured provider/model in this mode. Health checks, including an OmniRoute health response, do not establish successful completion.
+
+**Direct mode implemented in this branch:**
+
+```dotenv
+CONCEPTLENS_PROVIDER_MODE=direct_openai
+CONCEPTLENS_OPENAI_API_KEY=YOUR_BACKEND_ONLY_KEY
+```
+
+The adapter also supports an exported `OPENAI_API_KEY` fallback. It calls the Responses endpoint directly. Its checked-in tier strings are `gpt-6-luna` for light work, `gpt-6.1-sol` for standard work and `gpt-6-astra` for deep verification. These are **source-code configuration facts, not a statement of public model availability or account entitlement**. Confirm authorized access to the exact identifiers before using this path. Concise `just_answer` Ask uses light; other Ask modes and normal generation use standard; separate assessment, diagnosis, teaching and visual verification use deep where wired. The direct adapter's default timeout is 75 seconds; the compatible-mode timeout setting is not forwarded to it.
+
+Keep keys in backend settings. `VITE_` variables are public build-time values. No private network address, tunnel credential or management token is needed in submission documentation. Do not enable `TESTING=1` or `USE_FAKE_EMBEDDING=1` for a real demo.
+
+## Database and local servers
+
+Start the supplied database from the repository root:
+
+```sh
+docker compose up -d db
+```
+
+Compose binds PostgreSQL to loopback port **55432**, avoiding the common local 5432 conflict. It uses a persistent volume. For a new intended local database, create the schema:
+
+```sh
+cd backend
+.venv/bin/alembic upgrade head
+.venv/bin/alembic current
+```
+
+The inspected migration head is **0007**. Alembic uses the root environment configuration. A separate PostgreSQL installation must permit the migration to create/use pgvector. Do not downgrade or reset a database to prepare a demo; preserve existing records and review pending migrations before applying them to an existing database.
+
+Backend terminal, from the repository root:
+
+```sh
+cd backend
+.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8001
+```
+
+Frontend terminal, from the repository root:
+
+```sh
+cd frontend
+npm run dev
+```
+
+Open `http://127.0.0.1:5174`. API docs: `http://127.0.0.1:8001/docs`. `/health` reports the API process status only, not database or model readiness. Vite forwards `/api` to port 8001, removing the prefix. `CONCEPTLENS_API_PROXY_TARGET` overrides that development proxy target; optional `VITE_API_BASE_URL` overrides the browser API prefix. The production build does not provide Vite's development proxy.
+
+## Try the application
+
+1. In Workspace, create a course and upload supported material. Click **Process**, then **Index course material**. Uploading alone does not make evidence searchable.
+2. Open **Inspect source evidence** and the exact page, slide or timestamp. If using a real configured vision provider, **Interpret and verify visual**, then explicitly re-index accepted descriptions.
+3. In Ask, ask a question supported by that material and inspect the citations. A refusal is different from a provider error; neither is a generated answer.
+4. With curated concept/evidence mappings and an authorized working provider, use Learn and Practice, submit actual responses and reasoning, then inspect Learning Trace and Dashboard. There is no general concept-authoring UI; manual upload alone does not create the demo's curated prerequisites.
+
+For the authored CPU Scheduling course, the existing helper creates a disposable database, actual PDF, real embeddings and curated metadata. It creates no learner attempts or fake assessment history. To use it without external generation, from the repository root:
+
+```sh
+CONCEPTLENS_PROVIDER_MODE=compatible \
+CONCEPTLENS_OPENAI_API_KEY='' OPENAI_API_KEY='' \
+CONCEPTLENS_EVAL_ADMIN_URL='postgresql+asyncpg://conceptlens:conceptlens@127.0.0.1:55432/postgres' \
+backend/.venv/bin/python demo-course/prepare.py --serve
+```
+
+Then start Vite with `CONCEPTLENS_API_PROXY_TARGET=http://127.0.0.1:8100 npm run dev` from `frontend/`. Stop Vite, then Ctrl-C the helper when finished; the helper removes its own temporary database and storage. Ports must be free.
+
+**Helper caveat:** it predates direct routing. It clears compatible-provider fields by default but does not override `provider_mode` or direct API credentials. The command above explicitly forces compatible mode. For a live compatible-provider rehearsal, securely export the three required compatible settings, retain `CONCEPTLENS_PROVIDER_MODE=compatible`, and add `--with-provider`. That flag currently requires compatible settings even if direct mode was selected. Do not invent dummy gateway fields to bypass it; use the normal local setup for direct-mode testing. Reconcile this caveat with the final integrated source before recording.
+
+See the [4:40 script](docs/submission/DEMO_VIDEO_SCRIPT.md) and [historical detailed demo guide](docs/phase11/demo-guide.md). The historical guide's claims about provider isolation and a shared verifier model need the mode-specific qualifications above.
+
+## Tests
+
+From the repository root, run ordinary backend tests with external configuration cleared:
+
+```sh
+CONCEPTLENS_PROVIDER_MODE=compatible \
+CONCEPTLENS_LLM_BASE_URL='' CONCEPTLENS_LLM_API_KEY='' CONCEPTLENS_LLM_MODEL='' \
+CONCEPTLENS_VISION_MODEL='' CONCEPTLENS_OPENAI_API_KEY='' OPENAI_API_KEY='' \
+CONCEPTLENS_DATABASE_URL='sqlite+aiosqlite:///' \
+backend/.venv/bin/pytest -q backend/tests
+```
+
+These tests use SQLite and fake/injected model or embedding I/O; opt-in PostgreSQL suites are skipped by default. They are not real-provider acceptance.
+
+```sh
+cd frontend
+npm test
+npm run typecheck
+npm run lint
+npm run build
+# If a Playwright browser is not already installed:
+npx playwright install chromium
+CI=1 npm run test:e2e
+```
+
+Fixture Playwright journeys exercise UI states at desktop/mobile sizes. The acceptance live-backend case is opt-in; the Observatory suite also includes a read-only live route check. Keep port 5174 free for the default test server. Integration testing used an ignored configuration on port 5175 to preserve the existing frontend, with the real isolated API on 8001. Do not stop someone else's server or silently reuse an unknown backend.
+
+For a disposable real-ingestion browser smoke, use the helper command above with `--browser-smoke` instead of `--serve`; it starts the necessary servers and tests. This requires PostgreSQL, cached/downloadable embeddings and a browser, and still does not certify real generation. For optional evaluation/database suites and their separate locked framework environment, follow [evaluation/README.md](evaluation/README.md). No benchmark rerun is required simply to try the app.
+
+Integration review: **590 ordinary backend tests passed; all 23 opt-in PostgreSQL/migration tests passed separately; 55 frontend unit tests and 20 browser tests passed; typecheck, lint and build passed.** Four browser cases used the real existing backend for page/data checks. A fresh disposable API run verified PDF ingestion, real cached embeddings, retrieval and previews. See [integrated verification](docs/submission/INTEGRATION_VERIFICATION.md) for test scope, commands and limitations. The follow-up publication audit and clean-install checks **passed** at `9961bc3`: fresh npm/pip installs, production build, dependency consistency and a disposable backend migration/ingestion/retrieval/preview smoke. These checks used Apple Silicon macOS, existing PostgreSQL and cached model weights; fresh Docker/model downloads and other platforms were not tested. Live OmniRoute AI completion and the downstream generated learning journey remain **unverified**. See [publication and clean-install results](docs/submission/INTEGRATION_VERIFICATION.md#publication-and-clean-install-follow-up).
+
+## Limitations and troubleshooting
+
+| Symptom or limit | What to check |
+| --- | --- |
+| Course loading fails | Backend process, database connection and Vite proxy target; `/health` alone does not check the database. |
+| Port is occupied | Use the intended server/port after identifying it. Do not kill an unrelated process. |
+| Nothing is retrieved | Source processing status, explicit indexing, embedding model availability and supported source evidence. |
+| Model unavailable or completion times out | Selected mode, authorized model access, endpoint contract and actual completion response. Network/gateway health is not proof of generation. |
+| Images extracted but not searchable | Interpretation must be accepted, then explicitly re-indexed. Extraction is not verified semantic understanding. |
+| MP4 transcription fails | FFmpeg/FFprobe, Apple Silicon MLX Whisper and model download/cache availability. Other platforms need an implemented alternative provider. |
+| No concept/mastery change | Curated mappings, a fresh eligible verified question and a gradable attempt. Repeats, ambiguous mappings and ungradable responses may be excluded. |
+| PPTX looks different | Preview approximates source content; complex charts, groups, themes and effects may be omitted. Open the original file. |
+
+No general scanned-PDF OCR, PDF region highlighting, handwritten learner reasoning, durable chat history or authentication is implemented. Keep the unauthenticated prototype local. BKT defaults are uncalibrated and small-sample estimates provisional. Scheduling models one CPU with integer ticks and no context-switch overhead. Real AI acceptance, real vision quality and real grounding scores remain pending; simulations are not student outcome evidence.
+
+## Evaluation: evidence and trade-offs
+
+Two separate tracks measure grounding and simulated personalization. Grounding uses a frozen authored PDF/PPTX/video benchmark, deterministic citation/refusal checks and RAGAS 0.4.3. **Real framework results are pending, not zero.** Positive/negative framework fixtures test the metric implementation; they are not product quality measurements.
+
+**SIMULATED PERSONALIZATION RESULT** — the historical [Phase 10 post-change run](evaluation/reports/post-phase10-simulation.json), 120 learner identities, 480 sessions per policy:
+
+| Metric | Fixed | Simple Adaptive | ConceptLens |
+| --- | ---: | ---: | ---: |
+| Held-out transfer success | 57.92% | 60.00% | 59.38% |
+| Interventions per successful transfer (lower is cheaper) | 5.18 | 6.87 | 7.12 |
+| Exact question repetition | 33.33% | 33.82% | 17.29% |
+| Session completion | 58.13% | 86.25% | 58.96% |
+| Simulated latent mastery gain | +0.1958 | +0.2260 | +0.2123 |
+| BKT absolute tracking error | 0.2439 | 0.2609 | 0.2540 |
+
+ConceptLens slightly exceeds Fixed transfer and remains slightly below Simple Adaptive. It repeats fewer exact questions, but uses more interventions per successful transfer. This is **not a real student study**, a claim of statistical significance, or evidence of universal superiority. Latent learning gains depend on published simulator assumptions. Template repetition remains high; the raw artifact and [methodology](evaluation/README.md) expose the full metrics and uncertainty.
+
+Phase 9 results and Phase 10 pre/post artifacts are historical records. Phase 11 preserves the frozen benchmark inputs, policy adapter and result artifacts. [Phase 10 implementation notes](docs/phase10/implementation.md) describe that earlier acceptance state.
+
+
+## Contributors
+
+| Real full name | Contribution | Devpost account |
+| --- | --- | --- |
+| `MEMBER_1_FULL_NAME` | `CONFIRMED_CONTRIBUTION` | `MEMBER_1_DEVPOST_URL` |
+| `MEMBER_2_FULL_NAME_IF_APPLICABLE` | `CONFIRMED_CONTRIBUTION` | `MEMBER_2_DEVPOST_URL` |
+
+Confirm the final roster of 1–4 members; add/remove rows accordingly. Do not infer full names from machine paths or Git handles.
+
+## AI coding-assistant disclosure
+
+**OpenAI Codex** was used for the following evidenced parts of this project work:
+
+- Reviewing the Concept Observatory frontend code and investigating React/FastAPI and model-gateway connectivity.
+- Writing local verification tooling, integrating the frontend/backend/documentation contributions, running automated checks, and reviewing clean-install and publication-safety results.
+- Drafting and revising the README, setup instructions, Devpost description, architecture notes, demo script, verification records and submission checklist.
+
+This disclosure identifies the assistance evidenced in the reviewed work; it does not attribute every original application component to Codex. The project team is responsible for reviewing the resulting code, documentation and submission claims. Coding assistance and passing fixture tests do not establish successful live OmniRoute AI completion.
