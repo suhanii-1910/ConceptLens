@@ -1,6 +1,6 @@
 # ConceptLens architecture
 
-**Source-reviewed draft · commit `9fe1751` · 14 October 2026.** These diagrams describe the accessible implementation. They do not certify a successful real-provider journey or the unavailable Concept Observatory frontend. See [verification](VERIFICATION.md) and [repository provenance](INDEX.md).
+**Integrated source review · merge `16d208c` · 14 October 2026.** The Observatory frontend is integrated; backend behavior is unchanged. These diagrams describe implementation, not successful real-provider generation. See [integration verification](INTEGRATION_VERIFICATION.md) and [repository provenance](INDEX.md).
 
 ## 1. Application structure
 
@@ -28,7 +28,7 @@ flowchart TD
 
 The backend is a modular monolith, not a microservice or distributed-agent deployment. FastAPI mounts course/source, retrieval, Ask, assessment, mastery, diagnosis, adaptive-learning, preview, visual-evidence and report routers. SQLAlchemy models and Alembic migrations define persistence; migration head is `0007`.
 
-The frontend uses React Router for exactly five principal routes. Workspace manages sources; Ask presents grounded answers; Learn hosts reasoning and adaptive sessions; Practice exposes assessments and diagnostics; Dashboard presents concept/mastery/report data. Shared components render source previews, reasoning, teaching and Learning Trace.
+The frontend adds the decorative Observatory introduction and uses React Router for exactly five principal learning routes. Its concept explorer renders recorded API relationships and source uncertainty, not inferred learner mastery. Workspace manages sources; Ask presents grounded answers; Learn hosts reasoning and adaptive sessions; Practice exposes assessments and diagnostics; Dashboard presents concept/mastery/report data. Shared components render source previews, reasoning, teaching and Learning Trace.
 
 The browser stores a learner UUID and journey references scoped to learner/course. This identifier is not authentication. Course ownership checks provide internal data-scope boundaries, not an authenticated multi-user security model. The development proxy removes `/api`; the API routes themselves do not use that prefix.
 

@@ -2,7 +2,7 @@
 
 **Learn anything. Debug your understanding.**
 
-> Review draft based on accessible commit `9fe1751`. The final Concept Observatory frontend is awaiting source reconciliation. Generated AI workflows remain pending live verification. Retain these limitations in the published description unless newer evidence supports an update.
+> Integrated review at merge `16d208c`. The Concept Observatory frontend and backend/documentation contributions are combined locally. Generated AI workflows remain blocked by unresolved gateway completion timeouts; automated success does not establish live AI success.
 
 ## Inspiration: an answer is not proof of understanding
 
@@ -64,15 +64,15 @@ The CPU Scheduling showcase illustrates the difference. Under shortest remaining
 
 ## Verified accomplishments
 
-The accessible checkout passed **590 backend tests, with 23 skipped**, and **52 frontend tests** during the documentation review. Frontend typecheck, lint and production build also passed. These are software checks, including fixtures, rather than measurements of teaching quality.
+The integrated checkout passed **590 ordinary backend tests**, plus all **23 PostgreSQL/migration tests** in separate disposable databases, **55 frontend unit tests** and **20 desktop/mobile browser tests**. Frontend typecheck, lint and production build passed. Four browser cases exercised the real isolated backend for all-five-route page/data checks; the remaining cases validate UI behavior with fixtures or interface assertions. These are software checks, not measurements of teaching quality.
 
-An earlier checked-in runtime report records real PDF processing, local embeddings, supported retrieval, an exact-page preview and two browser smoke cases against FastAPI. It also records honest provider-unconfigured responses. Its eight fixture browser cases establish UI behavior, not a real AI learning journey. These results predate the unavailable Observatory work and do not certify that frontend.
+A fresh disposable API run verified real PDF processing, eight cached-model embeddings from nine evidence units, supported retrieval, an exact-page preview, three explicitly curated concepts and one prerequisite. It created no learner attempts. Ask, assessment generation and visual interpretation correctly returned 503 with providers deliberately unconfigured for that test process. This does not establish that the existing gateway can complete a model request. Disposable database cleanup was verified.
 
-See [verification details](VERIFICATION.md) for dates, scope and pending gates. No real-student learning improvements, production-scale performance or successful live AI workflow is claimed.
+See [integration verification details](INTEGRATION_VERIFICATION.md) for dates, scope and pending gates. No real-student learning improvements, production-scale performance or successful live AI workflow is claimed.
 
 ## Limitations and next steps
 
-Our immediate work is to reconcile the final Observatory source, verify the selected provider route and record an authentic end-to-end demonstration. Real grounding evaluation and vision quality remain pending. Existing personalization simulations are engineering experiments, not student studies or evidence of superiority.
+Our immediate work is to resolve the completion blocker in the existing provider route and record an authentic demonstration with each remaining limitation disclosed. Real grounding evaluation and vision quality remain pending. Existing personalization simulations are engineering experiments, not student studies or evidence of superiority.
 
 Concept/evidence mappings and prerequisites currently require curation. PPTX previews approximate some layouts, scanned-PDF OCR is absent, and the prototype has no authentication or production deployment. Future development should improve source authoring and format coverage, calibrate mastery with appropriate evidence, and evaluate educational outcomes with real learners before making impact claims.
 
@@ -82,4 +82,4 @@ Concept/evidence mappings and prerequisites currently require curation. PPTX pre
 
 **Team:** `MEMBER_1_FULL_NAME` — `MEMBER_1_DEVPOST_URL`; add each confirmed member, up to four.
 
-Before pasting into Devpost, replace placeholders and replace the relative verification link with the final public repository link to `docs/submission/VERIFICATION.md`.
+Before pasting into Devpost, replace placeholders and replace the relative verification link with the final public repository link to `docs/submission/INTEGRATION_VERIFICATION.md`.

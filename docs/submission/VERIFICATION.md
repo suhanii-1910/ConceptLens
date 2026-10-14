@@ -1,5 +1,7 @@
 # ConceptLens verification record
 
+**Historical documentation review retained below.** The newer [integration verification](INTEGRATION_VERIFICATION.md) supersedes the earlier missing-Observatory and occupied-browser-port blockers. Earlier counts and failed commands remain historical evidence, not the latest results.
+
 **Documentation review: 14 October 2026 (Asia/Kolkata).** Inspected HEAD: `9fe1751b6f7242308739b47135ce0ff2204d98e3`, branch `feature/direct-openai-router`. This is not a verification record for Suhani's unavailable `feature/uiux-observatory-fieldnotes` worktree.
 
 ## Evidence categories

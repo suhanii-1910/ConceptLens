@@ -1,17 +1,19 @@
 # ConceptLens demo guide
 
+Current integration setup and provider-mode caveats: see the [root README](../../README.md) and [integration verification](../submission/INTEGRATION_VERIFICATION.md). This older guide is not evidence of a successful live model completion.
+
 **Objective:** show how ConceptLens uses learner evidence to choose the next learning action and makes that decision inspectable. The CPU Scheduling story tests whether a learner compares remaining time rather than original burst.
 
 **Acceptance status:** real local ingestion, indexing, source preview and live browser smoke are recorded in [verification.json](verification.json). Real text/vision provider acceptance is **PENDING CONFIGURATION**. This guide is a reproducible rehearsal procedure, not a claim that a live provider journey has already passed.
 
 ## Pre-demo checklist
 
-- Install the [root README prerequisites](../../README.md#local-setup), backend dependencies, frontend dependencies and a Playwright browser.
+- Install the [root README prerequisites](../../README.md#prerequisites), backend dependencies, frontend dependencies and a Playwright browser.
 - Start PostgreSQL with `docker compose up -d`. Do not reset, seed or migrate the normal `conceptlens` database for acceptance.
 - Confirm the local embedding model is cached or downloadable. This helper uses the real sentence-transformers adapter, never fake embeddings. `HF_HUB_OFFLINE=1` can prevent downloads when the model is already cached.
-- Ports 8100 (disposable API) and 5173 (Vite) must be free. The helper fails instead of stopping someone else's server. `--port` changes the API port; update the Vite target accordingly.
+- Ports 8100 (disposable API) and 5174 (Vite) must be free. The helper fails instead of stopping someone else's server. `--port` changes the API port; update the Vite target accordingly.
 - For real generation, export `CONCEPTLENS_LLM_BASE_URL`, `CONCEPTLENS_LLM_API_KEY` and `CONCEPTLENS_LLM_MODEL` securely into the helper's process environment. Add `CONCEPTLENS_VISION_MODEL` for images. The adapter appends `/chat/completions` to the base URL. All credentials stay server-side.
-- Independent generator/verifier calls currently share the configured model. A provider must support the required strict JSON responses; vision must accept image content. Do not assume provider compatibility from an endpoint URL alone.
+- In compatible mode, separate generator/verifier calls share the configured model; direct-mode tier routing differs. A provider must support the required strict JSON responses; vision must accept image content. Do not assume provider compatibility from an endpoint URL alone.
 - Use a fresh browser profile or “Reset demo learner” to avoid prior learner references. This changes the local learner UUID; it does not delete evidence.
 - Before recording, rehearse once with real providers and inspect the actual citations, verification statuses, grading and trace. Record failures honestly. Do not repeatedly tune prompts against frozen evaluation test outcomes.
 
@@ -24,7 +26,7 @@ export CONCEPTLENS_EVAL_ADMIN_URL='postgresql+asyncpg://conceptlens:conceptlens@
 backend/.venv/bin/python demo-course/prepare.py --serve --with-provider
 ```
 
-For a provider-unconfigured demonstration, omit `--with-provider`. The helper explicitly disables external providers by default, including settings in the application's `.env`. With `--with-provider`, it requires the three text settings exported in the process environment; it never prints their values.
+For a provider-unconfigured demonstration, omit `--with-provider` and explicitly set `CONCEPTLENS_PROVIDER_MODE=compatible CONCEPTLENS_OPENAI_API_KEY='' OPENAI_API_KEY=''` for that helper process. The helper clears compatible-provider fields, but predates direct routing and does not clear direct-mode settings by itself. With `--with-provider`, explicitly select compatible mode and securely export the three compatible text settings; it never prints their values. See the root README for the direct-mode limitation.
 
 In a second terminal:
 
@@ -33,7 +35,7 @@ cd frontend
 CONCEPTLENS_API_PROXY_TARGET=http://127.0.0.1:8100 npm run dev
 ```
 
-Open `http://127.0.0.1:5173/workspace` and select **CPU Scheduling — disposable demo**. Keep the helper running throughout the rehearsal. On completion, stop Vite, then Ctrl-C the helper. It stops its backend and deletes its own temporary storage and database. Each invocation starts a new isolated course rather than accumulating duplicates in an existing database. Do not expect demo data to survive shutdown.
+Open `http://127.0.0.1:5174/workspace` and select **CPU Scheduling — disposable demo**. Keep the helper running throughout the rehearsal. On completion, stop Vite, then Ctrl-C the helper. It stops its backend and deletes its own temporary storage and database. Each invocation starts a new isolated course rather than accumulating duplicates in an existing database. Do not expect demo data to survive shutdown.
 
 ### What preparation actually does
 

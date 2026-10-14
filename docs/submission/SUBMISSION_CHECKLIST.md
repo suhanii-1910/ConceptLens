@@ -1,12 +1,12 @@
 # ConceptLens submission checklist
 
-**Review draft · 14 October 2026.** Official requirements below come from the user-supplied guideline summary. No separate official deadline or event URL was available. The additional review tasks are project-quality gates, not invented hackathon rules.
+**Integrated review · 14 October 2026; publication approval pending.** Official requirements below come from the user-supplied guideline summary. No separate official deadline or event URL was available. The additional review tasks are project-quality gates, not invented hackathon rules.
 
 ## Official submission requirements
 
 - [ ] Devpost project description completed, reviewed against final source, and pasted into the project. [Full draft](DEVPOST_DESCRIPTION.md) exists; final reconciliation remains open.
 - [ ] Public GitHub repository reviewed and accessible while signed out.
-- [ ] README covers prerequisites, dependencies, environment, frontend/backend setup and running instructions; setup instructions verified on the final integrated revision. [Proposed README](README_REVIEW_DRAFT.md) is ready for review, with assets pending.
+- [ ] README covers prerequisites, dependencies, environment, frontend/backend setup and running instructions; setup instructions verified on the final integrated revision. [Canonical README](../../README.md) has been reconciled; a clean-clone installation and final assets remain pending.
 - [ ] Source code committed and pushed to the intended public repository **after approval**.
 - [ ] Demo recorded showing the actual project working.
 - [ ] Video duration is between **3 and 10 minutes**; the [script](DEMO_VIDEO_SCRIPT.md) targets 4:40.
@@ -38,7 +38,7 @@ Remove unused rows. Priyanshu and Suhani are known first names from the task, no
 | Item | Value / status |
 | --- | --- |
 | Intended repository | https://github.com/suhanii-1910/ConceptLens — public visibility unconfirmed |
-| Final submission branch/ref | `FINAL_INTEGRATED_REF_PENDING` |
+| Final submission branch/ref | `feature/final-integration` (local only; push approval pending) |
 | Full final commit | `FINAL_COMMIT_SHA_PENDING` |
 | Devpost project | `DEVPOST_PROJECT_URL_PENDING` |
 | YouTube demonstration | `YOUTUBE_URL_PENDING` |
@@ -48,7 +48,7 @@ Remove unused rows. Priyanshu and Suhani are known first names from the task, no
 ## Documentation package status
 
 - [x] Complete Devpost narrative drafted.
-- [x] README replacement proposed separately; existing README preserved.
+- [x] README proposal reconciled into the root README; original proposal retained in Git history.
 - [x] Architecture documentation includes five source-supported Mermaid flows.
 - [x] Verification record separates current checks, historical evidence, fixtures and pending AI workflows.
 - [x] Full timed English demo script includes exact narration, navigation and failure alternatives.
@@ -58,15 +58,15 @@ Remove unused rows. Priyanshu and Suhani are known first names from the task, no
 
 ## Final project review — team tasks, not additional event rules
 
-- [ ] Obtain Suhani's final Observatory branch/commit and any reviewed uncommitted changes, plus integration/runtime reports. Follow the [handoff plan](INDEX.md#safe-handoff).
+- [x] Merge the committed Observatory contribution with backend/documentation in an isolated worktree; preserve unrelated local files. See [integration verification](INTEGRATION_VERIFICATION.md).
 - [ ] Confirm the actual model route and authorized access; reconcile the old demo helper and environment template documentation with the final source.
-- [ ] Re-run final build, lint, unit and browser checks; resolve the occupied test port without stopping unrelated work.
-- [ ] Reproduce course creation/loading, ingestion, indexing, previews, concept relationships and React/FastAPI connectivity on the final build.
+- [x] Run integrated build, lint, unit, PostgreSQL/migration and browser checks; use port 5175 without stopping existing services.
+- [x] Verify live route/course loading against the existing isolated API, plus fresh ingestion/indexing/previews/concept relationships in a disposable API run.
 - [ ] Record actual Ask completion, generation/verification, diagnosis, teaching, grading, transfer and eligible mastery update outcomes separately. If a workflow remains unavailable, retain that limitation in the description and video.
 - [ ] Preserve the earlier gateway timeout status unless newer reliable completion evidence supersedes it. Health endpoints alone do not clear this gate.
 - [ ] Verify real vision interpretation separately from image extraction if claiming vision success.
 - [ ] Do not promote fixture or simulation results into live-model or real-student achievements.
 - [ ] Review all publication files for credentials, private network information, management tokens and sensitive logs.
-- [ ] Adopt README improvements after review; fix relative link prefixes when moving the draft to the root, then check all Markdown/image links.
+- [x] Adopt README improvements and fix link prefixes; validate local documentation links.
 - [ ] Fill team, YouTube, Devpost, final-source and deadline placeholders consistently.
-- [ ] Obtain explicit approval before commit, push, merge or deployment. This documentation task performed none of those actions; deployment is not one of the supplied mandatory requirements.
+- [ ] Obtain next approval before pushing the integration branch, merging into main, changing visibility or deploying. The local integration merge and documentation changes were authorized; deployment is not one of the supplied mandatory requirements.
