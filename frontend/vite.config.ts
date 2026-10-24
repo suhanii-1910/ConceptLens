@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import type { PluginOption } from "vite";
 
 const frontendRoot = dirname(fileURLToPath(import.meta.url));
 
@@ -19,7 +20,7 @@ export default defineConfig(async ({ command }) => {
     process.env.VITEST !== "true" &&
     process.env.CONCEPTLENS_SUMMON === "1";
 
-  const plugins = [react()];
+  const plugins: PluginOption[] = [react()];
   let summonRoot: string | undefined;
 
   if (summonEnabled) {
@@ -42,7 +43,9 @@ export default defineConfig(async ({ command }) => {
 
     const { summonFixer } = await import(pathToFileURL(vitePluginFile).href);
     // Instrument before React's transformation; never affect production builds.
-    plugins.unshift(summonFixer({ workspaceRoot: frontendRoot }));
+    // Vite 7 and Vite 8 ship different Plugin type declarations; the runtime
+    // compatibility check is part of the opt-in smoke test.
+    plugins.unshift(summonFixer({ workspaceRoot: frontendRoot }) as unknown as PluginOption);
   }
 
   return {
